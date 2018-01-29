@@ -14,6 +14,10 @@ namespace UMS.Core
         public const string MENU_ITEM_ROOT = "Modding";
         public const string MENU_SERIALIZATION = "Serialization";
 
+        public static string SanitizeExtension(string extension)
+        {
+            return extension.TrimStart('.');
+        }
         public static List<Member> GetMembers(object obj)
         {
             List<Member> members = new List<Member>();

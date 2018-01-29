@@ -3,7 +3,6 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.IO;
 using Ionic.Zip;
 using UMS.Serialization;
 
@@ -14,45 +13,60 @@ namespace UMS.Core
     {
         public Mod(string name)
         {
+            _hashToID = new Dictionary<int, int>();
             _data = new List<ModData>();
-            _objects = new Dictionary<int, object>();
+            _idToObject = new Dictionary<int, object>();
             _entries = new List<ModEntry>();
 
             this.name = name;
         }
 
         [Newtonsoft.Json.JsonIgnore]
+        public static Mod Current { get { return Serializer.CurrentMod; } }
+
+        [Newtonsoft.Json.JsonIgnore]
         private List<ModEntry> _entries;
         [Newtonsoft.Json.JsonIgnore]
-        private Dictionary<int, object> _objects;
+        private Dictionary<int, object> _idToObject;
         [Newtonsoft.Json.JsonIgnore]
-        public IEnumerable<object> Objects { get { return _objects.Values; } }
-        
+        public IEnumerable<object> Objects { get { return _idToObject.Values; } }
+        [Newtonsoft.Json.JsonIgnore]
+        private Dictionary<int, int> _hashToID;
+
         public string name;
         public List<ModData> _data;
 
         private const string CONFIG_NAME = "config";
 
-        public int Add(object obj, string name, string extension)
+        public int Add(object obj, int hash, string name, string extension)
         {
-            int id = _data.Count + 1;
-
-            ModEntry entry = new ModEntry()
+            extension = Utility.SanitizeExtension(extension);
+            
+            if (!_hashToID.ContainsKey(hash))
             {
-                json = JsonSerializer.ToJson(obj),
-                name = name,
-                extension = extension,
-            };
+                int id = _data.Count + 1;
 
-            _entries.Add(entry);
-            _objects.Add(id, obj);
-            _data.Add(new ModData() { name = name, ID = id, type = obj.GetType() });
+                ModEntry entry = new ModEntry()
+                {
+                    json = JsonSerializer.ToJson(obj),
+                    name = name,
+                    extension = extension,
+                };
 
-            return _entries.Count;
+                _entries.Add(entry);
+                _idToObject.Add(id, obj);
+                _data.Add(new ModData() { name = name, ID = id, type = obj.GetType() });
+
+                return _entries.Count;
+            }
+            else
+            {
+                return _hashToID[hash];
+            }
         }
-        public object Get(int id)
+        public T Get<T>(int id)
         {
-            return _objects[id];
+            return (T)_idToObject[id];
         }
         public void Serialize(string path)
         {
@@ -98,7 +112,7 @@ namespace UMS.Core
             {
                 object obj = JsonSerializer.ToObject(files[data.name], data.type);
 
-                mod._objects.Add(data.ID, obj);
+                mod._idToObject.Add(data.ID, obj);
             }
 
             return mod;

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UMS.Core;
 using UnityEngine.Rendering;
+using UnityEditor;
 
 namespace UMS.Serialization
 {
@@ -29,7 +30,42 @@ namespace UMS.Serialization
         //    }
         //}
         //------------------------------------//
-        
+
+
+        //------------------Object------------------//
+        [System.Serializable]
+        public class SerializableObject
+        {
+            public SerializableObject(UnityEngine.Object input)
+            {
+                if (input == null)
+                    return;
+
+                this.name = input.name;
+                this.hideFlags = (uint)input.hideFlags;
+            }
+
+            public string name;
+            public uint hideFlags;
+
+            public static implicit operator UnityEngine.Object(SerializableObject serialized)
+            {
+                if (serialized == null)
+                    return null;
+
+                return new UnityEngine.Object()
+                {
+                    name = serialized.name,
+                    hideFlags = (HideFlags)serialized.hideFlags,
+                };
+            }
+            public static implicit operator SerializableObject(UnityEngine.Object input)
+            {
+                return new SerializableObject(input);
+            }
+        }
+        //------------------------------------//
+
         //------------------Vector2------------------//
         [TypeSerializer(typeof(Vector2))]
         public static object SerializeVector2(Vector2 input)
@@ -53,6 +89,9 @@ namespace UMS.Serialization
 
             public static implicit operator Vector2(SerializableVector2 serialized)
             {
+                if (serialized == null)
+                    return default(Vector2);
+
                 return new Vector2(serialized.x, serialized.y);
             }
             public static implicit operator SerializableVector2(Vector2 input)
@@ -87,6 +126,9 @@ namespace UMS.Serialization
 
             public static implicit operator Vector3(SerializableVector3 serialized)
             {
+                if (serialized == null)
+                    return default(Vector3);
+
                 return new Vector3(serialized.x, serialized.y, serialized.z);
             }
             public static implicit operator SerializableVector3(Vector3 input)
@@ -123,6 +165,9 @@ namespace UMS.Serialization
 
             public static implicit operator Vector4(SerializableVector4 serialized)
             {
+                if (serialized == null)
+                    return default(Vector4);
+
                 return new Vector4(serialized.x, serialized.y, serialized.z, serialized.w);
             }
             public static implicit operator SerializableVector4(Vector4 input)
@@ -164,6 +209,9 @@ namespace UMS.Serialization
 
             public static implicit operator Color(SerializableColor serialized)
             {
+                if (serialized == null)
+                    return Color.white;
+
                 return new Color(serialized.r, serialized.g, serialized.b, serialized.a);
             }
             public static implicit operator SerializableColor(Color serialized)
@@ -208,6 +256,9 @@ namespace UMS.Serialization
 
             public static implicit operator BoneWeight(SerializableBoneWeight serialized)
             {
+                if (serialized == null)
+                    return new BoneWeight();
+
                 return new BoneWeight()
                 {
                     weight0 = serialized.weight0,
@@ -253,6 +304,9 @@ namespace UMS.Serialization
 
             public static implicit operator Matrix4x4(SerializableMatrix4x4 serialized)
             {
+                if (serialized == null)
+                    return Matrix4x4.identity;
+
                 return new Matrix4x4(serialized.columns[0], serialized.columns[1], serialized.columns[2], serialized.columns[3]);
             }
             public static implicit operator SerializableMatrix4x4(Matrix4x4 input)
@@ -285,6 +339,9 @@ namespace UMS.Serialization
 
             public static implicit operator Bounds(SerializableBounds serialized)
             {
+                if (serialized == null)
+                    return new Bounds();
+
                 return new Bounds(serialized.center, serialized.size);
             }
             public static implicit operator SerializableBounds(Bounds input)
@@ -301,14 +358,13 @@ namespace UMS.Serialization
             return new SerializableMesh(mesh);
         }
         [System.Serializable]
-        public class SerializableMesh
+        public class SerializableMesh : SerializableObject
         {
-            public SerializableMesh(Mesh mesh)
+            public SerializableMesh(Mesh mesh) : base(mesh)
             {
                 if (mesh == null)
                     return;
-
-                this.name = mesh.name;
+                
                 this.indexFormat = (uint)mesh.indexFormat;
                 this.boneWeights = Utility.Copy<SerializableBoneWeight>(mesh.boneWeights);
                 this.bindposes = Utility.Copy<SerializableMatrix4x4>(mesh.bindposes);
@@ -324,8 +380,7 @@ namespace UMS.Serialization
                 this.colors32 = Utility.Copy<SerializableColor>(mesh.colors32);
                 this.triangles = mesh.triangles;
         }
-
-            public string name;
+            
             public uint indexFormat;
             public SerializableBoneWeight[] boneWeights;
             public SerializableMatrix4x4[] bindposes;
@@ -343,6 +398,9 @@ namespace UMS.Serialization
 
             public static implicit operator Mesh(SerializableMesh serialized)
             {
+                if (serialized == null)
+                    return null;
+
                 Mesh mesh = new Mesh
                 {
                     name = serialized.name,
@@ -384,14 +442,13 @@ namespace UMS.Serialization
             return new SerializableTexture(input);
         }
         [System.Serializable]
-        public class SerializableTexture
+        public class SerializableTexture : SerializableObject
         {
-            public SerializableTexture(Texture input)
+            public SerializableTexture(Texture input) : base(input)
             {
                 if (input == null)
                     return;
-
-                this.name = input.name;
+                
                 this.mipMapBias = input.mipMapBias;
                 this.wrapMode = (uint)input.wrapMode;
                 this.wrapModeU = (uint)input.wrapModeU;
@@ -402,8 +459,7 @@ namespace UMS.Serialization
                 this.width = input.width;
                 this.filterMode = (uint)input.filterMode;
             }
-
-            public string name;
+            
             public float mipMapBias;
             public uint wrapModeW;
             public uint wrapModeV;
@@ -416,6 +472,12 @@ namespace UMS.Serialization
 
             public static implicit operator Texture(SerializableTexture serialized)
             {
+                if (serialized == null)
+                    return null;
+
+                if (serialized.name == null)
+                    return null;
+
                 return new Texture()
                 {
                     mipMapBias = serialized.mipMapBias,
@@ -464,6 +526,9 @@ namespace UMS.Serialization
 
             public static implicit operator Texture2D(SerializableTexture2D serialized)
             {
+                if (serialized == null)
+                    return null;
+
                 Texture2D texture = new Texture2D(serialized.width, serialized.height)
                 {
                     mipMapBias = serialized.mipMapBias,
@@ -499,6 +564,9 @@ namespace UMS.Serialization
         {
             public SerializableRenderTexture(RenderTexture input) : base(input)
             {
+                if (input == null)
+                    return;
+
                 this.descriptor = input.descriptor;
             }
 
@@ -506,6 +574,9 @@ namespace UMS.Serialization
             
             public static implicit operator RenderTexture(SerializableRenderTexture serialized)
             {
+                if (serialized == null)
+                    return null;
+
                 return new RenderTexture(serialized.descriptor)
                 {
                     name = serialized.name,
@@ -556,6 +627,9 @@ namespace UMS.Serialization
 
             public static implicit operator RenderTextureDescriptor(SerializableRenderTextureDescriptor serialized)
             {
+                if (serialized == null)
+                    return new RenderTextureDescriptor();
+
                 return new RenderTextureDescriptor()
                 {
                     useMipMap = serialized.useMipMap,
@@ -582,27 +656,112 @@ namespace UMS.Serialization
         }
         //------------------------------------//
 
-        //------------------Material------------------//
-        //[TypeSerializer(typeof(Material))]
-        //public static object SerializeMaterial(Material input)
-        //{
-        //    return new SerializableMaterial(input);
-        //}
-        //[System.Serializable]
-        //public class SerializableMaterial
-        //{
-        //    public SerializableMaterial(Material input)
-        //    {
-                
-        //    }
-
+        //------------------Shader------------------//
+        [TypeSerializer(typeof(Shader))]
+        public static object SerializeShader(Shader input)
+        {
+            return new SerializableShader(input);
+        }
+        [System.Serializable]
+        public class SerializableShader : SerializableObject
+        {
+            public SerializableShader(Shader input) : base(input) { }
             
+            public static implicit operator Shader(SerializableShader serialized)
+            {
+                if (serialized == null)
+                    return null;
 
-        //    public static implicit operator Material(SerializableMaterial serialized)
-        //    {
-        //        return new Material();
-        //    }
-        //}
+                return Shader.Find(serialized.name);
+            }
+            public static implicit operator SerializableShader(Shader input)
+            {
+                return new SerializableShader(input);
+            }
+        }
+        //------------------------------------//
+
+        //------------------Material------------------//
+        [TypeSerializer(typeof(Material))]
+        public static object SerializeMaterial(Material input)
+        {
+            return new SerializableMaterial(input);
+        }
+        [System.Serializable]
+        public class SerializableMaterial
+        {
+            public SerializableMaterial(Material input)
+            {
+                if (input == null)
+                    return;
+                
+                id = Mod.Current.Add(new Data(input), input.GetHashCode(), input.name, "material");
+            }
+
+            public int id;
+
+            [System.Serializable]
+            public class Data : SerializableObject
+            {
+                public Data(Material input) : base(input)
+                {
+                    if (input == null)
+                        return;
+
+                    this.shader = input.shader;
+                    this.globalIlluminationFlags = (uint)input.globalIlluminationFlags;
+                    this.shaderKeywords = input.shaderKeywords;
+                    this.renderQueue = input.renderQueue;
+                    this.mainTexture = input.mainTexture;
+                    this.mainTextureScale = input.mainTextureScale;
+                    this.mainTextureOffset = input.mainTextureOffset;
+                    this.enableInstancing = input.enableInstancing;
+                    this.doubleSidedGI = input.doubleSidedGI;
+                    this.color = input.color;
+                }
+
+                public SerializableShader shader;
+                public uint globalIlluminationFlags;
+                public string[] shaderKeywords;
+                public int renderQueue;
+                public SerializableVector2 mainTextureScale;
+                public SerializableVector2 mainTextureOffset;
+                public SerializableTexture mainTexture;
+                public SerializableColor color;
+                public bool enableInstancing;
+                public bool doubleSidedGI;
+            }
+
+            public static implicit operator Material(SerializableMaterial serialized)
+            {
+                if (serialized == null)
+                    return null;
+                
+                Data data = Mod.Current.Get<Data>(serialized.id);
+
+                if (data == null)
+                    return null;
+
+#pragma warning disable
+                return new Material(data.shader)
+                {
+                    globalIlluminationFlags = (MaterialGlobalIlluminationFlags)data.globalIlluminationFlags,
+                    shaderKeywords = data.shaderKeywords,
+                    renderQueue = data.renderQueue,
+                    mainTexture = data.mainTexture,
+                    mainTextureOffset = data.mainTextureOffset,
+                    mainTextureScale = data.mainTextureScale,
+                    enableInstancing = data.enableInstancing,
+                    doubleSidedGI = data.doubleSidedGI,
+                    color = data.color,
+                };
+#pragma warning restore
+            }
+            public static implicit operator SerializableMaterial(Material input)
+            {
+                return new SerializableMaterial(input);
+            }
+        }
         //------------------------------------//
     }
 }

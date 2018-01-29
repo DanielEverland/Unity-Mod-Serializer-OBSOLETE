@@ -13,7 +13,8 @@ namespace UMS.Serialization
     public class Serializer
     {
         private static Serializer _instance;
-
+        public static Mod CurrentMod;
+        
         [MenuItem(itemName: Utility.MENU_ITEM_ROOT + "/Serialize Selection", priority = Utility.MENU_ITEM_PRIORITY)]
         private static void SerializeSelection()
         {
@@ -37,15 +38,15 @@ namespace UMS.Serialization
         }
         private static void SerializeObject(GameObject gameObject)
         {
-            Mod mod = new Mod("Test Mod");
+            CurrentMod = new Mod("Test Mod");
             
             Core.Object obj = new Core.Object(gameObject);
 
-            mod.Add(obj, gameObject.name, "prefab");
+            CurrentMod.Add(obj, obj.GetHashCode(), gameObject.name, "prefab");
 
-            mod.Serialize(@"C:\Users\Daniel\Desktop");
+            CurrentMod.Serialize(@"C:\Users\Daniel\Desktop");
 
-            UnityEngine.Debug.Log("Finished serializing");
+            Debug.Log("Finished serializing");
         }
 
 
@@ -72,7 +73,7 @@ namespace UMS.Serialization
                 }
             }
 
-            UnityEngine.Debug.LogError("Couldn't serializer " + value.GetType() + value);
+            Debug.LogError("Couldn't serialize " + value.GetType() + value);
 
             return null;
         }
@@ -86,7 +87,7 @@ namespace UMS.Serialization
         }
         private void InitializeSerializers()
         {
-            foreach (Assembly assembly in System.AppDomain.CurrentDomain.GetAssemblies())
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 foreach (Type type in assembly.GetTypes())
                 {
