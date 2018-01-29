@@ -806,5 +806,32 @@ namespace UMS.Serialization
             }
         }
         //------------------------------------//
+
+        //------------------HideFlags------------------//
+        [TypeSerializer(typeof(HideFlags))]
+        public static object SerializeHideFlags(HideFlags input)
+        {
+            return new SerializableHideFlags(input);
+        }
+        [System.Serializable]
+        public class SerializableHideFlags
+        {
+            public SerializableHideFlags(HideFlags input)
+            {
+                _flags = (uint)input;
+            }
+
+            public uint _flags;
+
+            public static implicit operator HideFlags(SerializableHideFlags serialized)
+            {
+                return (HideFlags)serialized._flags;
+            }
+            public static implicit operator SerializableHideFlags(HideFlags input)
+            {
+                return new SerializableHideFlags(input);
+            }
+        }
+        //------------------------------------//
     }
 }
