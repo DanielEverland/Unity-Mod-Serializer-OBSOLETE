@@ -10,9 +10,10 @@ namespace UMS.Deserialization
 {
     public static class ObjectCreator
     {
-        public static GameObject CreateObject(Core.Object obj)
+        public static GameObject CreateObject(Core.Object obj, Transform parent)
         {
             GameObject gameObject = new GameObject();
+            gameObject.transform.SetParent(parent);
 
             LoadMembers(gameObject, obj._members);
 
@@ -29,6 +30,8 @@ namespace UMS.Deserialization
                     LoadMembers(unityComponent, comp._members);
                 }
             }
+
+            obj._children.ForEach(x => CreateObject(x, gameObject.transform));
 
             return gameObject;
         }

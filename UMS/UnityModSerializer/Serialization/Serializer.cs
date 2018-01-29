@@ -44,7 +44,7 @@ namespace UMS.Serialization
             mod.Add(obj, obj.GetHashCode(), gameObject.name, "prefab");
 
             mod.Serialize(@"C:\Users\Daniel\Desktop");
-
+            
             Debug.Log("Finished serializing");
         }
 

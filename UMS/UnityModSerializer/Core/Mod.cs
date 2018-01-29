@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Ionic.Zip;
 using UMS.Serialization;
+using System.Text.RegularExpressions;
 
 namespace UMS.Core
 {
@@ -17,6 +18,7 @@ namespace UMS.Core
             _data = new List<ModData>();
             _idToObject = new Dictionary<int, object>();
             _entries = new List<ModEntry>();
+            _usedFilenames = new HashSet<string>();
 
             this.name = name;
 
@@ -34,10 +36,13 @@ namespace UMS.Core
         public IEnumerable<object> Objects { get { return _idToObject.Values; } }
         [Newtonsoft.Json.JsonIgnore]
         private Dictionary<int, int> _hashToID;
+        [Newtonsoft.Json.JsonIgnore]
+        private HashSet<string> _usedFilenames;
 
         public string name;
         public List<ModData> _data;
 
+        private static Regex EndNumberParanthesis = new Regex(@"\(\d\)$");
         private const string CONFIG_NAME = "config";
 
         public int Add(object obj, int hash, string name, string extension)
@@ -48,17 +53,20 @@ namespace UMS.Core
             {
                 int id = _data.Count + 1;
 
+                string uniqueName = GetValidName(name, _usedFilenames);
+                _usedFilenames.Add(uniqueName);
+
                 ModEntry entry = new ModEntry()
                 {
                     json = JsonSerializer.ToJson(obj),
-                    name = name,
+                    name = uniqueName,
                     extension = extension,
                 };
-
+                
                 _entries.Add(entry);
                 _idToObject.Add(id, obj);
                 _hashToID.Add(hash, id);
-                _data.Add(new ModData() { name = name, ID = id, type = obj.GetType() });
+                _data.Add(new ModData() { name = uniqueName, ID = id, type = obj.GetType() });
 
                 return _entries.Count;
             }
@@ -80,13 +88,45 @@ namespace UMS.Core
                 foreach (ModEntry entry in _entries)
                 {
                     string fileName = entry.name + "." + entry.extension;
-
+                    
                     UnityEngine.Debug.Log("Creating file " + fileName);
                     zip.AddEntry(fileName, entry.json);
                 }
 
                 zip.Save(string.Format(@"{0}\{1}.mod", path, name));
             }
+        }
+        private static string GetValidName(string preferredName, HashSet<string> blackList)
+        {
+            if (blackList.Contains(preferredName))
+            {
+                if (EndNumberParanthesis.IsMatch(preferredName))
+                {
+                    Match match = EndNumberParanthesis.Match(preferredName);
+
+                    int index = 0;
+                    string strippedString = preferredName.Replace(match.Value, string.Empty);
+
+                    
+                    foreach (Capture capture in match.Captures)
+                    {
+                        int value = 0;
+                        if(int.TryParse(capture.Value.Trim(')', '('), out value))
+                        {
+                            index = value;
+                            break;
+                        }
+                    }
+                    
+                    return GetValidName(strippedString + "(" + (index + 1) + ")", blackList);                    
+                }
+                else
+                {
+                    return GetValidName(preferredName + " (1)", blackList);
+                }                
+            }
+
+            return preferredName;
         }
         public static Mod Deserialize(string path)
         {

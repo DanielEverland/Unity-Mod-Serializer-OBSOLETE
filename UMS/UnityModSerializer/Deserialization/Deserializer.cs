@@ -22,7 +22,7 @@ namespace UMS.Deserialization
 
             foreach (Core.Object obj in mod.Objects.Where(x => x.GetType().IsAssignableFrom(typeof(Core.Object))))
             {
-                ObjectCreator.CreateObject(obj);
+                ObjectCreator.CreateObject(obj, null);
             }
         }
     }
