@@ -26,6 +26,13 @@ namespace UMS.Serialization
         {
             return JsonConvert.DeserializeObject(json, type, settings);
         }
+        public static bool CanSerialize(Type type)
+        {
+            if (type == null)
+                return false;
+
+            return (type.Attributes & TypeAttributes.Serializable) == TypeAttributes.Serializable;
+        }
         public static bool CanSerialize(object obj)
         {
             if (obj == null)

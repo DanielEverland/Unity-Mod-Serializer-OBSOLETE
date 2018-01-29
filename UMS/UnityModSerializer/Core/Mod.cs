@@ -19,10 +19,12 @@ namespace UMS.Core
             _entries = new List<ModEntry>();
 
             this.name = name;
+
+            Current = this;
         }
 
         [Newtonsoft.Json.JsonIgnore]
-        public static Mod Current { get { return Serializer.CurrentMod; } }
+        public static Mod Current { get; private set; }
 
         [Newtonsoft.Json.JsonIgnore]
         private List<ModEntry> _entries;
@@ -55,6 +57,7 @@ namespace UMS.Core
 
                 _entries.Add(entry);
                 _idToObject.Add(id, obj);
+                _hashToID.Add(hash, id);
                 _data.Add(new ModData() { name = name, ID = id, type = obj.GetType() });
 
                 return _entries.Count;
@@ -76,7 +79,10 @@ namespace UMS.Core
                 
                 foreach (ModEntry entry in _entries)
                 {
-                    zip.AddEntry(entry.name + "." + entry.extension, entry.json);
+                    string fileName = entry.name + "." + entry.extension;
+
+                    UnityEngine.Debug.Log("Creating file " + fileName);
+                    zip.AddEntry(fileName, entry.json);
                 }
 
                 zip.Save(string.Format(@"{0}\{1}.mod", path, name));
@@ -107,7 +113,9 @@ namespace UMS.Core
 
             Mod mod = JsonSerializer.ToObject<Mod>(files[CONFIG_NAME]);
             files.Remove(CONFIG_NAME);
-            
+
+            Current = mod;
+
             foreach (ModData data in mod._data)
             {
                 object obj = JsonSerializer.ToObject(files[data.name], data.type);

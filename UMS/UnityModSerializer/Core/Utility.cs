@@ -63,21 +63,56 @@ namespace UMS.Core
         }
         public static object ConvertObject(object obj, Type fromType, Type toType)
         {
-            if(fromType == null)
+            if (fromType == null)
             {
                 try
                 {
-                    return Convert.ChangeType(obj, toType);
+                    return System.Convert.ChangeType(obj, toType);
                 }
                 catch (Exception)
                 {
                     return null;
-                }                
+                }
             }
+            else if (toType.IsArray)
+            {
+                Array objd = ConvertAsArray(obj, fromType, toType.GetElementType());
+                
+                return objd;
+            }
+            else
+            {
+                return Convert(obj, fromType, toType);
+            }            
+        }
+        private static Array ConvertAsArray(object obj, Type fromType, Type toType)
+        {            
+            if(obj is Array)
+            {
+                return ((object[])obj).Select(x => Convert(x, fromType, toType)).ToArray();
+            }
+            else if(obj is JArray)
+            {
+                object[] objArray = ((JArray)obj).Select(x => Convert(x, fromType, toType)).ToArray();
+                Array array = Array.CreateInstance(toType, objArray.Length);
 
+                for (int i = 0; i < objArray.Length; i++)
+                {
+                    array.SetValue(objArray[i], i);
+                }
+                
+                return array;
+            }
+            else
+            {
+                throw new NotImplementedException("Array type " + obj.GetType() + " not recognized");
+            }
+        }
+        private static object Convert(object obj, Type fromType, Type toType)
+        {
             object toReturn;
 
-            if(CanConvert(obj, fromType, toType, out toReturn))
+            if (CanConvert(obj, fromType, toType, out toReturn))
             {
                 return toReturn;
             }

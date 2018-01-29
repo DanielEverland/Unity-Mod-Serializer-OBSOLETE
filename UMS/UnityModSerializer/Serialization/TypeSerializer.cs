@@ -19,6 +19,8 @@ namespace UMS.Serialization
             this.type = type;
             this.priority = priority;
         }
+
+        public Type ReturnType { get { return method.ReturnType; } }
         
         public readonly Type type;
         public readonly int priority;

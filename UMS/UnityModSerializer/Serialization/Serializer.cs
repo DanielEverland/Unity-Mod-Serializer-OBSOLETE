@@ -13,7 +13,6 @@ namespace UMS.Serialization
     public class Serializer
     {
         private static Serializer _instance;
-        public static Mod CurrentMod;
         
         [MenuItem(itemName: Utility.MENU_ITEM_ROOT + "/Serialize Selection", priority = Utility.MENU_ITEM_PRIORITY)]
         private static void SerializeSelection()
@@ -38,13 +37,13 @@ namespace UMS.Serialization
         }
         private static void SerializeObject(GameObject gameObject)
         {
-            CurrentMod = new Mod("Test Mod");
+            Mod mod = new Mod("Test Mod");
             
             Core.Object obj = new Core.Object(gameObject);
 
-            CurrentMod.Add(obj, obj.GetHashCode(), gameObject.name, "prefab");
+            mod.Add(obj, obj.GetHashCode(), gameObject.name, "prefab");
 
-            CurrentMod.Serialize(@"C:\Users\Daniel\Desktop");
+            mod.Serialize(@"C:\Users\Daniel\Desktop");
 
             Debug.Log("Finished serializing");
         }

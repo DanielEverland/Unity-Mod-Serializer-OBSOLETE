@@ -708,6 +708,9 @@ namespace UMS.Serialization
                     if (input == null)
                         return;
 
+                    if (input.name == null)
+                        return;
+
                     this.shader = input.shader;
                     this.globalIlluminationFlags = (uint)input.globalIlluminationFlags;
                     this.shaderKeywords = input.shaderKeywords;
@@ -738,24 +741,25 @@ namespace UMS.Serialization
                     return null;
                 
                 Data data = Mod.Current.Get<Data>(serialized.id);
-
+                
                 if (data == null)
                     return null;
 
 #pragma warning disable
-                return new Material(data.shader)
-                {
-                    globalIlluminationFlags = (MaterialGlobalIlluminationFlags)data.globalIlluminationFlags,
-                    shaderKeywords = data.shaderKeywords,
-                    renderQueue = data.renderQueue,
-                    mainTexture = data.mainTexture,
-                    mainTextureOffset = data.mainTextureOffset,
-                    mainTextureScale = data.mainTextureScale,
-                    enableInstancing = data.enableInstancing,
-                    doubleSidedGI = data.doubleSidedGI,
-                    color = data.color,
-                };
+                Material toReturn =  new Material(data.shader);
 #pragma warning restore
+                
+                toReturn.globalIlluminationFlags = (MaterialGlobalIlluminationFlags)data.globalIlluminationFlags;
+                toReturn.shaderKeywords = data.shaderKeywords;
+                toReturn.renderQueue = data.renderQueue;
+                toReturn.mainTexture = data.mainTexture;
+                toReturn.mainTextureOffset = data.mainTextureOffset;
+                toReturn.mainTextureScale = data.mainTextureScale;
+                toReturn.enableInstancing = data.enableInstancing;
+                toReturn.doubleSidedGI = data.doubleSidedGI;
+                toReturn.color = data.color;
+
+                return toReturn;
             }
             public static implicit operator SerializableMaterial(Material input)
             {

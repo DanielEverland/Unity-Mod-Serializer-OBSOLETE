@@ -41,7 +41,7 @@ namespace UMS.Deserialization
             {
                 if (member._value == null)
                     continue;
-
+                
                 member.AssignValue(target);
             }
         }

@@ -18,20 +18,15 @@ namespace UMS.Core
 
             if (value == null)
                 return;
-            
-            if (JsonSerializer.CanSerialize(value))
+
+            if (value.GetType().IsArray)
             {
-                _value = value;
-            }
-            else if(Serializer.ContainsSerializer(value.GetType()))
-            {
-                _value = Serializer.SerializeCustom(value);
-                _type = _value.GetType();
+                SerializeArray((Array)value, value.GetType().GetElementType());
             }
             else
             {
-                UnityEngine.Debug.LogWarning("Cannot serialize object " + value.GetType() + " " + value);
-            }
+                SerializeSingular(value);
+            }            
         }
         
         public string _memberName;
@@ -39,6 +34,46 @@ namespace UMS.Core
         public object _value;
         public Type _type;
 
+        private void SerializeArray(Array array, Type elementType)
+        {
+            object[] newArray = new object[array.Length];
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                object obj = SerializeObject(array.GetValue(i));
+
+                _type = obj.GetType();
+
+                newArray[i] = obj;
+            }
+            
+            _value = newArray;
+        }
+        private void SerializeSingular(object value)
+        {
+            _value = SerializeObject(value);
+
+            if (Serializer.ContainsSerializer(value.GetType()))
+            {
+                _type = _value.GetType();
+            }
+        }
+        private object SerializeObject(object value)
+        {
+            if (JsonSerializer.CanSerialize(value))
+            {
+                return value;
+            }
+            else if (Serializer.ContainsSerializer(value.GetType()))
+            {
+                return Serializer.SerializeCustom(value);
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning("Cannot serialize object " + value.GetType() + " " + value);
+                return null;
+            }
+        }
         public void AssignValue(object obj)
         {
             if(_isProperty)
@@ -56,18 +91,27 @@ namespace UMS.Core
 
             if (property == null)
                 return;
-
+            
             MethodInfo info = property.GetSetMethod();
 
             if (info == null)
                 return;
 
-            object convertedObject = Utility.ConvertObject(_value, _type, property.PropertyType);
+            object convertedObject = null;
 
-            if (convertedObject == null)
-                return;
+            try
+            {
+                convertedObject = Utility.ConvertObject(_value, _type, property.PropertyType);
 
-            property.SetValue(obj, convertedObject, null);
+                if (convertedObject == null)
+                    return;
+
+                property.SetValue(obj, convertedObject, null);
+            }
+            catch (Exception)
+            {
+                throw new InvalidCastException(string.Format("Couldn't assign {0} to property {1}. ConvertedObject: {2}", _value, property, convertedObject));
+            }
         }
         private void AssignAsField(object obj)
         {
@@ -76,12 +120,25 @@ namespace UMS.Core
             if (field == null)
                 return;
 
-            object convertedObject = Utility.ConvertObject(_value, _type, field.FieldType);
+            object convertedObject = null;
 
-            if (convertedObject == null)
-                return;
+            try
+            {
+                convertedObject = Utility.ConvertObject(_value, _type, field.FieldType);
 
-            field.SetValue(obj, convertedObject);
+                if (convertedObject == null)
+                    return;
+
+                field.SetValue(obj, convertedObject);
+            }
+            catch (Exception)
+            {
+                throw new InvalidCastException(string.Format("Couldn't assign {0} to field {1}. ConvertedObject: {2}", _value, field, convertedObject));
+            }            
+        }
+        public override string ToString()
+        {
+            return string.Format("MemberName: {0}, IsProperty: {1}, Value: {2}, Type: {3}", _memberName, _isProperty, _value, _type);
         }
     }
 }
