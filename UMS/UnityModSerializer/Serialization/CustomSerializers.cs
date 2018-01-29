@@ -767,5 +767,44 @@ namespace UMS.Serialization
             }
         }
         //------------------------------------//
+
+        //------------------Quaternion------------------//
+        [TypeSerializer(typeof(Quaternion))]
+        public static object SerializeQuaternion(Quaternion input)
+        {
+            return new SerializableQuaternion(input);
+        }
+        [System.Serializable]
+        public class SerializableQuaternion
+        {
+            public SerializableQuaternion(Quaternion input)
+            {
+                if (input == null)
+                    return;
+
+                this.x = input.x;
+                this.y = input.y;
+                this.z = input.z;
+                this.w = input.w;
+            }
+
+            public float x;
+            public float y;
+            public float z;
+            public float w;
+
+            public static implicit operator Quaternion(SerializableQuaternion serialized)
+            {
+                if (serialized == null)
+                    return Quaternion.identity;
+
+                return new Quaternion(serialized.x, serialized.y, serialized.z, serialized.w);
+            }
+            public static implicit operator SerializableQuaternion(Quaternion input)
+            {
+                return new SerializableQuaternion(input);
+            }
+        }
+        //------------------------------------//
     }
 }
