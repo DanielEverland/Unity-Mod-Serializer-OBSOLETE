@@ -833,5 +833,98 @@ namespace UMS.Serialization
             }
         }
         //------------------------------------//
+
+        //------------------PhysicMaterial------------------//
+        [TypeSerializer(typeof(PhysicMaterial))]
+        public static object SerializeTYPE(PhysicMaterial input)
+        {
+            return new SerializablePhysicMaterial(input);
+        }
+        [System.Serializable]
+        public class SerializablePhysicMaterial
+        {
+            public SerializablePhysicMaterial(PhysicMaterial input)
+            {
+                if (input == null)
+                    return;
+
+                _id = Mod.Current.Add(new Data(input), input.GetHashCode(), input.name, "physicMaterial");
+            }
+
+            public int _id;
+
+            public class Data : SerializableObject
+            {
+                public Data(PhysicMaterial physicMaterial) : base(physicMaterial)
+                {
+                    if (physicMaterial == null)
+                        return;
+
+                    dynamicFriction = physicMaterial.dynamicFriction;
+                    staticFriction = physicMaterial.staticFriction;
+                    bounciness = physicMaterial.bounciness;
+                    frictionCombine = physicMaterial.frictionCombine;
+                    bounceCombine = physicMaterial.bounceCombine;
+                }
+
+                public float dynamicFriction;
+                public float staticFriction;
+                public float bounciness;
+                public SerializablePhysicMaterialCombine frictionCombine;
+                public SerializablePhysicMaterialCombine bounceCombine;
+            }
+
+            public static implicit operator PhysicMaterial(SerializablePhysicMaterial serialized)
+            {
+                if (serialized == null)
+                    return null;
+
+                Data data = Mod.Current.Get<Data>(serialized._id);
+
+                if (data == null)
+                    return null;
+
+                return new PhysicMaterial()
+                {
+                    dynamicFriction = data.dynamicFriction,
+                    staticFriction = data.staticFriction,
+                    bounciness = data.bounciness,
+                    frictionCombine = data.frictionCombine,
+                    bounceCombine = data.bounceCombine,
+                };
+            }
+            public static implicit operator SerializablePhysicMaterial(PhysicMaterial input)
+            {
+                return new SerializablePhysicMaterial(input);
+            }
+        }
+        //------------------------------------//
+
+        //------------------PhysicMaterialCombine------------------//
+        [TypeSerializer(typeof(PhysicMaterialCombine))]
+        public static object SerializePhysicMaterialCombine(PhysicMaterialCombine input)
+        {
+            return new SerializablePhysicMaterialCombine(input);
+        }
+        [System.Serializable]
+        public class SerializablePhysicMaterialCombine
+        {
+            public SerializablePhysicMaterialCombine(PhysicMaterialCombine input)
+            {
+                _enum = (uint)input;
+            }
+
+            public uint _enum;
+
+            public static implicit operator PhysicMaterialCombine(SerializablePhysicMaterialCombine serialized)
+            {
+                return (PhysicMaterialCombine)serialized._enum;
+            }
+            public static implicit operator SerializablePhysicMaterialCombine(PhysicMaterialCombine input)
+            {
+                return new SerializablePhysicMaterialCombine(input);
+            }
+        }
+        //------------------------------------//
     }
 }
