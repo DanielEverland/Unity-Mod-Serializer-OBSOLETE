@@ -26,7 +26,7 @@ namespace UMS.Core
             else
             {
                 SerializeSingular(value);
-            }            
+            }
         }
         
         public string _memberName;

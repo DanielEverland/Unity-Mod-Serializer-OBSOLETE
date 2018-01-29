@@ -22,15 +22,15 @@ namespace UMS.Core
         {
             List<Member> members = new List<Member>();
 
-            foreach (FieldInfo field in obj.GetType().GetAllFields())
+            foreach (FieldInfo field in obj.GetType().GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance))
             {
                 if (!CanAccessMember(field))
                     continue;
-
+                
                 members.Add(new Member(field.Name, field.GetValue(obj), false));
             }
 
-            foreach (PropertyInfo property in obj.GetType().GetAllProperties())
+            foreach (PropertyInfo property in obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance))
             {
                 MethodInfo method = property.GetGetMethod();
 
@@ -39,11 +39,11 @@ namespace UMS.Core
 
                 if (!CanAccessMember(property))
                     continue;
-
+                
                 members.Add(new Member(property.Name, property.GetValue(obj, null), true));
             }
 
-            return members;
+            return members.Where(x => x._value != null).ToList();
         }
         private static bool CanAccessMember(MemberInfo member)
         {
