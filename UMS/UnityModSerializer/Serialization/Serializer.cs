@@ -56,7 +56,7 @@ namespace UMS.Serialization
             _blockedTypes = new Dictionary<Type, TypeBlocker>();
 
             OnBehaviourLoaded += BehaviourLoaded;
-
+            
             CreateAnalyzers();
             InitializeBehaviours();
         }

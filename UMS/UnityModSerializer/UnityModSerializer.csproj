@@ -64,6 +64,7 @@
     <Compile Include="Core\Member.cs" />
     <Compile Include="Core\Mod.cs" />
     <Compile Include="Core\Object.cs" />
+    <Compile Include="Core\Priority.cs" />
     <Compile Include="Core\Utility.cs" />
     <Compile Include="Deserialization\Deserializer.cs" />
     <Compile Include="Deserialization\ObjectCreator.cs" />

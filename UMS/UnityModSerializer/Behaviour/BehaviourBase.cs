@@ -12,7 +12,7 @@ namespace UMS.Behaviour
     public abstract class BehaviourBase : Attribute
     {
         private BehaviourBase() { }
-        public BehaviourBase(int priority = 0)
+        public BehaviourBase(int priority = (int)Core.Priority.Medium)
         {
             _priority = priority;
         }

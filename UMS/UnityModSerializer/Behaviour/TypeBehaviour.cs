@@ -12,7 +12,7 @@ namespace UMS.Behaviour
     public abstract class TypeBehaviour : BehaviourBase
     {
         private TypeBehaviour() { }
-        public TypeBehaviour(Type type, int priority = 0) : base(priority)
+        public TypeBehaviour(Type type, int priority = (int)Core.Priority.Medium) : base(priority)
         {
             this._type = type;
         }

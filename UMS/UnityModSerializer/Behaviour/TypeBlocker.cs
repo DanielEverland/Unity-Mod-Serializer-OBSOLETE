@@ -11,10 +11,6 @@ namespace UMS.Behaviour
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
     public class TypeBlocker : BehaviourBase, IBehaviourLoader<PropertyInfo>, IBehaviourLoader<MethodInfo>, IBehaviourLoader<FieldInfo>
     {
-        public TypeBlocker(int priority = 0) : base(priority)
-        {
-        }
-
         public Func<IEnumerable<Type>> TypeFunction;
 
         public void Load(PropertyInfo type)

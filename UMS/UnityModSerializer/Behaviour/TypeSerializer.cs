@@ -14,7 +14,7 @@ namespace UMS.Behaviour
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
     public class TypeSerializer : TypeBehaviour, IBehaviourLoader<MethodInfo>
     {
-        public TypeSerializer(Type type, int priority = 0) : base(type, priority)
+        public TypeSerializer(Type type, int priority = (int)Core.Priority.Medium) : base(type, priority)
         {
         }
 
