@@ -13,7 +13,11 @@ namespace UMS.Core
 
         public const string MENU_ITEM_ROOT = "Modding";
         public const string MENU_SERIALIZATION = "Serialization";
-
+        
+        public static bool ContainsAttribute(MemberInfo member, Type type)
+        {
+            return member.GetCustomAttributes(false).Any(x => type.IsAssignableFrom(x.GetType()));
+        }
         public static bool IsPrefab(UnityEngine.GameObject obj)
         {
             return UnityEditor.PrefabUtility.GetPrefabParent(obj) == null && UnityEditor.PrefabUtility.GetPrefabObject(obj) != null;

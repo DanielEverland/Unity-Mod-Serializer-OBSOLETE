@@ -4,28 +4,19 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UMS.Serialization;
 
-namespace UMS.Serialization
+namespace UMS.Behaviour
 {
     /// <summary>
     /// Defines a function that returns a serializable object. Must return object, be static, and contain a single parameter of same type as defined in constructor
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
-    public class TypeSerializer : Attribute
+    public class TypeSerializer : TypeBehaviour, IBehaviourLoader<MethodInfo>
     {
-        private TypeSerializer() { }
-        public TypeSerializer(Type type, int priority = 0)
+        public TypeSerializer(Type type, int priority = 0) : base(type, priority)
         {
-            this.type = type;
-            this.priority = priority;
         }
-
-        public Type ReturnType { get { return method.ReturnType; } }
-        
-        public readonly Type type;
-        public readonly int priority;
-
-        private MethodInfo method;
 
         public bool IsValid(MethodInfo info)
         {
@@ -34,30 +25,40 @@ namespace UMS.Serialization
 
             if (parameters.Length == 1)
             {
-                validParameters = parameters[0].ParameterType == type;
+                validParameters = parameters[0].ParameterType == AttributeType;
             }
 
             if (!validParameters)
             {
-                UnityEngine.Debug.LogError("Detected improper usage of TypeSerailizer. Method must contain a single parameter of type " + type);
+                throw BehaviourException.Generate(this, "Method must contain a single parameter of type " + AttributeType);
             }
 
             bool validReturnType = info.ReturnType == typeof(object);
 
             if (!validReturnType)
             {
-                UnityEngine.Debug.LogError("Detected improper usage of TypeSerializer. Return type must be object");
+                throw BehaviourException.Generate(this, "Return type must be object");
             }
 
             bool isStatic = info.IsStatic;
 
             if (!isStatic)
             {
-                UnityEngine.Debug.LogError("Detected improper usage of TypeSerializer. Method must be static");
+                throw BehaviourException.Generate(this, "Method must be static");
             }
 
             return validReturnType && validParameters && isStatic;
+
         }
+
+        public void Load(MethodInfo type)
+        {
+            if (IsValid(type))
+            {
+                SetMethod(type);
+            }
+        }
+
         public bool Serialize(object input, out object output)
         {
             output = method.Invoke(null, new object[1] { input });
@@ -73,13 +74,6 @@ namespace UMS.Serialization
 
             output = null;
             return false;
-        }
-        public void SetMethod(MethodInfo method)
-        {
-            if (IsValid(method))
-            {
-                this.method = method;
-            }            
         }
     }
 }

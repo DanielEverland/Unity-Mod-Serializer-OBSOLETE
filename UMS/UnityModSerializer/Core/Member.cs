@@ -18,13 +18,21 @@ namespace UMS.Core
 
             if (value == null)
                 return;
-
+            
             if (value.GetType().IsArray)
             {
-                SerializeArray((Array)value, value.GetType().GetElementType());
+                Type valueType = value.GetType().GetElementType();
+
+                if (Serializer.IsBlocked(valueType))
+                    return;
+
+                SerializeArray((Array)value);
             }
             else
             {
+                if (Serializer.IsBlocked(value.GetType()))
+                    return;
+
                 SerializeSingular(value);
             }
         }
@@ -34,20 +42,32 @@ namespace UMS.Core
         public object _value;
         public Type _type;
 
-        private void SerializeArray(Array array, Type elementType)
+        private void SerializeArray(Array array)
         {
+            if (array == null)
+                return;
+
             object[] newArray = new object[array.Length];
 
             for (int i = 0; i < array.Length; i++)
             {
+                object arrayValue = array.GetValue(i);
+
+                if (arrayValue == null)
+                    continue;
+
                 object obj = SerializeObject(array.GetValue(i));
 
-                _type = obj.GetType();
-
+                if (obj != null)
+                    _type = obj.GetType();
+                
                 newArray[i] = obj;
             }
             
             _value = newArray;
+
+            if (_type == null)
+                _value = null;
         }
         private void SerializeSingular(object value)
         {

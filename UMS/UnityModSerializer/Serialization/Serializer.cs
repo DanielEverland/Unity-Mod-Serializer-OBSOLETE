@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UMS.Core;
+using UMS.Behaviour;
 
 namespace UMS.Serialization
 {
@@ -52,18 +53,33 @@ namespace UMS.Serialization
         public Serializer()
         {
             _typeSerializers = new Dictionary<Type, TypeSerializer>();
+            _blockedTypes = new Dictionary<Type, TypeBlocker>();
 
-            InitializeSerializers();
+            OnBehaviourLoaded += BehaviourLoaded;
+
+            CreateAnalyzers();
+            InitializeBehaviours();
         }
 
+        public static event Action<BehaviourBase> OnBehaviourLoaded;
+        
         private static Dictionary<Type, TypeSerializer> Serializers { get { return _instance._typeSerializers; } }
+        private static Dictionary<Type, TypeBlocker> BlockedTypes { get { return _instance._blockedTypes; } }
 
         private Dictionary<Type, TypeSerializer> _typeSerializers;
+        private Dictionary<Type, TypeBlocker> _blockedTypes;
+
+        private void CreateAnalyzers()
+        {
+              
+        }
         public static object SerializeCustom(object value)
         {
-            if (ContainsSerializer(value.GetType()))
+            Type type = value.GetType();
+
+            if (ContainsSerializer(type) && !IsBlocked(type))
             {
-                TypeSerializer serializer = GetSerializer(value.GetType());
+                TypeSerializer serializer = GetSerializer(type);
                 object output;
 
                 if(serializer.Serialize(value, out output))
@@ -72,47 +88,106 @@ namespace UMS.Serialization
                 }
             }
 
-            Debug.LogError("Couldn't serialize " + value.GetType() + value);
+            Debug.LogError("Couldn't serialize " + type + value);
 
             return null;
+        }
+        public static bool IsBlocked(Type type)
+        {
+            return BlockedTypes.ContainsKey(type);
         }
         public static bool ContainsSerializer(Type type)
         {
             return Serializers.ContainsKey(type);
         }
+        public static TypeBlocker GetBlocker(Type type)
+        {
+            return BlockedTypes[type];
+        }
         public static TypeSerializer GetSerializer(Type type)
         {
             return Serializers[type];
         }
-        private void InitializeSerializers()
+        private void InitializeBehaviours()
         {
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 foreach (Type type in assembly.GetTypes())
                 {
+                    foreach (PropertyInfo property in type.GetProperties())
+                    {
+                        Analyze(property);
+                    }
+                    
+                    foreach (FieldInfo field in type.GetFields())
+                    {
+                        Analyze(field);
+                    }
+                                        
                     foreach (MethodInfo method in type.GetMethods())
                     {
-                        IEnumerable<TypeSerializer> attributes = method.GetCustomAttributes(false)
-                            .Where(x => x.GetType() == typeof(TypeSerializer)).Select(x => (TypeSerializer)x);
-
-                        foreach (TypeSerializer serializer in attributes)
-                        {
-                            serializer.SetMethod(method);
-
-                            if (_typeSerializers.ContainsKey(serializer.type))
-                            {
-                                if(serializer.priority > _typeSerializers[serializer.type].priority)
-                                {
-                                    _typeSerializers[serializer.type] = serializer;
-                                }
-                            }
-                            else
-                            {
-                                _typeSerializers.Add(serializer.type, serializer);
-                            }
-                        }                                                                    
+                        Analyze(method);
                     }
                 }
+            }
+        }
+        private void Analyze<T>(T targetObj) where T : MemberInfo
+        {
+            foreach (Attribute attribute in targetObj.GetCustomAttributes(false))
+            {
+                Analyze(attribute, targetObj);
+            }
+        }
+        private void Analyze<T>(Attribute attribute, T targetObj) where T : MemberInfo
+        {
+            if (!(attribute is BehaviourBase))
+                return;
+
+            if(attribute is IBehaviourLoader<T> loader)
+            {
+                loader.Load(targetObj);
+            }
+
+            AddBehaviour(attribute as BehaviourBase);
+        }
+        private void AddBehaviour(BehaviourBase behaviour)
+        {
+            if (OnBehaviourLoaded != null && behaviour != null)
+                OnBehaviourLoaded.Invoke(behaviour);
+        }
+        private void BehaviourLoaded(BehaviourBase behaviour)
+        {
+            if(behaviour is TypeSerializer)
+            {
+                TypeSerializer serializer = behaviour as TypeSerializer;
+                
+                AddBehaviour(_typeSerializers, serializer.AttributeType, serializer);
+            }
+            else if(behaviour is TypeBlocker)
+            {
+                TypeBlocker blocker = behaviour as TypeBlocker;
+
+                foreach (Type type in blocker.TypeFunction())
+                {
+                    AddBehaviour(_blockedTypes, type, blocker);
+                }
+            }
+        }
+        private void AddBehaviour<TKey, TValue>(Dictionary<TKey, TValue> dictionary, TKey key, TValue behaviour) where TValue : BehaviourBase
+        {
+            if (key == null || behaviour == null)
+                return;
+
+            int priority = behaviour.Priority;
+
+            if (dictionary.ContainsKey(key))
+            {
+                if (dictionary[key].Priority < priority)
+                    dictionary[key] = behaviour;
+            }
+            else
+            {
+                dictionary.Add(key, behaviour);
             }
         }
     }
