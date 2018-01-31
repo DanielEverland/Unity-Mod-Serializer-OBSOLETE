@@ -110,7 +110,7 @@ namespace UMS.Serialization
         }
         private void InitializeBehaviours()
         {
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (Assembly assembly in GetAssemblies())
             {
                 foreach (Type type in assembly.GetTypes())
                 {
@@ -129,6 +129,53 @@ namespace UMS.Serialization
                         Analyze(method);
                     }
                 }
+            }
+        }
+        private IEnumerable<Assembly> GetAssemblies()
+        {
+            HashSet<Assembly> _toReturn = new HashSet<Assembly>()
+            {
+                Assembly.GetExecutingAssembly(),
+            };
+
+            Queue<string> toCheck = new Queue<string>();
+            toCheck.Enqueue(Application.dataPath);
+
+            while (toCheck.Count > 0)
+            {
+                string current = toCheck.Dequeue();
+
+                if(Path.GetFileNameWithoutExtension(current) == "Plugins")
+                {
+                    GetAssemblies(current, _toReturn);
+                }
+                else
+                {
+                    foreach (string subFolder in Directory.GetDirectories(current))
+                    {
+                        toCheck.Enqueue(subFolder);
+                    }
+                }                
+            }
+
+            return _toReturn;
+        }
+        private void GetAssemblies(string path, HashSet<Assembly> collection)
+        {
+            foreach (string file in Directory.GetFiles(path))
+            {
+                if (Path.GetExtension(file) == ".dll")
+                {
+                    Assembly assembly = Assembly.LoadFile(file);
+
+                    if(!collection.Contains(assembly))
+                        collection.Add(assembly);
+                }                    
+            }
+
+            foreach (string subDirectory in Directory.GetDirectories(path))
+            {
+                GetAssemblies(subDirectory, collection);
             }
         }
         private void Analyze<T>(T targetObj) where T : MemberInfo
