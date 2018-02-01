@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 using Ionic.Zip;
 using UMS.Serialization;
+using UnityEditor;
 using System.Text.RegularExpressions;
+using static UMS.Serialization.CustomSerializers;
 
 namespace UMS.Core
 {
@@ -14,11 +16,9 @@ namespace UMS.Core
     {
         public Mod(string name)
         {
-            _hashToID = new Dictionary<int, int>();
+            _entries = new Dictionary<int, ModEntry>();
+            _usedFileNames = new HashSet<string>();
             _data = new List<ModData>();
-            _idToObject = new Dictionary<int, object>();
-            _entries = new List<ModEntry>();
-            _usedFilenames = new HashSet<string>();
 
             this.name = name;
 
@@ -27,79 +27,107 @@ namespace UMS.Core
 
         [Newtonsoft.Json.JsonIgnore]
         public static Mod Current { get; private set; }
-
-        [Newtonsoft.Json.JsonIgnore]
-        private List<ModEntry> _entries;
-        [Newtonsoft.Json.JsonIgnore]
-        private Dictionary<int, object> _idToObject;
-        [Newtonsoft.Json.JsonIgnore]
-        public IEnumerable<object> Objects { get { return _idToObject.Values; } }
-        [Newtonsoft.Json.JsonIgnore]
-        private Dictionary<int, int> _hashToID;
-        [Newtonsoft.Json.JsonIgnore]
-        private HashSet<string> _usedFilenames;
-
+        
         public string name;
         public List<ModData> _data;
 
+        [Newtonsoft.Json.JsonIgnore]
+        private static Dictionary<int, ModEntry> _entries;
+        [Newtonsoft.Json.JsonIgnore]
+        private static HashSet<string> _usedFileNames;
+
+        //Default(int) must be an invalid ID. Therefore we start at 1
+        private static int CurrentID = 1;
         private static Regex EndNumberParanthesis = new Regex(@"\(\d\)$");
         private const string CONFIG_NAME = "config";
-
-        public int Add(object obj, string name, string extension)
+        
+        public void Serialize(UnityEngine.Object obj)
         {
-            string serialized = JsonSerializer.ToJson(obj);
-            int hash = serialized.GetHashCode();
-            extension = Utility.SanitizeExtension(extension);
-            
-            if (!_hashToID.ContainsKey(hash))
+            Serialize<SerializableObject>(obj);
+        }
+        public T Serialize<T>(UnityEngine.Object obj) where T : SerializableObject
+        {
+            if (Serializer.ContainsSerializer(obj.GetType()))
             {
-                int id = _data.Count + 1;
-
-                string uniqueName = GetValidName(name, _usedFilenames);
-                _usedFilenames.Add(uniqueName);
-                
-                ModEntry entry = new ModEntry()
-                {
-                    json = serialized,
-                    name = uniqueName,
-                    extension = extension,
-                };
-
-                ModData data = new ModData()
-                {
-                    name = uniqueName,
-                    ID = id,
-                    type = obj.GetType(),
-                };
-                
-                _entries.Add(entry);
-                _hashToID.Add(hash, id);
-                _data.Add(data);
-
-                return _entries.Count;
+                return (T)Serializer.SerializeCustom(obj);
             }
             else
             {
-                return _hashToID[hash];
+                UnityEngine.Debug.LogError("Cannot serialize " + obj);
+                return null;
             }
         }
-        public T Get<T>(int id)
+        public int Add(SerializableObject obj)
         {
-            return (T)_idToObject[id];
+            if (_entries.ContainsKey(obj.InstanceID))
+            {
+                if(_entries[obj.InstanceID].HasObject)
+                    return _entries[obj.InstanceID].ID;
+            }
+
+            return CreateEntry(obj);
+        }
+        public static bool Contains(int instanceID)
+        {
+            return _entries.ContainsKey(instanceID);
+        }
+        public static int Get(int instanceID)
+        {
+            if(_entries.ContainsKey(instanceID))
+            {
+                return _entries[instanceID].ID;
+            }
+            else
+            {
+                ModEntry entry = new ModEntry();
+
+                _entries.Add(instanceID, entry);
+
+                return entry.ID;
+            }
+        }
+        private int CreateEntry(SerializableObject obj)
+        {
+            ModEntry entry = new ModEntry(obj);
+
+            if (_entries.ContainsKey(obj.InstanceID))
+            {
+                _entries[obj.InstanceID].SetObject(obj);
+            }
+            else
+            {
+                _entries.Add(obj.InstanceID, entry);
+            }            
+
+            return entry.ID;
         }
         public void Serialize(string path)
         {
             using (ZipFile zip = new ZipFile())
             {
-                zip.AddEntry(CONFIG_NAME, JsonSerializer.ToJson(this));
-                
-                foreach (ModEntry entry in _entries)
+                foreach (KeyValuePair<int, ModEntry> keyValuePair in _entries)
                 {
-                    string fileName = entry.name + "." + entry.extension;
-                    
+                    ModEntry entry = keyValuePair.Value;
+
+                    if (!entry.HasObject)
+                    {
+                        Object obj = EditorUtility.InstanceIDToObject(keyValuePair.Key);
+
+                        UnityEngine.Debug.LogWarning("Skipping " + entry.ID + " which is " + obj);
+                        continue;
+                    }
+
+                    string fileNameWithoutExtension = GetValidName(entry.Name, _usedFileNames);
+                    string fileName = fileNameWithoutExtension + "." + entry.Extension;
+
                     UnityEngine.Debug.Log("Creating file " + fileName);
-                    zip.AddEntry(fileName, entry.json);
+                    zip.AddEntry(fileName, entry.JSON);
+
+                    _usedFileNames.Add(fileNameWithoutExtension);
+                    _data.Add(new ModData(entry));
                 }
+
+                zip.AddEntry(CONFIG_NAME, JsonSerializer.ToJson(this));
 
                 zip.Save(string.Format(@"{0}\{1}.mod", path, name));
             }
@@ -163,29 +191,69 @@ namespace UMS.Core
             files.Remove(CONFIG_NAME);
 
             Current = mod;
-
-            foreach (ModData data in mod._data)
-            {
-                object obj = JsonSerializer.ToObject(files[data.name], data.type);
-
-                mod._idToObject.Add(data.ID, obj);
-            }
-
+            
             return mod;
         }
 
-        [System.Serializable]
+        [Serializable]
         public struct ModData
         {
+            public ModData(ModEntry entry)
+            {
+                name = entry.Name;
+                ID = entry.ID;
+                type = entry.Type;
+            }
+
             public string name;
             public int ID;
             public Type type;
         }
-        public struct ModEntry
+        public class ModEntry
         {
-            public string json;
-            public string name;
-            public string extension;
+            public ModEntry()
+            {
+                ID = CurrentID++;
+            }
+            public ModEntry(SerializableObject obj)
+            {
+                ID = CurrentID++;
+
+                SetObject(obj);
+            }
+
+            public void SetObject(SerializableObject obj)
+            {
+                if (HasObject || obj == null)
+                    return;
+
+                HasObject = true;
+                _obj = obj;
+                Extension = obj.Extension;
+                Type = obj.GetType();
+            }
+        
+            public string JSON
+            {
+                get
+                {
+                    return JsonSerializer.ToJson(_obj);
+                }
+            }
+            private SerializableObject _obj;
+
+            public string Name
+            {
+                get
+                {
+                    return _obj.ToString();
+                }
+            }
+
+            public bool HasObject { get; private set; }
+            public string Extension { get; private set; }
+            public int ID { get; private set; }
+            public Type Type { get; private set; }
         }
     }
 }

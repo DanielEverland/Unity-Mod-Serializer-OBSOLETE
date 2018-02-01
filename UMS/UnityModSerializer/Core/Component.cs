@@ -7,19 +7,19 @@ using UMS.Serialization;
 
 namespace UMS.Core
 {
-    [System.Serializable]
-    public class Component
-    {
-        public Component(UnityEngine.Component component)
-        {
-            if (component == null)
-                return;
+    //[System.Serializable]
+    //public class Component
+    //{
+    //    public Component(UnityEngine.Component component)
+    //    {
+    //        if (component == null)
+    //            return;
 
-            _componentType = component.GetType();
-            _members = Utility.GetMembers(component);
-        }
+    //        _componentType = component.GetType();
+    //        _members = Utility.GetMembers(component);
+    //    }
 
-        public Type _componentType;
-        public List<Member> _members;
-    }
+    //    public Type _componentType;
+    //    public List<Member> _members;
+    //}
 }

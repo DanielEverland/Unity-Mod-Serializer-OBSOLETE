@@ -8,71 +8,71 @@ using UMS.Core;
 
 namespace UMS.Deserialization
 {
-    public static class ObjectCreator
-    {
-        public static GameObject CreateObject(Core.Object obj, Transform parent)
-        {
-            GameObject gameObject = new GameObject();
-            gameObject.transform.SetParent(parent);
+    //public static class ObjectCreator
+    //{
+    //    public static GameObject CreateObject(Core.Object obj, Transform parent)
+    //    {
+    //        GameObject gameObject = new GameObject();
+    //        gameObject.transform.SetParent(parent);
 
-            LoadMembers(gameObject, obj._members);
+    //        LoadMembers(gameObject, obj._members);
 
-            foreach (Core.Component comp in obj._components)
-            {
-                UnityEngine.Component unityComponent = null;
+    //        foreach (Core.Component comp in obj._components)
+    //        {
+    //            UnityEngine.Component unityComponent = null;
 
-                if(comp._componentType == typeof(Transform))
-                {
-                    LoadMembers(gameObject.GetComponent<Transform>(), comp._members);
-                }
-                else if(TryAdd(comp._componentType, gameObject, out unityComponent))
-                {
-                    LoadMembers(unityComponent, comp._members);
-                }
-            }
+    //            if(comp._componentType == typeof(Transform))
+    //            {
+    //                LoadMembers(gameObject.GetComponent<Transform>(), comp._members);
+    //            }
+    //            else if(TryAdd(comp._componentType, gameObject, out unityComponent))
+    //            {
+    //                LoadMembers(unityComponent, comp._members);
+    //            }
+    //        }
 
-            obj._children.ForEach(x => CreateObject(x, gameObject.transform));
+    //        obj._children.ForEach(x => CreateObject(x, gameObject.transform));
 
-            return gameObject;
-        }
-        private static void LoadMembers(object target, IEnumerable<Member> members)
-        {
-            if (target == null || members == null)
-                return;
+    //        return gameObject;
+    //    }
+    //    private static void LoadMembers(object target, IEnumerable<Member> members)
+    //    {
+    //        if (target == null || members == null)
+    //            return;
 
-            foreach (Member member in members)
-            {
-                if (member._value == null)
-                    continue;
+    //        foreach (Member member in members)
+    //        {
+    //            if (member._value == null)
+    //                continue;
                 
-                member.AssignValue(target);
-            }
-        }
-        private static bool TryGet(Type type, GameObject gameobject, out UnityEngine.Component component)
-        {
-            try
-            {
-                component = gameobject.GetComponent(type);
-                return true;
-            }
-            catch (Exception)
-            {
-                component = null;
-                return false;
-            }
-        }
-        private static bool TryAdd(Type type, GameObject gameobject, out UnityEngine.Component component)
-        {
-            try
-            {
-                component = gameobject.AddComponent(type);
-                return true;
-            }
-            catch (Exception)
-            {
-                component = null;
-                return false;
-            }
-        }
-    }
+    //            member.AssignValue(target);
+    //        }
+    //    }
+    //    private static bool TryGet(Type type, GameObject gameobject, out UnityEngine.Component component)
+    //    {
+    //        try
+    //        {
+    //            component = gameobject.GetComponent(type);
+    //            return true;
+    //        }
+    //        catch (Exception)
+    //        {
+    //            component = null;
+    //            return false;
+    //        }
+    //    }
+    //    private static bool TryAdd(Type type, GameObject gameobject, out UnityEngine.Component component)
+    //    {
+    //        try
+    //        {
+    //            component = gameobject.AddComponent(type);
+    //            return true;
+    //        }
+    //        catch (Exception)
+    //        {
+    //            component = null;
+    //            return false;
+    //        }
+    //    }
+    //}
 }

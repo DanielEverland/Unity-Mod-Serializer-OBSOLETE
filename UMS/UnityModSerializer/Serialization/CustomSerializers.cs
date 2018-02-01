@@ -1,8 +1,10 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UMS.Core;
 using UnityEngine.Rendering;
 using UnityEditor;
 using UMS.Behaviour;
+using Newtonsoft.Json;
 
 namespace UMS.Serialization
 {
@@ -21,11 +23,15 @@ namespace UMS.Serialization
         //    {
         //        //Set fields
         //    }
-        //
+
         //    //field1
         //    //field2
-        //
+
         //    public static implicit operator TYPE(SerializableTYPE serialized)
+        //    {
+        //        return new TYPE();
+        //    }
+        //    public static implicit operator SerializableTYPE(TYPE info)
         //    {
         //        return new TYPE();
         //    }
@@ -35,34 +41,141 @@ namespace UMS.Serialization
 
         //------------------Object------------------//
         [System.Serializable]
-        public class SerializableObject
+        public abstract class SerializableObject
         {
-            public SerializableObject(UnityEngine.Object input)
+            public SerializableObject(Object input)
             {
                 if (input == null)
                     return;
 
                 this.name = input.name;
                 this.hideFlags = (uint)input.hideFlags;
+
+                InstanceID = input.GetInstanceID();
+
+                SerializableID = Mod.Current.Add(this);
             }
 
             public string name;
             public uint hideFlags;
 
-            public static implicit operator UnityEngine.Object(SerializableObject serialized)
-            {
-                if (serialized == null)
-                    return null;
+            [JsonIgnore]
+            public int InstanceID { get; private set; }
+            [JsonIgnore]
+            public abstract string Extension { get; }
+            [JsonIgnore]
+            public int SerializableID { get; private set; }
 
-                return new UnityEngine.Object()
-                {
-                    name = serialized.name,
-                    hideFlags = (HideFlags)serialized.hideFlags,
-                };
-            }
-            public static implicit operator SerializableObject(UnityEngine.Object input)
+            public static implicit operator int(SerializableObject obj)
             {
-                return new SerializableObject(input);
+                return Mod.Get(obj.InstanceID);
+            }
+            public override string ToString()
+            {
+                return name;
+            }
+        }
+        //------------------------------------//
+
+        //------------------GameObject------------------//
+        [TypeSerializer(typeof(GameObject))]
+        public static object SerializeGameObject(GameObject input)
+        {
+            return new SerializableGameObject(input);
+        }
+        [System.Serializable]
+        public class SerializableGameObject : SerializableObject
+        {
+            public SerializableGameObject(GameObject input) : base(input)
+            {
+                if (input == null)
+                    return;
+
+                layer = input.layer;
+                activeInHierarchy = input.activeInHierarchy;
+                isStatic = input.isStatic;
+                tag = input.tag;
+
+                _components = new List<int>();
+
+                foreach (Component comp in input.GetComponents<Component>())
+                {
+                    _components.Add(new SerializableComponent(comp));
+                }
+
+                foreach (Transform child in input.transform)
+                {
+                    Mod.Current.Serialize(child.gameObject);
+                }
+            }
+
+            public override string Extension => "gameObject";
+
+            public int layer;
+            public bool activeInHierarchy;
+            public bool isStatic;
+            public string tag;
+
+            public List<int> _components;
+
+            public static implicit operator GameObject(SerializableGameObject serialized)
+            {
+                GameObject obj = new GameObject(serialized.name);
+
+                obj.layer = serialized.layer;
+                obj.SetActive(serialized.activeInHierarchy);
+                obj.isStatic = serialized.isStatic;
+                obj.tag = serialized.tag;
+
+                return obj;
+            }
+            public static implicit operator SerializableGameObject(GameObject input)
+            {
+                return new SerializableGameObject(input);
+            }
+        }
+        //------------------------------------//
+        
+        //------------------Component------------------//
+        [System.Serializable]
+        public class SerializableComponent : SerializableObject
+        {
+            public SerializableComponent(Component input) : base(input)
+            {
+                if (input == null)
+                    return;
+
+                _customName = string.Format("{0} - {1}", input.gameObject.name, input.GetType().Name);
+
+                _type = input.GetType();
+                _members = Utility.GetMembers(input);
+                _gameObject = new Reference(input.gameObject);
+            }
+
+            public override string Extension => "component";
+
+            public Reference _gameObject;
+            public System.Type _type;
+            public List<Member> _members;
+            public List<Reference> _children;
+
+            [JsonIgnore]
+            private string _customName = null;
+
+            public static implicit operator Component(SerializableComponent serialized)
+            {
+                throw new System.NotImplementedException();
+            }
+            public static implicit operator SerializableComponent(Component info)
+            {
+                return new SerializableComponent(info);
+            }
+            public override string ToString()
+            {
+                if (_customName != null)
+                    return _customName;
+
+                return base.ToString();
             }
         }
         //------------------------------------//
@@ -356,7 +469,7 @@ namespace UMS.Serialization
         [TypeSerializer(typeof(Mesh))]
         public static object SerializeMesh(Mesh mesh)
         {
-            return new SerializableMesh(mesh);
+            return new Reference(mesh);
         }
         [System.Serializable]
         public class SerializableMesh : SerializableObject
@@ -380,8 +493,10 @@ namespace UMS.Serialization
                 this.colors = Utility.Copy<SerializableColor>(mesh.colors);
                 this.colors32 = Utility.Copy<SerializableColor>(mesh.colors32);
                 this.triangles = mesh.triangles;
-        }
-            
+            }
+
+            public override string Extension => "mesh";
+
             public uint indexFormat;
             public SerializableBoneWeight[] boneWeights;
             public SerializableMatrix4x4[] bindposes;
@@ -418,7 +533,7 @@ namespace UMS.Serialization
 
                 mesh.tangents = Utility.Copy<Vector4>(serialized.tangents);
 
-                mesh.indexFormat = (UnityEngine.Rendering.IndexFormat)serialized.indexFormat;
+                mesh.indexFormat = (IndexFormat)serialized.indexFormat;
                 mesh.boneWeights = Utility.Copy<BoneWeight>(serialized.boneWeights);
                 mesh.bindposes = Utility.Copy<Matrix4x4>(serialized.bindposes);
                 
@@ -440,7 +555,7 @@ namespace UMS.Serialization
         [TypeSerializer(typeof(Texture))]
         public static object SerializeTexture(Texture input)
         {
-            return new SerializableTexture(input);
+            return new Reference(input);
         }
         [System.Serializable]
         public class SerializableTexture : SerializableObject
@@ -460,7 +575,9 @@ namespace UMS.Serialization
                 this.width = input.width;
                 this.filterMode = (uint)input.filterMode;
             }
-            
+
+            public override string Extension => "texture";
+
             public float mipMapBias;
             public uint wrapModeW;
             public uint wrapModeV;
@@ -661,13 +778,15 @@ namespace UMS.Serialization
         [TypeSerializer(typeof(Shader))]
         public static object SerializeShader(Shader input)
         {
-            return new SerializableShader(input);
+            return new Reference(input);
         }
         [System.Serializable]
         public class SerializableShader : SerializableObject
         {
             public SerializableShader(Shader input) : base(input) { }
-            
+
+            public override string Extension => "shader";
+
             public static implicit operator Shader(SerializableShader serialized)
             {
                 if (serialized == null)
@@ -686,81 +805,66 @@ namespace UMS.Serialization
         [TypeSerializer(typeof(Material))]
         public static object SerializeMaterial(Material input)
         {
-            return new SerializableMaterial(input);
+            return new Reference(input);
         }
         [System.Serializable]
-        public class SerializableMaterial
+        public class SerializableMaterial : SerializableObject
         {
-            public SerializableMaterial(Material input)
+            public SerializableMaterial(Material input) : base(input)
             {
                 if (input == null)
                     return;
-                
-                id = Mod.Current.Add(new Data(input), input.name, "material");
+
+                if (input.name == null)
+                    return;
+
+                this.shader = new Reference(input.shader);
+                this.globalIlluminationFlags = (uint)input.globalIlluminationFlags;
+                this.shaderKeywords = input.shaderKeywords;
+                this.renderQueue = input.renderQueue;
+                this.mainTexture = input.mainTexture;
+                this.mainTextureScale = input.mainTextureScale;
+                this.mainTextureOffset = input.mainTextureOffset;
+                this.enableInstancing = input.enableInstancing;
+                this.doubleSidedGI = input.doubleSidedGI;
+                this.color = input.color;
             }
 
-            public int id;
+            public override string Extension => "material";
 
-            [System.Serializable]
-            public class Data : SerializableObject
-            {
-                public Data(Material input) : base(input)
-                {
-                    if (input == null)
-                        return;
-
-                    if (input.name == null)
-                        return;
-
-                    this.shader = input.shader;
-                    this.globalIlluminationFlags = (uint)input.globalIlluminationFlags;
-                    this.shaderKeywords = input.shaderKeywords;
-                    this.renderQueue = input.renderQueue;
-                    this.mainTexture = input.mainTexture;
-                    this.mainTextureScale = input.mainTextureScale;
-                    this.mainTextureOffset = input.mainTextureOffset;
-                    this.enableInstancing = input.enableInstancing;
-                    this.doubleSidedGI = input.doubleSidedGI;
-                    this.color = input.color;
-                }
-
-                public SerializableShader shader;
-                public uint globalIlluminationFlags;
-                public string[] shaderKeywords;
-                public int renderQueue;
-                public SerializableVector2 mainTextureScale;
-                public SerializableVector2 mainTextureOffset;
-                public SerializableTexture mainTexture;
-                public SerializableColor color;
-                public bool enableInstancing;
-                public bool doubleSidedGI;
-            }
-
+            public Reference shader;
+            public uint globalIlluminationFlags;
+            public string[] shaderKeywords;
+            public int renderQueue;
+            public SerializableVector2 mainTextureScale;
+            public SerializableVector2 mainTextureOffset;
+            public SerializableTexture mainTexture;
+            public SerializableColor color;
+            public bool enableInstancing;
+            public bool doubleSidedGI;
+            
             public static implicit operator Material(SerializableMaterial serialized)
             {
                 if (serialized == null)
                     return null;
-                
-                Data data = Mod.Current.Get<Data>(serialized.id);
-                
-                if (data == null)
-                    return null;
 
-#pragma warning disable
-                Material toReturn =  new Material(data.shader);
-#pragma warning restore
-                
-                toReturn.globalIlluminationFlags = (MaterialGlobalIlluminationFlags)data.globalIlluminationFlags;
-                toReturn.shaderKeywords = data.shaderKeywords;
-                toReturn.renderQueue = data.renderQueue;
-                toReturn.mainTexture = data.mainTexture;
-                toReturn.mainTextureOffset = data.mainTextureOffset;
-                toReturn.mainTextureScale = data.mainTextureScale;
-                toReturn.enableInstancing = data.enableInstancing;
-                toReturn.doubleSidedGI = data.doubleSidedGI;
-                toReturn.color = data.color;
+                throw new System.NotImplementedException();
 
-                return toReturn;
+//#pragma warning disable
+//                Material toReturn =  new Material(serialized.shader);
+//#pragma warning restore
+                
+//                toReturn.globalIlluminationFlags = (MaterialGlobalIlluminationFlags)serialized.globalIlluminationFlags;
+//                toReturn.shaderKeywords = serialized.shaderKeywords;
+//                toReturn.renderQueue = serialized.renderQueue;
+//                toReturn.mainTexture = serialized.mainTexture;
+//                toReturn.mainTextureOffset = serialized.mainTextureOffset;
+//                toReturn.mainTextureScale = serialized.mainTextureScale;
+//                toReturn.enableInstancing = serialized.enableInstancing;
+//                toReturn.doubleSidedGI = serialized.doubleSidedGI;
+//                toReturn.color = serialized.color;
+
+//                return toReturn;
             }
             public static implicit operator SerializableMaterial(Material input)
             {
@@ -807,91 +911,48 @@ namespace UMS.Serialization
             }
         }
         //------------------------------------//
-
-        //------------------HideFlags------------------//
-        [TypeSerializer(typeof(HideFlags))]
-        public static object SerializeHideFlags(HideFlags input)
-        {
-            return new SerializableHideFlags(input);
-        }
-        [System.Serializable]
-        public class SerializableHideFlags
-        {
-            public SerializableHideFlags(HideFlags input)
-            {
-                _flags = (uint)input;
-            }
-
-            public uint _flags;
-
-            public static implicit operator HideFlags(SerializableHideFlags serialized)
-            {
-                return (HideFlags)serialized._flags;
-            }
-            public static implicit operator SerializableHideFlags(HideFlags input)
-            {
-                return new SerializableHideFlags(input);
-            }
-        }
-        //------------------------------------//
-
+        
         //------------------PhysicMaterial------------------//
         [TypeSerializer(typeof(PhysicMaterial))]
         public static object SerializeTYPE(PhysicMaterial input)
         {
-            return new SerializablePhysicMaterial(input);
+            return new Reference(input);
         }
         [System.Serializable]
-        public class SerializablePhysicMaterial
+        public class SerializablePhysicMaterial : SerializableObject
         {
-            public SerializablePhysicMaterial(PhysicMaterial input)
+            public SerializablePhysicMaterial(PhysicMaterial input) : base(input)
             {
                 if (input == null)
                     return;
 
-                _id = Mod.Current.Add(new Data(input), input.name, "physicMaterial");
+                dynamicFriction = input.dynamicFriction;
+                staticFriction = input.staticFriction;
+                bounciness = input.bounciness;
+                frictionCombine = (int)input.frictionCombine;
+                bounceCombine = (int)input.bounceCombine;
             }
 
-            public int _id;
+            public override string Extension => "physicsMaterial";
 
-            public class Data : SerializableObject
-            {
-                public Data(PhysicMaterial physicMaterial) : base(physicMaterial)
-                {
-                    if (physicMaterial == null)
-                        return;
-
-                    dynamicFriction = physicMaterial.dynamicFriction;
-                    staticFriction = physicMaterial.staticFriction;
-                    bounciness = physicMaterial.bounciness;
-                    frictionCombine = (int)physicMaterial.frictionCombine;
-                    bounceCombine = (int)physicMaterial.bounceCombine;
-                }
-
-                public float dynamicFriction;
-                public float staticFriction;
-                public float bounciness;
-                public int frictionCombine;
-                public int bounceCombine;
-            }
-
+            public float dynamicFriction;
+            public float staticFriction;
+            public float bounciness;
+            public int frictionCombine;
+            public int bounceCombine;
+            
             public static implicit operator PhysicMaterial(SerializablePhysicMaterial serialized)
             {
                 if (serialized == null)
                     return null;
 
-                Data data = Mod.Current.Get<Data>(serialized._id);
-
-                if (data == null)
-                    return null;
-
                 return new PhysicMaterial()
                 {
-                    dynamicFriction = data.dynamicFriction,
-                    staticFriction = data.staticFriction,
-                    bounciness = data.bounciness,
-                    frictionCombine = (PhysicMaterialCombine)data.frictionCombine,
-                    bounceCombine = (PhysicMaterialCombine)data.bounceCombine,
+                    dynamicFriction = serialized.dynamicFriction,
+                    staticFriction = serialized.staticFriction,
+                    bounciness = serialized.bounciness,
+                    frictionCombine = (PhysicMaterialCombine)serialized.frictionCombine,
+                    bounceCombine = (PhysicMaterialCombine)serialized.bounceCombine,
                 };
             }
             public static implicit operator SerializablePhysicMaterial(PhysicMaterial input)
@@ -934,7 +995,7 @@ namespace UMS.Serialization
         [TypeSerializer(typeof(Sprite))]
         public static object SerializeSprite(Sprite input)
         {
-            return new SerializableSprite(input);
+            return new Reference(input);
         }
         [System.Serializable]
         public class SerializableSprite : SerializableObject
@@ -944,14 +1005,16 @@ namespace UMS.Serialization
                 if (input == null)
                     return;
 
-                _texture = input.texture;
+                _texture = new Reference(input.texture);
                 _rect = input.rect;
                 _pivot = input.pivot;
                 _pixelsPerUnit = input.pixelsPerUnit;
                 _border = input.border;
             }
 
-            public SerializableTexture2D _texture;
+            public override string Extension => "sprite";
+
+            public Reference _texture;
             public SerializableRect _rect;
             public SerializableVector2 _pivot;
             public float _pixelsPerUnit;
@@ -959,7 +1022,8 @@ namespace UMS.Serialization
 
             public static implicit operator Sprite(SerializableSprite serialized)
             {
-                return Sprite.Create(serialized._texture, serialized._rect, serialized._pivot, serialized._pixelsPerUnit, 0, SpriteMeshType.FullRect, serialized._border);
+                throw new System.NotImplementedException();
+                //return Sprite.Create(serialized._texture, serialized._rect, serialized._pivot, serialized._pixelsPerUnit, 0, SpriteMeshType.FullRect, serialized._border);
             }
             public static implicit operator SerializableSprite(Sprite input)
             {

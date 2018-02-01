@@ -18,7 +18,7 @@ namespace UMS.Serialization
         [MenuItem(itemName: Utility.MENU_ITEM_ROOT + "/Serialize Selection", priority = Utility.MENU_ITEM_PRIORITY)]
         private static void SerializeSelection()
         {
-            if (Selection.gameObjects.Length == 0)
+            if (Selection.objects.Length == 0)
             {
                 Debug.LogWarning("No objects selected");
                 return;
@@ -26,27 +26,21 @@ namespace UMS.Serialization
 
             StartNewSerializer();
 
-            for (int i = 0; i < Selection.gameObjects.Length; i++)
+            for (int i = 0; i < Selection.objects.Length; i++)
             {
-                SerializeObject(Selection.gameObjects[i]);
+                Mod.Current.Serialize(Selection.objects[i]);
             }
+
+            Mod.Current.Serialize(@"C:\Users\Daniel\Desktop");
+
+            Debug.Log("Finished serializing");
         }
 
         private static void StartNewSerializer()
         {
             _instance = new Serializer();
-        }
-        private static void SerializeObject(GameObject gameObject)
-        {
-            Mod mod = new Mod("Test Mod");
-            
-            Core.Object obj = new Core.Object(gameObject);
 
-            mod.Add(obj, gameObject.name, "prefab");
-
-            mod.Serialize(@"C:\Users\Daniel\Desktop");
-            
-            Debug.Log("Finished serializing");
+            new Mod("Test Mod");
         }
 
 
@@ -58,7 +52,6 @@ namespace UMS.Serialization
 
             OnBehaviourLoaded += BehaviourLoaded;
             
-            CreateAnalyzers();
             InitializeBehaviours();
         }
 
@@ -71,15 +64,11 @@ namespace UMS.Serialization
         private Dictionary<Type, TypeSerializer> _typeSerializers;
         private Dictionary<Type, TypeBlocker> _blockedTypes;
         private HashSet<string> _blockedMembers;
-
-        private void CreateAnalyzers()
-        {
-              
-        }
+        
         public static object SerializeCustom(object value)
         {
             Type type = value.GetType();
-            
+                        
             if (ContainsSerializer(type) && !IsBlocked(type))
             {
                 TypeSerializer serializer = GetSerializer(type);

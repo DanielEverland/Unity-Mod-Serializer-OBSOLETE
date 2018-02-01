@@ -14,7 +14,6 @@ namespace UMS.Serialization
         [TypeBlocker()]
         public static readonly List<Type> Types = new List<Type>()
         {
-            typeof(GameObject),
             typeof(Transform),
             typeof(Scene),
             typeof(RectTransform),

@@ -84,12 +84,20 @@ namespace UMS.Core
         }
         private void SerializeSingular(object value)
         {
-            _value = SerializeObject(value);
-
-            if (Serializer.ContainsSerializer(value.GetType()))
+            if(value is UnityEngine.Object)
             {
-                _type = _value.GetType();
+                _value = new Reference(value as UnityEngine.Object);
+                _type = typeof(Reference);
             }
+            else
+            {
+                _value = SerializeObject(value);
+
+                if (Serializer.ContainsSerializer(value.GetType()))
+                {
+                    _type = _value.GetType();
+                }
+            }            
         }
         private object SerializeObject(object value)
         {

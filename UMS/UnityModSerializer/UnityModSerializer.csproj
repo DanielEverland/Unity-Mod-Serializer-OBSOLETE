@@ -79,6 +79,7 @@
     <Compile Include="Serialization\CustomSerializers.cs" />
     <Compile Include="Behaviour\BehaviourBase.cs" />
     <Compile Include="Serialization\JsonSerializer.cs" />
+    <Compile Include="Serialization\Reference.cs" />
     <Compile Include="Serialization\Serializer.cs" />
     <Compile Include="Behaviour\TypeBlocker.cs" />
     <Compile Include="Behaviour\TypeSerializer.cs" />

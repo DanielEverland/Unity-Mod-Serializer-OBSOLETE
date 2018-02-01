@@ -20,10 +20,7 @@ namespace UMS.Deserialization
         {
             Mod mod = Mod.Deserialize(path);
 
-            foreach (Core.Object obj in mod.Objects.Where(x => x.GetType().IsAssignableFrom(typeof(Core.Object))))
-            {
-                ObjectCreator.CreateObject(obj, null);
-            }
+            
         }
     }
 }
