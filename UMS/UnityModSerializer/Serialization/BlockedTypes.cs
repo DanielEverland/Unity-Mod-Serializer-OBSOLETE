@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UMS.Behaviour;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace UMS.Serialization
 {
@@ -14,6 +15,7 @@ namespace UMS.Serialization
         {
             typeof(GameObject),
             typeof(Transform),
+            typeof(Scene),
         };
 
         [MemberBlocker()]
