@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using UMS.Serialization;
 
 namespace UMS.Core
 {
@@ -14,6 +15,10 @@ namespace UMS.Core
         public const string MENU_ITEM_ROOT = "Modding";
         public const string MENU_SERIALIZATION = "Serialization";
         
+        public static string GetObjectMemberName(string objName, string memberName)
+        {
+            return string.Format("{0}.{1}", objName, memberName);
+        }
         public static bool ContainsAttribute(MemberInfo member, Type type)
         {
             return member.GetCustomAttributes(false).Any(x => type.IsAssignableFrom(x.GetType()));
@@ -32,23 +37,45 @@ namespace UMS.Core
 
             foreach (FieldInfo field in obj.GetType().GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance))
             {
+                if (Serializer.IsBlocked(GetObjectMemberName(field.DeclaringType.Name, field.Name)))
+                    continue;
+
                 if (!CanAccessMember(field))
                     continue;
                 
-                members.Add(new Member(field.Name, field.GetValue(obj), false));
+                try
+                {
+                    members.Add(new Member(field.Name, field.GetValue(obj), false));
+                }
+                catch (Exception)
+                {
+                    UnityEngine.Debug.LogError("Issue getting value of " + GetObjectMemberName(field.DeclaringType.Name, field.Name));
+                    throw;
+                }
             }
 
             foreach (PropertyInfo property in obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance))
             {
+                if (Serializer.IsBlocked(GetObjectMemberName(property.DeclaringType.Name, property.Name)))
+                    continue;
+                                
                 MethodInfo method = property.GetGetMethod();
-
+                
                 if (method == null)
                     continue;
 
                 if (!CanAccessMember(property))
                     continue;
-                
-                members.Add(new Member(property.Name, property.GetValue(obj, null), true));
+
+                try
+                {
+                    members.Add(new Member(property.Name, property.GetValue(obj, null), true));
+                }
+                catch (Exception)
+                {
+                    UnityEngine.Debug.LogError("Issue getting value of " + GetObjectMemberName(property.DeclaringType.Name, property.Name));
+                    throw;
+                }             
             }
 
             return members.Where(x => x._value != null).ToList();

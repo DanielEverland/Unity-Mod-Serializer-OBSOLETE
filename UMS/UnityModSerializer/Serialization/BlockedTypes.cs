@@ -15,5 +15,13 @@ namespace UMS.Serialization
             typeof(GameObject),
             typeof(Transform),
         };
+
+        [MemberBlocker()]
+        public static readonly List<string> Members = new List<string>()
+        {
+            "MeshFilter.mesh",
+            "Renderer.material",
+            "Renderer.materials",
+        };
     }
 }

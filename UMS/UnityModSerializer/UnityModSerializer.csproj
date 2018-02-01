@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="Behaviour\BehaviourException.cs" />
     <Compile Include="Behaviour\IBehaviourLoader.cs" />
+    <Compile Include="Behaviour\MemberBlocker.cs" />
     <Compile Include="Behaviour\TypeBehaviour.cs" />
     <Compile Include="Core\Component.cs" />
     <Compile Include="Core\Extensions.cs" />

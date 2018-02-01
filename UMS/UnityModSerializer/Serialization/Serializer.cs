@@ -54,6 +54,7 @@ namespace UMS.Serialization
         {
             _typeSerializers = new Dictionary<Type, TypeSerializer>();
             _blockedTypes = new Dictionary<Type, TypeBlocker>();
+            _blockedMembers = new HashSet<string>();
 
             OnBehaviourLoaded += BehaviourLoaded;
             
@@ -65,9 +66,11 @@ namespace UMS.Serialization
         
         private static Dictionary<Type, TypeSerializer> Serializers { get { return _instance._typeSerializers; } }
         private static Dictionary<Type, TypeBlocker> BlockedTypes { get { return _instance._blockedTypes; } }
+        private static HashSet<string> BlockedMembers { get { return _instance._blockedMembers; } }
 
         private Dictionary<Type, TypeSerializer> _typeSerializers;
         private Dictionary<Type, TypeBlocker> _blockedTypes;
+        private HashSet<string> _blockedMembers;
 
         private void CreateAnalyzers()
         {
@@ -76,7 +79,7 @@ namespace UMS.Serialization
         public static object SerializeCustom(object value)
         {
             Type type = value.GetType();
-
+            
             if (ContainsSerializer(type) && !IsBlocked(type))
             {
                 TypeSerializer serializer = GetSerializer(type);
@@ -91,6 +94,10 @@ namespace UMS.Serialization
             Debug.LogError("Couldn't serialize " + type + value);
 
             return null;
+        }
+        public static bool IsBlocked(string memberObjectName)
+        {
+            return BlockedMembers.Contains(memberObjectName);
         }
         public static bool IsBlocked(Type type)
         {
@@ -217,6 +224,18 @@ namespace UMS.Serialization
                 foreach (Type type in blocker.TypeFunction())
                 {
                     AddBehaviour(_blockedTypes, type, blocker);
+                }
+            }
+            else if(behaviour is MemberBlocker)
+            {
+                MemberBlocker blocker = behaviour as MemberBlocker;
+
+                foreach (string memberObjectName in blocker.MemberFunction())
+                {
+                    if (!_blockedMembers.Contains(memberObjectName))
+                    {
+                        _blockedMembers.Add(memberObjectName);
+                    }
                 }
             }
         }
