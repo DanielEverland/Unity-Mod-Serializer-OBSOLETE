@@ -5,6 +5,7 @@ using System.Text;
 using UMS.Behaviour;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace UMS.Serialization
 {
@@ -16,6 +17,7 @@ namespace UMS.Serialization
             typeof(GameObject),
             typeof(Transform),
             typeof(Scene),
+            typeof(RectTransform),
         };
 
         [MemberBlocker()]
@@ -24,6 +26,8 @@ namespace UMS.Serialization
             "MeshFilter.mesh",
             "Renderer.material",
             "Renderer.materials",
+            "Canvas.rootCanvas",
+            "Graphic.canvas",
         };
     }
 }

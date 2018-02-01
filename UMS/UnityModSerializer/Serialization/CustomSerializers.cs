@@ -900,5 +900,72 @@ namespace UMS.Serialization
             }
         }
         //------------------------------------//
+
+        //------------------Rect------------------//
+        [TypeSerializer(typeof(Rect))]
+        public static object SerializeRect(Rect input)
+        {
+            return new SerializableRect(input);
+        }
+        [System.Serializable]
+        public class SerializableRect
+        {
+            public SerializableRect(Rect input)
+            {
+                _position = input.position;
+                _size = input.size;
+            }
+
+            private SerializableVector2 _position;
+            private SerializableVector2 _size;
+
+            public static implicit operator Rect(SerializableRect serialized)
+            {
+                return new Rect(serialized._position, serialized._size);
+            }
+            public static implicit operator SerializableRect(Rect input)
+            {
+                return new SerializableRect(input);
+            }
+        }
+        //------------------------------------//
+
+        //------------------Sprite------------------//
+        [TypeSerializer(typeof(Sprite))]
+        public static object SerializeSprite(Sprite input)
+        {
+            return new SerializableSprite(input);
+        }
+        [System.Serializable]
+        public class SerializableSprite : SerializableObject
+        {
+            public SerializableSprite(Sprite input) : base(input)
+            {
+                if (input == null)
+                    return;
+
+                _texture = input.texture;
+                _rect = input.rect;
+                _pivot = input.pivot;
+                _pixelsPerUnit = input.pixelsPerUnit;
+                _border = input.border;
+            }
+
+            public SerializableTexture2D _texture;
+            public SerializableRect _rect;
+            public SerializableVector2 _pivot;
+            public float _pixelsPerUnit;
+            public SerializableVector4 _border;
+
+            public static implicit operator Sprite(SerializableSprite serialized)
+            {
+                return Sprite.Create(serialized._texture, serialized._rect, serialized._pivot, serialized._pixelsPerUnit, 0, SpriteMeshType.FullRect, serialized._border);
+            }
+            public static implicit operator SerializableSprite(Sprite input)
+            {
+                return new SerializableSprite(input);
+            }
+        }
+        //------------------------------------//
     }
 }
