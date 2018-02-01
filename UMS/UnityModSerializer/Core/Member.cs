@@ -11,11 +11,13 @@ namespace UMS.Core
     [System.Serializable]
     public class Member
     {
-        public Member(string memberName, object value, bool isProperty)
+        public Member(MemberInfo info, object value, bool isProperty)
         {
-            _isProperty = isProperty;
-            _memberName = memberName;
+            _currentMember = info;
 
+            _isProperty = isProperty;
+            _memberName = info.Name;
+            
             if (value == null)
                 return;
             
@@ -41,6 +43,8 @@ namespace UMS.Core
         public bool _isProperty;
         public object _value;
         public Type _type;
+
+        private static MemberInfo _currentMember;
 
         private void SerializeArray(Array array)
         {
@@ -90,7 +94,8 @@ namespace UMS.Core
             }
             else
             {
-                UnityEngine.Debug.LogWarning("Cannot serialize object " + value.GetType() + " " + value);
+                UnityEngine.Debug.LogError(string.Format("Cannot serialize {0} {1} on {2}", value.GetType(), value,
+                    Utility.GetObjectMemberName(_currentMember.DeclaringType.Name, _currentMember.Name)));
                 return null;
             }
         }

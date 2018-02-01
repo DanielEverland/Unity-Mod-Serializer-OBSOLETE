@@ -45,7 +45,7 @@ namespace UMS.Core
                 
                 try
                 {
-                    members.Add(new Member(field.Name, field.GetValue(obj), false));
+                    members.Add(new Member(field, field.GetValue(obj), false));
                 }
                 catch (Exception)
                 {
@@ -69,7 +69,7 @@ namespace UMS.Core
 
                 try
                 {
-                    members.Add(new Member(property.Name, property.GetValue(obj, null), true));
+                    members.Add(new Member(property, property.GetValue(obj, null), true));
                 }
                 catch (Exception)
                 {
