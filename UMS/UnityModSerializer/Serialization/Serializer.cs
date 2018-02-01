@@ -42,7 +42,7 @@ namespace UMS.Serialization
             
             Core.Object obj = new Core.Object(gameObject);
 
-            mod.Add(obj, obj.GetHashCode(), gameObject.name, "prefab");
+            mod.Add(obj, gameObject.name, "prefab");
 
             mod.Serialize(@"C:\Users\Daniel\Desktop");
             

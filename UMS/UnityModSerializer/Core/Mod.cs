@@ -45,8 +45,10 @@ namespace UMS.Core
         private static Regex EndNumberParanthesis = new Regex(@"\(\d\)$");
         private const string CONFIG_NAME = "config";
 
-        public int Add(object obj, int hash, string name, string extension)
+        public int Add(object obj, string name, string extension)
         {
+            string serialized = JsonSerializer.ToJson(obj);
+            int hash = serialized.GetHashCode();
             extension = Utility.SanitizeExtension(extension);
             
             if (!_hashToID.ContainsKey(hash))
@@ -55,10 +57,10 @@ namespace UMS.Core
 
                 string uniqueName = GetValidName(name, _usedFilenames);
                 _usedFilenames.Add(uniqueName);
-
+                
                 ModEntry entry = new ModEntry()
                 {
-                    json = JsonSerializer.ToJson(obj),
+                    json = serialized,
                     name = uniqueName,
                     extension = extension,
                 };

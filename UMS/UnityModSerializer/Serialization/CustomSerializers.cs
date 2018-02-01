@@ -696,7 +696,7 @@ namespace UMS.Serialization
                 if (input == null)
                     return;
                 
-                id = Mod.Current.Add(new Data(input), input.GetHashCode(), input.name, "material");
+                id = Mod.Current.Add(new Data(input), input.name, "material");
             }
 
             public int id;
@@ -849,7 +849,7 @@ namespace UMS.Serialization
                 if (input == null)
                     return;
 
-                _id = Mod.Current.Add(new Data(input), input.GetHashCode(), input.name, "physicMaterial");
+                _id = Mod.Current.Add(new Data(input), input.name, "physicMaterial");
             }
 
             public int _id;
