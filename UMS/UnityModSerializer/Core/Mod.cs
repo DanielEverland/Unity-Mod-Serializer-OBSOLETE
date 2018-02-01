@@ -64,11 +64,17 @@ namespace UMS.Core
                     name = uniqueName,
                     extension = extension,
                 };
+
+                ModData data = new ModData()
+                {
+                    name = uniqueName,
+                    ID = id,
+                    type = obj.GetType(),
+                };
                 
                 _entries.Add(entry);
-                _idToObject.Add(id, obj);
                 _hashToID.Add(hash, id);
-                _data.Add(new ModData() { name = uniqueName, ID = id, type = obj.GetType() });
+                _data.Add(data);
 
                 return _entries.Count;
             }
