@@ -13,6 +13,9 @@ namespace UMS.Core
     {
         public Member(MemberInfo info, object value, bool isProperty)
         {
+            if (info == null)
+                return;
+
             _currentMember = info;
 
             _isProperty = isProperty;
@@ -21,7 +24,13 @@ namespace UMS.Core
             if (value == null)
                 return;
             
-            if (value.GetType().IsArray)
+            if(value is Enum)
+            {
+                SerializeSingular(Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType())));
+
+                _type = value.GetType();
+            }
+            else if (value.GetType().IsArray)
             {
                 Type valueType = value.GetType().GetElementType();
 

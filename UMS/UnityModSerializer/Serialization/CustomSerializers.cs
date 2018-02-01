@@ -864,15 +864,15 @@ namespace UMS.Serialization
                     dynamicFriction = physicMaterial.dynamicFriction;
                     staticFriction = physicMaterial.staticFriction;
                     bounciness = physicMaterial.bounciness;
-                    frictionCombine = physicMaterial.frictionCombine;
-                    bounceCombine = physicMaterial.bounceCombine;
+                    frictionCombine = (int)physicMaterial.frictionCombine;
+                    bounceCombine = (int)physicMaterial.bounceCombine;
                 }
 
                 public float dynamicFriction;
                 public float staticFriction;
                 public float bounciness;
-                public SerializablePhysicMaterialCombine frictionCombine;
-                public SerializablePhysicMaterialCombine bounceCombine;
+                public int frictionCombine;
+                public int bounceCombine;
             }
 
             public static implicit operator PhysicMaterial(SerializablePhysicMaterial serialized)
@@ -890,40 +890,13 @@ namespace UMS.Serialization
                     dynamicFriction = data.dynamicFriction,
                     staticFriction = data.staticFriction,
                     bounciness = data.bounciness,
-                    frictionCombine = data.frictionCombine,
-                    bounceCombine = data.bounceCombine,
+                    frictionCombine = (PhysicMaterialCombine)data.frictionCombine,
+                    bounceCombine = (PhysicMaterialCombine)data.bounceCombine,
                 };
             }
             public static implicit operator SerializablePhysicMaterial(PhysicMaterial input)
             {
                 return new SerializablePhysicMaterial(input);
-            }
-        }
-        //------------------------------------//
-
-        //------------------PhysicMaterialCombine------------------//
-        [TypeSerializer(typeof(PhysicMaterialCombine))]
-        public static object SerializePhysicMaterialCombine(PhysicMaterialCombine input)
-        {
-            return new SerializablePhysicMaterialCombine(input);
-        }
-        [System.Serializable]
-        public class SerializablePhysicMaterialCombine
-        {
-            public SerializablePhysicMaterialCombine(PhysicMaterialCombine input)
-            {
-                _enum = (uint)input;
-            }
-
-            public uint _enum;
-
-            public static implicit operator PhysicMaterialCombine(SerializablePhysicMaterialCombine serialized)
-            {
-                return (PhysicMaterialCombine)serialized._enum;
-            }
-            public static implicit operator SerializablePhysicMaterialCombine(PhysicMaterialCombine input)
-            {
-                return new SerializablePhysicMaterialCombine(input);
             }
         }
         //------------------------------------//

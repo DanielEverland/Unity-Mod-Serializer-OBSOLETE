@@ -109,6 +109,10 @@ namespace UMS.Core
                     return null;
                 }
             }
+            else if (toType.IsEnum)
+            {
+                return Enum.Parse(toType, obj.ToString());
+            }
             else if (toType.IsArray)
             {
                 Array objd = ConvertAsArray(obj, fromType, toType.GetElementType());
