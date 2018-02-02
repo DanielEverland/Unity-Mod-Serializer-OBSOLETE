@@ -1,9 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UMS.Core;
+﻿using UMS.Core;
 using UnityEngine;
-using static UMS.Serialization.CustomSerializers;
 
 namespace UMS.Serialization
 {
@@ -12,11 +8,16 @@ namespace UMS.Serialization
     {
         public Reference(Object obj)
         {
-            _id = Mod.Get(obj.GetInstanceID());         
+            if(obj == null)
+            {
+                throw new System.NullReferenceException("Object cannot be null!");
+            }
+
+            _id = Mod.Current.GetID(obj);
         }
-
+        
         public int _id;
-
+        
         public static implicit operator Object(Reference reference)
         {
             throw new System.NotImplementedException();

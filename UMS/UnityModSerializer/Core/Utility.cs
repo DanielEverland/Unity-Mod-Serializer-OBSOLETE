@@ -80,7 +80,7 @@ namespace UMS.Core
 
             return members.Where(x => x._value != null).ToList();
         }
-        private static bool CanAccessMember(MemberInfo member)
+        public static bool CanAccessMember(MemberInfo member)
         {
             return !member.GetCustomAttributes(false).Any(x => x.GetType() == typeof(ObsoleteAttribute));
         }

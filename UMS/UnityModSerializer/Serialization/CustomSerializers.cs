@@ -51,25 +51,19 @@ namespace UMS.Serialization
                 this.name = input.name;
                 this.hideFlags = (uint)input.hideFlags;
 
-                InstanceID = input.GetInstanceID();
+                ID = Mod.Current.GetID(input);
 
-                SerializableID = Mod.Current.Add(this);
+                Mod.Current.Add(this, ID);
             }
 
             public string name;
             public uint hideFlags;
-
-            [JsonIgnore]
-            public int InstanceID { get; private set; }
+            
             [JsonIgnore]
             public abstract string Extension { get; }
             [JsonIgnore]
-            public int SerializableID { get; private set; }
-
-            public static implicit operator int(SerializableObject obj)
-            {
-                return Mod.Get(obj.InstanceID);
-            }
+            public int ID { get; private set; }
+            
             public override string ToString()
             {
                 return name;
@@ -96,7 +90,7 @@ namespace UMS.Serialization
                 isStatic = input.isStatic;
                 tag = input.tag;
 
-                _components = new List<int>();
+                _components = new List<SerializableComponent>();
 
                 foreach (Component comp in input.GetComponents<Component>())
                 {
@@ -116,7 +110,7 @@ namespace UMS.Serialization
             public bool isStatic;
             public string tag;
 
-            public List<int> _components;
+            public List<SerializableComponent> _components;
 
             public static implicit operator GameObject(SerializableGameObject serialized)
             {

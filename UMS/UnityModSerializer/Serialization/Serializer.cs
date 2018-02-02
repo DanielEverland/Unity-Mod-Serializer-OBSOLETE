@@ -28,7 +28,9 @@ namespace UMS.Serialization
 
             for (int i = 0; i < Selection.objects.Length; i++)
             {
-                Mod.Current.Serialize(Selection.objects[i]);
+                UnityEngine.Object toSerialize = UnityEngine.Object.Instantiate(Selection.objects[i]);
+
+                Mod.Current.Serialize(toSerialize);
             }
 
             Mod.Current.Serialize(@"C:\Users\Daniel\Desktop");

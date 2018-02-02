@@ -8,6 +8,7 @@ using UMS.Serialization;
 using UnityEditor;
 using System.Text.RegularExpressions;
 using static UMS.Serialization.CustomSerializers;
+using System.Reflection;
 
 namespace UMS.Core
 {
@@ -19,6 +20,7 @@ namespace UMS.Core
             _entries = new Dictionary<int, ModEntry>();
             _usedFileNames = new HashSet<string>();
             _data = new List<ModData>();
+            references = new Queue<Reference>();
 
             this.name = name;
 
@@ -32,12 +34,13 @@ namespace UMS.Core
         public List<ModData> _data;
 
         [Newtonsoft.Json.JsonIgnore]
+        public Queue<Reference> references;
+
+        [Newtonsoft.Json.JsonIgnore]
         private static Dictionary<int, ModEntry> _entries;
         [Newtonsoft.Json.JsonIgnore]
         private static HashSet<string> _usedFileNames;
-
-        //Default(int) must be an invalid ID. Therefore we start at 1
-        private static int CurrentID = 1;
+        
         private static Regex EndNumberParanthesis = new Regex(@"\(\d\)$");
         private const string CONFIG_NAME = "config";
         
@@ -57,49 +60,49 @@ namespace UMS.Core
                 return null;
             }
         }
-        public int Add(SerializableObject obj)
+        public void Add(SerializableObject obj, int id)
         {
-            if (_entries.ContainsKey(obj.InstanceID))
-            {
-                if(_entries[obj.InstanceID].HasObject)
-                    return _entries[obj.InstanceID].ID;
-            }
+            if (obj == null)
+                return;
 
-            return CreateEntry(obj);
-        }
-        public static bool Contains(int instanceID)
-        {
-            return _entries.ContainsKey(instanceID);
-        }
-        public static int Get(int instanceID)
-        {
-            if(_entries.ContainsKey(instanceID))
+            if (!_entries.ContainsKey(id))
             {
-                return _entries[instanceID].ID;
-            }
-            else
-            {
-                ModEntry entry = new ModEntry();
-
-                _entries.Add(instanceID, entry);
-
-                return entry.ID;
+                _entries.Add(id, new ModEntry(obj));
             }
         }
-        private int CreateEntry(SerializableObject obj)
+        public int GetID(UnityEngine.Object obj)
         {
-            ModEntry entry = new ModEntry(obj);
-
-            if (_entries.ContainsKey(obj.InstanceID))
+            if (obj == null)
+                return 0;
+            
+            unchecked
             {
-                _entries[obj.InstanceID].SetObject(obj);
+                int i = 17;
+
+                foreach (PropertyInfo info in obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+                {
+                    if (Serializer.IsBlocked(Utility.GetObjectMemberName(info.DeclaringType.Name, info.Name)))
+                        continue;
+
+                    MethodInfo method = info.GetGetMethod();
+
+                    if (method == null)
+                        continue;
+
+                    if (!Utility.CanAccessMember(info))
+                        continue;
+
+                    try
+                    {
+                        i = i + info.GetValue(obj, null).GetHashCode() * 13;
+                    }
+                    catch (System.Exception)
+                    {
+                    }
+                }
+                                
+                return i;
             }
-            else
-            {
-                _entries.Add(obj.InstanceID, entry);
-            }            
-
-            return entry.ID;
         }
         public void Serialize(string path)
         {
@@ -108,15 +111,7 @@ namespace UMS.Core
                 foreach (KeyValuePair<int, ModEntry> keyValuePair in _entries)
                 {
                     ModEntry entry = keyValuePair.Value;
-
-                    if (!entry.HasObject)
-                    {
-                        Object obj = EditorUtility.InstanceIDToObject(keyValuePair.Key);
-
-                        UnityEngine.Debug.LogWarning("Skipping " + entry.ID + " which is " + obj);
-                        continue;
-                    }
-
+                    
                     string fileNameWithoutExtension = GetValidName(entry.Name, _usedFileNames);
                     string fileName = fileNameWithoutExtension + "." + entry.Extension;
 
@@ -211,28 +206,14 @@ namespace UMS.Core
         }
         public class ModEntry
         {
-            public ModEntry()
-            {
-                ID = CurrentID++;
-            }
             public ModEntry(SerializableObject obj)
             {
-                ID = CurrentID++;
-
-                SetObject(obj);
-            }
-
-            public void SetObject(SerializableObject obj)
-            {
-                if (HasObject || obj == null)
-                    return;
-
-                HasObject = true;
                 _obj = obj;
                 Extension = obj.Extension;
                 Type = obj.GetType();
+                ID = obj.ID;
             }
-        
+                    
             public string JSON
             {
                 get
@@ -249,8 +230,7 @@ namespace UMS.Core
                     return _obj.ToString();
                 }
             }
-
-            public bool HasObject { get; private set; }
+            
             public string Extension { get; private set; }
             public int ID { get; private set; }
             public Type Type { get; private set; }
