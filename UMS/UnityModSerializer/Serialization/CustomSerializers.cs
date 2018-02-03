@@ -13,6 +13,7 @@ namespace UMS.Serialization
 {
     public static class CustomSerializers
     {
+        #region Serialization
         private static List<IModSerializer> serializers;
 
         public static void Initialize()
@@ -90,6 +91,16 @@ namespace UMS.Serialization
         {
             return Query(predicate, x => { return x.NonSerializableType; }, x => { return x.SerializedType; }, out instance);
         }
+        public static T SerializeObject<T>(object fromObject)
+        {
+            if (fromObject == null)
+                return default(T);
+
+            object instance;
+            MethodInfo info = QueryForSerialization(x => x.NonSerializableType == fromObject.GetType() && x.SerializedType == typeof(T), out instance);
+
+            return (T)info.Invoke(instance, new object[1] { fromObject });
+        }
         public static object SerializeObject(object fromObject)
         {
             if (fromObject == null)
@@ -99,6 +110,16 @@ namespace UMS.Serialization
             MethodInfo info = QueryForSerialization(x => x.NonSerializableType == fromObject.GetType(), out instance);
 
             return info.Invoke(instance, new object[1] { fromObject});
+        }
+        public static T DeserializeObject<T>(object serialized)
+        {
+            if (serialized == null)
+                return default(T);
+
+            object instance;
+            MethodInfo info = QueryForDeserialization(x => x.SerializedType == serialized.GetType() && x.NonSerializableType == typeof(T), out instance);
+
+            return (T)info.Invoke(instance, new object[1] { serialized });
         }
         public static object DeserializeObject(object serialized)
         {
@@ -110,6 +131,7 @@ namespace UMS.Serialization
             
             return info.Invoke(instance, new object[1] { serialized });
         }
+        #endregion
 
         #region Definitions
         [Serializable]
