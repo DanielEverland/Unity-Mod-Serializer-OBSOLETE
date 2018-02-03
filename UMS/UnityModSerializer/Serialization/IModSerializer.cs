@@ -7,6 +7,8 @@ namespace UMS.Serialization
 {
     public interface IModSerializer
     {
+        int Priority { get; }
+
         Type NonSerializableType { get; }
         Type SerializedType { get; }
     }
