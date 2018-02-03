@@ -25,8 +25,8 @@ namespace UMS.Core
         {
             if (OnLoadType == null)
                 throw new NullReferenceException("No reflection analyzers loaded!");
-
-            foreach (Assembly assembly in AssemblyManager.LoadedAssemblies)
+            
+            foreach (Assembly assembly in LoadedAssemblies)
             {
                 foreach (Type type in assembly.GetTypes())
                 {
@@ -41,6 +41,7 @@ namespace UMS.Core
             HashSet<Assembly> _toReturn = new HashSet<Assembly>()
             {
                 Assembly.GetExecutingAssembly(),
+                GetUnityAssembly(),
             };
 
             Queue<string> toCheck = new Queue<string>();
@@ -64,6 +65,14 @@ namespace UMS.Core
             }
 
             return _toReturn;
+        }
+        private static Assembly GetUnityAssembly()
+        {
+            string path = Application.dataPath;
+            string projectPath = Directory.GetParent(path).FullName;
+            string fullPath = projectPath + "/Library/ScriptAssemblies/Assembly-CSharp.dll";
+
+            return Assembly.LoadFile(fullPath);
         }
         private static void GetAssemblies(string path, HashSet<Assembly> collection)
         {
