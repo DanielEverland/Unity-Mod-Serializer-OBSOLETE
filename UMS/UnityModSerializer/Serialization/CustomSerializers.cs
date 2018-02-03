@@ -171,7 +171,7 @@ namespace UMS.Serialization
 
         public override GameObject Deserialize(SerializableGameObject serializable)
         {
-            return new GameObject("Looooool u suck nigguh");
+            return new GameObject(serializable.Name);
         }
         public override SerializableGameObject Serialize(GameObject obj)
         {
