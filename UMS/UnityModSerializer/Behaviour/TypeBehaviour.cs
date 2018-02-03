@@ -29,6 +29,8 @@ namespace UMS.Behaviour
         }
         public Type AttributeType { get { return _type; } }
 
+        public MethodInfo Method { get { return method; } }
+
         private readonly Type _type;
 
         protected MethodInfo method;

@@ -25,6 +25,7 @@ namespace UMS.Serialization
             "Renderer.materials",
             "Canvas.rootCanvas",
             "Graphic.canvas",
+            "Transform.root",
         };
     }
 }

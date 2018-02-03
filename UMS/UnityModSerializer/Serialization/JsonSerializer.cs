@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using UMS.Core;
 
 namespace UMS.Serialization
 {
@@ -11,12 +13,32 @@ namespace UMS.Serialization
     {
         private static JsonSerializerSettings settings = new JsonSerializerSettings()
         {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            ReferenceLoopHandling = ReferenceLoopHandling.Error,
+            NullValueHandling = NullValueHandling.Ignore,
+            TypeNameHandling = TypeNameHandling.All,
+            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+            TraceWriter = new Debugging.EG_TraceLogger(),
+            PreserveReferencesHandling = PreserveReferencesHandling.All,
+            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
         };
 
         public static string ToJson(object obj)
         {
             return JsonConvert.SerializeObject(obj, Formatting.Indented, settings);
+        }
+        public static object ToObject(string json)
+        {
+            JObject jobject = JsonConvert.DeserializeObject<JObject>(json);
+            Type type = jobject["$type"].ToObject<Type>();
+
+            object obj = jobject.ToObject(type);
+
+            if(obj is IModSerializer serializer)
+            {
+                return CustomSerializers.DeserializeObject(obj);
+            }
+
+            return obj;
         }
         public static T ToObject<T>(string json)
         {
