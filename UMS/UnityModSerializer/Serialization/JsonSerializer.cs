@@ -18,7 +18,6 @@ namespace UMS.Serialization
             TypeNameHandling = TypeNameHandling.All,
             TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
             TraceWriter = new Debugging.EG_TraceLogger(),
-            PreserveReferencesHandling = PreserveReferencesHandling.All,
             MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
         };
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
+using UnityEditor;
 
 namespace UMS.Core
 {
@@ -28,22 +29,38 @@ namespace UMS.Core
             
             foreach (Assembly assembly in LoadedAssemblies)
             {
-                foreach (Type type in assembly.GetTypes())
+                Debug.Log(assembly);
+
+                try
                 {
-                    OnLoadType(type);
+                    foreach (Type type in assembly.GetTypes())
+                    {
+                        OnLoadType(type);
+                    }
                 }
+                catch (ReflectionTypeLoadException)
+                {
+                    Debug.LogError("Cannot load types in " + assembly);
+                    throw;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                
             }
 
             OnFinishedReflection?.Invoke();
         }
         private static IEnumerable<Assembly> GetAssemblies()
         {
-            HashSet<Assembly> _toReturn = new HashSet<Assembly>()
-            {
-                Assembly.GetExecutingAssembly(),
-                GetUnityAssembly(),
-            };
+            HashSet<Assembly> _toReturn = new HashSet<Assembly>();
 
+            Assembly unityAssembly = GetUnityAssembly();
+
+            if (unityAssembly != null)
+                _toReturn.Add(unityAssembly);
+            
             Queue<string> toCheck = new Queue<string>();
             toCheck.Enqueue(Application.dataPath);
 
@@ -68,9 +85,14 @@ namespace UMS.Core
         }
         private static Assembly GetUnityAssembly()
         {
-            string path = Application.dataPath;
-            string projectPath = Directory.GetParent(path).FullName;
-            string fullPath = projectPath + "/Library/ScriptAssemblies/Assembly-CSharp.dll";
+            string assetPath = Application.dataPath;
+            string projectPath = Directory.GetParent(assetPath).FullName;
+            string fullPath = projectPath + @"\Library\ScriptAssemblies\Assembly-CSharp.dll";
+
+            AssetDatabase.Refresh();
+
+            if (!File.Exists(fullPath))
+                return null;
 
             return Assembly.LoadFile(fullPath);
         }

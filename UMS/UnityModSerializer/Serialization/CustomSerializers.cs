@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using UMS.Core;
 using UMS.Behaviour;
@@ -155,31 +154,7 @@ namespace UMS.Serialization
     }
     #region Definitions
     [Serializable]
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public class SerializableGameObject : SerializableObject<GameObject, SerializableGameObject>
-    {
-        public SerializableGameObject() { }
-        public SerializableGameObject(GameObject obj)
-        {
-            _name = obj.name;
-        }
-
-        public string Name { get { return _name; } }
-
-        [JsonProperty]
-        private string _name;
-
-        public override GameObject Deserialize(SerializableGameObject serializable)
-        {
-            return new GameObject(serializable.Name);
-        }
-        public override SerializableGameObject Serialize(GameObject obj)
-        {
-            return new SerializableGameObject(obj);
-        }
-    }
-    [Serializable]
-    public abstract class SerializableObject<TFrom, TTo> : IModSerializer<TFrom, TTo>
+    public abstract class Serializable<TFrom, TTo> : IModSerializer<TFrom, TTo>
     {
         [JsonIgnore]
         public Type NonSerializableType => typeof(TFrom);
@@ -191,6 +166,71 @@ namespace UMS.Serialization
         public abstract TFrom Deserialize(TTo serializable);
         public abstract TTo Serialize(TFrom obj);
     }
+    [Serializable]
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    public abstract class SerializableObject<TFrom, TTo> : Serializable<TFrom, TTo>, IModEntry where TFrom : UnityEngine.Object
+    {
+        public SerializableObject() { }
+        public SerializableObject(UnityEngine.Object obj)
+        {
+            _name = obj.name;
+
+            ObjectManager.Add(this);
+        }
+
+        public string Name { get { return _name; } }
+
+        public abstract string Extension { get; }
+        public string FileName => Name;
+
+        [JsonProperty]
+        private string _name;
+    }
+    [Serializable]
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    public class SerializableGameObject : SerializableObject<GameObject, SerializableGameObject>
+    {
+        public SerializableGameObject() { }
+        public SerializableGameObject(GameObject obj) : base(obj)
+        {
+        }
+
+        public override string Extension => "gameObject";
+
+        public override GameObject Deserialize(SerializableGameObject serializable)
+        {
+            return new GameObject(serializable.Name);
+        }
+        public override SerializableGameObject Serialize(GameObject obj)
+        {
+            return new SerializableGameObject(obj);
+        }
+    }
+    [Serializable]
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    public class Reference : Serializable<object, Reference>
+    {
+        public Reference() { }
+        public Reference(object obj)
+        {
+            _id = ObjectManager.Add(obj);
+        }
+
+        public int ID { get { return _id; } }
+
+        [JsonProperty]
+        private int _id;
+        
+        public override object Deserialize(Reference serializable)
+        {
+            throw new NotImplementedException();
+        }
+        public override Reference Serialize(object obj)
+        {
+            return new Reference(obj);
+        }
+    }
+
 
     //        //------------------Template------------------//
     //        //[TypeSerializer(typeof(TYPE))]

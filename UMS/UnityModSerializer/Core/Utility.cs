@@ -215,6 +215,10 @@ namespace UMS.Core
         //{
         //    return (type.Attributes & TypeAttributes.Serializable) == TypeAttributes.Serializable;
         //}
+        public static string ModEntryToFullName(IModEntry entry)
+        {
+            return string.Format("{0}.{1}", entry.FileName, entry.Extension);
+        }
         public static T GetMostInherited<T>(IEnumerable<T> source)
         {
             int max = source.Max(x => GetInheritanceCount(x.GetType()));
@@ -241,40 +245,40 @@ namespace UMS.Core
 
             return i;
         }
-        //public static int GetID(UnityEngine.Object obj)
-        //{
-        //    if (obj == null)
-        //        return 0;
+        public static int GetID(object obj)
+        {
+            if (obj == null)
+                return 0;
 
-        //    unchecked
-        //    {
-        //        int i = 17;
+            unchecked
+            {
+                int i = 17;
 
-        //        foreach (PropertyInfo info in obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
-        //        {
-        //            if (Serializer.IsBlocked(Utility.GetObjectMemberName(info.DeclaringType.Name, info.Name)))
-        //                continue;
+                foreach (PropertyInfo info in obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+                {
+                    //if (Serializer.IsBlocked(Utility.GetObjectMemberName(info.DeclaringType.Name, info.Name)))
+                    //    continue;
 
-        //            MethodInfo method = info.GetGetMethod();
+                    MethodInfo method = info.GetGetMethod();
 
-        //            if (method == null)
-        //                continue;
+                    if (method == null)
+                        continue;
 
-        //            if (!Utility.CanAccessMember(info))
-        //                continue;
+                    //if (!Utility.CanAccessMember(info))
+                    //    continue;
 
-        //            try
-        //            {
-        //                i = i + info.GetValue(obj, null).GetHashCode() * 13;
-        //            }
-        //            catch (System.Exception)
-        //            {
-        //            }
-        //        }
+                    try
+                    {
+                        i = i + info.GetValue(obj, null).GetHashCode() * 13;
+                    }
+                    catch (System.Exception)
+                    {
+                    }
+                }
 
-        //        return i;
-        //    }
-        //}
+                return i;
+            }
+        }
         //public static string GetValidName(string preferredName, HashSet<string> blackList)
         //{
         //    if (blackList.Contains(preferredName))

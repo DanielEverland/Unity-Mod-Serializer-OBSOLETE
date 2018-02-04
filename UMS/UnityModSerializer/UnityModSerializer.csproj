@@ -65,11 +65,14 @@
     <Compile Include="Behaviour\TypeBehaviour.cs" />
     <Compile Include="Core\AssemblyManager.cs" />
     <Compile Include="Core\Component.cs" />
+    <Compile Include="Core\Config.cs" />
     <Compile Include="Core\Debugging.cs" />
     <Compile Include="Core\Extensions.cs" />
+    <Compile Include="Core\IModEntry.cs" />
     <Compile Include="Core\Member.cs" />
     <Compile Include="Core\Mod.cs" />
     <Compile Include="Core\Object.cs" />
+    <Compile Include="Core\ObjectManager.cs" />
     <Compile Include="Core\Priority.cs" />
     <Compile Include="Core\Utility.cs" />
     <Compile Include="Deserialization\Deserializer.cs" />
@@ -80,7 +83,6 @@
     <Compile Include="Behaviour\BehaviourBase.cs" />
     <Compile Include="Serialization\IModSerializer.cs" />
     <Compile Include="Serialization\JsonSerializer.cs" />
-    <Compile Include="Serialization\Reference.cs" />
     <Compile Include="Serialization\Serializer.cs" />
     <Compile Include="Behaviour\TypeBlocker.cs" />
     <Compile Include="Behaviour\TypeSerializer.cs" />

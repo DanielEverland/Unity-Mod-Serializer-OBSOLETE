@@ -28,30 +28,13 @@ namespace UMS.Serialization
             {
                 UnityEngine.Object toSerialize = UnityEngine.Object.Instantiate(Selection.objects[i]);
 
-                Serialize(toSerialize);
+                CustomSerializers.SerializeObject(toSerialize);
             }
 
-            //Mod.Serialize(@"C:\Users\Daniel\Desktop");
+            InitializeSerialization();
 
             Debug.Log("Finished serializing");
         }
-        [MenuItem(Utility.MENU_ITEM_ROOT + "/Deserialize")]
-        private static void Deserialize()
-        {
-            Initialize();
-            
-            string text = File.ReadAllText(@"C:/Users/Daniel/Desktop/JSON.txt");
-
-            object obj = JsonSerializer.ToObject(text);
-
-            Debug.Log(obj.GetType());
-        }
-        //private static void StartNewSerializer()
-        //{
-
-
-        //    new Mod("Test Mod");
-        //}
 
         private static void Initialize()
         {
@@ -62,14 +45,10 @@ namespace UMS.Serialization
 
             AssemblyManager.ExecuteReflection();
         }
-        
-        private static void Serialize(object obj)
+        private static void InitializeSerialization()
         {
-            object serialized = CustomSerializers.SerializeObject(obj);
-
-            string json = JsonSerializer.ToJson(serialized);
-
-            File.WriteAllText(@"C:/Users/Daniel/Desktop/JSON.txt", json);
+            Mod.Initialize();
+            Mod.Serialize(@"C:/Users/Daniel/Desktop/New Mod.mod");
         }
     }
 }
