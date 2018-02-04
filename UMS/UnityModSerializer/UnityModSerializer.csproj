@@ -70,7 +70,6 @@
     <Compile Include="Core\Extensions.cs" />
     <Compile Include="Core\IDManager.cs" />
     <Compile Include="Core\IModEntry.cs" />
-    <Compile Include="Core\Member.cs" />
     <Compile Include="Core\Mod.cs" />
     <Compile Include="Core\Object.cs" />
     <Compile Include="Core\ObjectManager.cs" />

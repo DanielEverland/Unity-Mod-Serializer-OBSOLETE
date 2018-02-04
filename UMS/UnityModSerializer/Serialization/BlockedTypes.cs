@@ -30,6 +30,7 @@ namespace UMS.Serialization
             "Canvas.rootCanvas",
             "Graphic.canvas",
             "Transform.root",
+            "Component.rigidbody",
         };
         #endregion
 

@@ -13,7 +13,7 @@ namespace UMS.Serialization
     {
         private static JsonSerializerSettings settings = new JsonSerializerSettings()
         {
-            ReferenceLoopHandling = ReferenceLoopHandling.Error,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             NullValueHandling = NullValueHandling.Ignore,
             TypeNameHandling = TypeNameHandling.All,
             TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
@@ -36,7 +36,7 @@ namespace UMS.Serialization
             {
                 return CustomSerializers.DeserializeObject(obj);
             }
-
+            
             return obj;
         }
         public static T ToObject<T>(string json)

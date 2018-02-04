@@ -299,19 +299,56 @@ namespace UMS.Serialization
         {
             _type = obj.GetType();
             _fileName = string.Format("{0} - {1}", obj.gameObject.name, obj.GetType().Name);
+            _members = new List<SerializableMember>();
+
+            AddMembers(obj);
         }
 
         public override string Extension { get { return "component"; } }
         public override string FileName { get { return _fileName; } }
 
         public Type ComponentType { get { return _type; } }
-
+        
         [JsonProperty]
         private Type _type;
+        [JsonProperty]
+        private List<SerializableMember> _members;
 
         [JsonIgnore]
         private string _fileName;
 
+        private void AddMembers(Component comp)
+        {
+            foreach (PropertyInfo property in ComponentType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+            {
+                try
+                {
+                    if (IsValid(property))
+                        _members.Add(new SerializableMember(property, property.GetValue(comp, null)));
+                }
+                catch (NotSupportedException)
+                {
+                    throw new NotSupportedException(Utility.GetObjectMemberName(property.DeclaringType.Name, property.Name) + " is not supported. Please block");
+                }
+                catch (Exception)
+                {
+                    throw;
+                }                
+            }
+        }
+        private bool IsValid(PropertyInfo info)
+        {
+            if (info.GetSetMethod() == null)
+                return false;
+
+            return IsValid((MemberInfo)info);
+        }
+        private bool IsValid(MemberInfo info)
+        {
+            string objectMemberValue = Utility.GetObjectMemberName(info.DeclaringType.Name, info.Name);
+
+            return !BlockedTypes.IsBlocked(objectMemberValue);
+        }
         public void Deserialize(Component serializable)
         {
             throw new System.NotImplementedException();
@@ -320,6 +357,27 @@ namespace UMS.Serialization
         {
             return new SerializableComponent(obj);
         }        
+    }
+    //------------------------------------//
+
+    ///------------------Member------------------//
+    [Serializable]
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    public class SerializableMember : IDeserializer<object>
+    {
+        private SerializableMember() { }
+        public SerializableMember(MemberInfo info, object value)
+        {
+            _value = value;
+        }
+
+        [JsonProperty]
+        private object _value;
+
+        public void Deserialize(object serializable)
+        {
+            throw new NotImplementedException();
+        }
     }
     //------------------------------------//
 
