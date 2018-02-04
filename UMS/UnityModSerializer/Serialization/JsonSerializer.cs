@@ -20,7 +20,7 @@ namespace UMS.Serialization
             TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
             TraceWriter = new Debugging.EG_TraceLogger(),
             MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-            ContractResolver = new WritablePropertiesOnlyResolver(),
+            ContractResolver = new OnlyFieldsContractResolver(),
         };
 
         public static string ToJson(object obj)
