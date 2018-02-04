@@ -32,10 +32,10 @@ namespace UMS.Core
         //{
         //    return UnityEditor.PrefabUtility.GetPrefabParent(obj) == null && UnityEditor.PrefabUtility.GetPrefabObject(obj) != null;
         //}
-        //public static string SanitizeExtension(string extension)
-        //{
-        //    return extension.TrimStart('.');
-        //}
+        public static string SanitizeExtension(string extension)
+        {
+            return extension.TrimStart('.');
+        }
         //public static List<Member> GetMembers(object obj)
         //{
         //    List<Member> members = new List<Member>();
@@ -215,10 +215,6 @@ namespace UMS.Core
         //{
         //    return (type.Attributes & TypeAttributes.Serializable) == TypeAttributes.Serializable;
         //}
-        public static string ModEntryToFullName(IModEntry entry)
-        {
-            return string.Format("{0}.{1}", entry.FileName, entry.Extension);
-        }
         public static T GetMostInherited<T>(IEnumerable<T> source)
         {
             int max = source.Max(x => GetInheritanceCount(x.GetType()));
@@ -279,37 +275,37 @@ namespace UMS.Core
                 return i;
             }
         }
-        //public static string GetValidName(string preferredName, HashSet<string> blackList)
-        //{
-        //    if (blackList.Contains(preferredName))
-        //    {
-        //        if (EndNumberParanthesis.IsMatch(preferredName))
-        //        {
-        //            Match match = EndNumberParanthesis.Match(preferredName);
+        public static string GetValidName(string preferredName, HashSet<string> blackList)
+        {
+            if (blackList.Contains(preferredName))
+            {
+                if (EndNumberParanthesis.IsMatch(preferredName))
+                {
+                    Match match = EndNumberParanthesis.Match(preferredName);
 
-        //            int index = 0;
-        //            string strippedString = preferredName.Replace(match.Value, string.Empty);
+                    int index = 0;
+                    string strippedString = preferredName.Replace(match.Value, string.Empty);
 
 
-        //            foreach (Capture capture in match.Captures)
-        //            {
-        //                int value = 0;
-        //                if (int.TryParse(capture.Value.Trim(')', '('), out value))
-        //                {
-        //                    index = value;
-        //                    break;
-        //                }
-        //            }
+                    foreach (Capture capture in match.Captures)
+                    {
+                        int value = 0;
+                        if (int.TryParse(capture.Value.Trim(')', '('), out value))
+                        {
+                            index = value;
+                            break;
+                        }
+                    }
 
-        //            return GetValidName(strippedString + "(" + (index + 1) + ")", blackList);
-        //        }
-        //        else
-        //        {
-        //            return GetValidName(preferredName + " (1)", blackList);
-        //        }
-        //    }
+                    return GetValidName(strippedString + "(" + (index + 1) + ")", blackList);
+                }
+                else
+                {
+                    return GetValidName(preferredName + " (1)", blackList);
+                }
+            }
 
-        //    return preferredName;
-        //}
+            return preferredName;
+        }
     }
 }

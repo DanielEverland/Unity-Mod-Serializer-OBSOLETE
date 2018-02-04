@@ -17,4 +17,20 @@ namespace UMS.Serialization
         TSerializable Serialize(TObject obj);
         TObject Deserialize(TSerializable serializable);
     }
+    public interface ISerializer<TObject, TSerializable>
+    {
+        TSerializable Serialize(TObject obj);
+    }
+    public interface IDeserializer<TObject, TSerializable>
+    {
+        TObject Deserialize(TSerializable serializable);
+    }
+    public interface IDeserializer<TSerializable>
+    {
+        void Deserialize(TSerializable serializable);
+    }
+    public interface ISerializer<TObject>
+    {
+        void Serialize(TObject obj);
+    }
 }

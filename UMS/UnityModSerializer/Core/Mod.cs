@@ -10,27 +10,38 @@ namespace UMS.Core
         
         private static Config configFile;
         private static Dictionary<string, string> filesToWrite;
-
+        private static HashSet<string> usedNames;
+             
         public static void Initialize()
         {
             configFile = new Config();
             filesToWrite = new Dictionary<string, string>();
+            usedNames = new HashSet<string>();
 
             foreach (ObjectData data in ObjectManager.Data)
             {
                 if (data.Object is IModEntry entry)
                 {
-                    AddToConfig(entry, data.ID);
-
                     string json = JsonSerializer.ToJson(data.Object);
+                    string name = Utility.GetValidName(entry.FileName, usedNames);
+                    string extension = Utility.SanitizeExtension(entry.Extension);
+                    string selectedName = string.Format("{0}.{1}", name, extension);
 
-                    filesToWrite.Add(Utility.ModEntryToFullName(entry), json);
+                    AddToConfig(data.ID, selectedName);
+
+                    usedNames.Add(name);
+
+                    filesToWrite.Add(selectedName, json);
+                }
+                else
+                {
+                    UnityEngine.Debug.LogWarning("Tried to add " + data + " as a reference type, but it doesn't implement IModEntry");
                 }
             }
         }
-        private static void AddToConfig(IModEntry entry, int id)
+        private static void AddToConfig(int id, string name)
         {
-            configFile.Add(id, Utility.ModEntryToFullName(entry));
+            configFile.Add(id, name);
         }
         public static void Serialize(string path)
         {

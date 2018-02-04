@@ -17,10 +17,15 @@ namespace UMS.Core
         }
         public static int Add(object obj)
         {
+            if (obj == null)
+                throw new NullReferenceException("Object cannot be null");
+
             ObjectData data = new ObjectData(obj);
 
             if (!_data.Contains(data))
+            {
                 _data.Add(data);
+            }
 
             return data.ID;
         }
@@ -58,7 +63,7 @@ namespace UMS.Core
         }
         public override string ToString()
         {
-            return _id.ToString();
+            return string.Format("{0}: {1}", _id, _obj);
         }
     }
 }

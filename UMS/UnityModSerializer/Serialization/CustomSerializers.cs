@@ -95,7 +95,7 @@ namespace UMS.Serialization
             List<IModSerializer> validSerializers = new List<IModSerializer>(serializers.Where(predicate));
             
             if (validSerializers.Count == 0)
-                throw new System.NotImplementedException("Couldn't find any valid serializers");
+                throw new NotImplementedException("Couldn't find any valid serializers");
             
             IModSerializer selectedSerializer = Utility.GetMostInherited(validSerializers);
             instance = selectedSerializer;
@@ -116,7 +116,7 @@ namespace UMS.Serialization
                 return default(T);
 
             object instance;
-            MethodInfo info = QueryForSerialization(x => x.NonSerializableType == fromObject.GetType() && x.SerializedType == typeof(T), out instance);
+            MethodInfo info = QueryForSerialization(x => x.NonSerializableType.IsAssignableFrom(fromObject.GetType()) && x.SerializedType.IsAssignableFrom(typeof(T)), out instance);
 
             return (T)info.Invoke(instance, new object[1] { fromObject });
         }
@@ -126,7 +126,7 @@ namespace UMS.Serialization
                 return null;
 
             object instance;
-            MethodInfo info = QueryForSerialization(x => x.NonSerializableType == fromObject.GetType(), out instance);
+            MethodInfo info = QueryForSerialization(x => x.NonSerializableType.IsAssignableFrom(fromObject.GetType()), out instance);
 
             return info.Invoke(instance, new object[1] { fromObject});
         }
@@ -136,7 +136,7 @@ namespace UMS.Serialization
                 return default(T);
 
             object instance;
-            MethodInfo info = QueryForDeserialization(x => x.SerializedType == serialized.GetType() && x.NonSerializableType == typeof(T), out instance);
+            MethodInfo info = QueryForDeserialization(x => x.SerializedType.IsAssignableFrom(serialized.GetType()) && x.NonSerializableType.IsAssignableFrom(typeof(T)), out instance);
 
             return (T)info.Invoke(instance, new object[1] { serialized });
         }
@@ -146,7 +146,7 @@ namespace UMS.Serialization
                 return null;
 
             object instance;
-            MethodInfo info = QueryForDeserialization(x => x.SerializedType == serialized.GetType(), out instance);
+            MethodInfo info = QueryForDeserialization(x => x.SerializedType.IsAssignableFrom(serialized.GetType()), out instance);
             
             return info.Invoke(instance, new object[1] { serialized });
         }
@@ -186,8 +186,8 @@ namespace UMS.Serialization
         [JsonIgnore]
         public virtual int Priority => (int)Core.Priority.Medium;
 
-        public abstract TFrom Deserialize(TTo serializable);
-        public abstract TTo Serialize(TFrom obj);
+        public virtual TFrom Deserialize(TTo serializable) { return default(TFrom); }
+        public virtual TTo Serialize(TFrom obj) { return default(TTo); }
     }
     //------------------------------------//
 
@@ -199,18 +199,25 @@ namespace UMS.Serialization
         public SerializableObject() { }
         public SerializableObject(UnityEngine.Object obj)
         {
+            if (obj is null)
+                throw new NullReferenceException("Object cannot be null");
+
             _name = obj.name;
+            _hideFlags = (int)obj.hideFlags;
 
             ObjectManager.Add(this);
         }
 
-        public string Name { get { return _name; } }
-
         public abstract string Extension { get; }
-        public string FileName => Name;
+        public string FileName { get { return Name; } }
+
+        public string Name { get { return _name; } }
+        public HideFlags HideFlags { get { return (HideFlags)_hideFlags; } }
 
         [JsonProperty]
         private string _name;
+        [JsonProperty]
+        private int _hideFlags;
     }
     //------------------------------------//
 
@@ -222,9 +229,22 @@ namespace UMS.Serialization
         public SerializableGameObject() { }
         public SerializableGameObject(GameObject obj) : base(obj)
         {
+            _components = new List<Reference>();
+            foreach (Component comp in obj.GetComponents<Component>())
+            {
+                if(comp == null)
+                    continue;
+
+                _components.Add(new Reference(comp));
+            }
         }
 
         public override string Extension => "gameObject";
+
+        public IList<Reference> Components { get { return _components; } }
+
+        [JsonProperty]
+        private List<Reference> _components;
 
         public override GameObject Deserialize(SerializableGameObject serializable)
         {
@@ -245,7 +265,17 @@ namespace UMS.Serialization
         public Reference() { }
         public Reference(object obj)
         {
-            _id = ObjectManager.Add(obj);
+            if (obj == null)
+                throw new NullReferenceException("Object cannot be null");
+
+            if(obj is IModSerializer)
+            {
+                _id = ObjectManager.Add(obj);
+            }
+            else
+            {
+                _id = ObjectManager.Add(CustomSerializers.SerializeObject(obj));
+            }            
         }
 
         public int ID { get { return _id; } }
@@ -261,6 +291,35 @@ namespace UMS.Serialization
         {
             return new Reference(obj);
         }
+    }
+    //------------------------------------//
+
+    //------------------Component------------------//
+    [Serializable]
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    public class SerializableComponent : SerializableObject<Component, SerializableComponent>, IDeserializer<Component>
+    {
+        public SerializableComponent() { }
+        public SerializableComponent(Component obj) : base(obj)
+        {
+            _type = obj.GetType();
+        }
+
+        public override string Extension { get { return "component"; } }
+
+        public Type ComponentType { get { return _type; } }
+
+        [JsonProperty]
+        private Type _type;
+
+        public void Deserialize(Component serializable)
+        {
+            throw new System.NotImplementedException();
+        }
+        public override SerializableComponent Serialize(Component obj)
+        {
+            return new SerializableComponent(obj);
+        }        
     }
     //------------------------------------//
 
