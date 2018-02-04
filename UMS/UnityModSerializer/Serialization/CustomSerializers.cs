@@ -376,7 +376,14 @@ namespace UMS.Serialization
         private SerializableMember() { }
         public SerializableMember(MemberInfo info, object value)
         {
-            _value = value;
+            if (value.GetType().IsPrimitive)
+            {
+                _value = value;
+            }
+            else
+            {
+                _value = new Reference(value);
+            }            
         }
 
         [JsonProperty]
