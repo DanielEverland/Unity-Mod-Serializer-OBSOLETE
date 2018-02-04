@@ -153,6 +153,29 @@ namespace UMS.Serialization
         #endregion
     }
     #region Definitions
+
+    //------------------Template------------------//
+    //[Serializable]
+    //[JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    //public class SerializableTYPE : Serializable<UNITY_TYPE, SERIALIZABLE_TYPE>
+    //{
+    //    public SerializableTYPE() { }
+    //    public SerializableTYPE(UNITY_TYPE obj) : base(obj)
+    //    {
+    //    }
+
+    //    public override UNITY_TYPE Deserialize(SerializableTYPE serializable)
+    //    {
+    //        return new UNITY_TYPE(serializable.Name);
+    //    }
+    //    public override SerializableTYPE Serialize(UNITY_TYPE obj)
+    //    {
+    //        return new SerializableTYPE(obj);
+    //    }
+    //}
+    //------------------------------------//
+
+    //------------------Serializable------------------//
     [Serializable]
     public abstract class Serializable<TFrom, TTo> : IModSerializer<TFrom, TTo>
     {
@@ -166,6 +189,9 @@ namespace UMS.Serialization
         public abstract TFrom Deserialize(TTo serializable);
         public abstract TTo Serialize(TFrom obj);
     }
+    //------------------------------------//
+
+    //------------------UnityEngine.Object------------------//
     [Serializable]
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public abstract class SerializableObject<TFrom, TTo> : Serializable<TFrom, TTo>, IModEntry where TFrom : UnityEngine.Object
@@ -186,6 +212,9 @@ namespace UMS.Serialization
         [JsonProperty]
         private string _name;
     }
+    //------------------------------------//
+
+    //------------------GameObject------------------//
     [Serializable]
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class SerializableGameObject : SerializableObject<GameObject, SerializableGameObject>
@@ -206,6 +235,9 @@ namespace UMS.Serialization
             return new SerializableGameObject(obj);
         }
     }
+    //------------------------------------//
+
+    //------------------Reference------------------//
     [Serializable]
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class Reference : Serializable<object, Reference>
@@ -230,6 +262,7 @@ namespace UMS.Serialization
             return new Reference(obj);
         }
     }
+    //------------------------------------//
 
 
     //        //------------------Template------------------//
