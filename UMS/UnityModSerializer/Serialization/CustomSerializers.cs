@@ -166,7 +166,7 @@ namespace UMS.Serialization
 
     //    public override UNITY_TYPE Deserialize(SerializableTYPE serializable)
     //    {
-    //        return new UNITY_TYPE(serializable.Name);
+    //        return new UNITY_TYPE(serializable);
     //    }
     //    public override SerializableTYPE Serialize(UNITY_TYPE obj)
     //    {
