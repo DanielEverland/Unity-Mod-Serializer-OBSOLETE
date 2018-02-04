@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using UMS.Core;
 
 namespace UMS.Serialization
@@ -19,6 +20,7 @@ namespace UMS.Serialization
             TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
             TraceWriter = new Debugging.EG_TraceLogger(),
             MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+            ContractResolver = new WritablePropertiesOnlyResolver(),
         };
 
         public static string ToJson(object obj)
@@ -60,6 +62,14 @@ namespace UMS.Serialization
                 return false;
 
             return (obj.GetType().Attributes & TypeAttributes.Serializable) == TypeAttributes.Serializable;
+        }
+    }
+    public class OnlyFieldsContractResolver : DefaultContractResolver
+    {
+        protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
+        {
+            return type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Select(x => base.CreateProperty(x, memberSerialization)).ToList();
         }
     }
 }
