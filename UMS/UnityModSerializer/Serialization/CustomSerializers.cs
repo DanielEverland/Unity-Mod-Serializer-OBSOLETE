@@ -324,7 +324,15 @@ namespace UMS.Serialization
                 try
                 {
                     if (IsValid(property))
-                        _members.Add(new SerializableMember(property, property.GetValue(comp, null)));
+                    {
+                        object propertyValue = property.GetValue(comp, null);
+
+                        if(propertyValue != null)
+                        {
+                            _members.Add(new SerializableMember(property, propertyValue));
+                        }                        
+                    }
+                        
                 }
                 catch (NotSupportedException)
                 {
