@@ -66,6 +66,7 @@
     <Compile Include="Core\AssemblyManager.cs" />
     <Compile Include="Core\Component.cs" />
     <Compile Include="Core\Config.cs" />
+    <Compile Include="Core\CoreManager.cs" />
     <Compile Include="Core\Debugging.cs" />
     <Compile Include="Core\Extensions.cs" />
     <Compile Include="Core\IDManager.cs" />
@@ -85,7 +86,6 @@
     <Compile Include="Serialization\JsonSerializer.cs" />
     <Compile Include="Serialization\Serializer.cs" />
     <Compile Include="Behaviour\TypeBlocker.cs" />
-    <Compile Include="Behaviour\TypeSerializer.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
