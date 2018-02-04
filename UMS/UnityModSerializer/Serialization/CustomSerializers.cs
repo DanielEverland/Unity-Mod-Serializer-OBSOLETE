@@ -150,6 +150,14 @@ namespace UMS.Serialization
             
             return info.Invoke(instance, new object[1] { serialized });
         }
+        public static bool CanSerialize(Type type)
+        {
+            return serializers.Any(x => x.NonSerializableType.IsAssignableFrom(type) && !IsPrimitive(x.NonSerializableType));
+        }
+        private static bool IsPrimitive(Type type)
+        {
+            return type.IsPrimitive || type == typeof(System.Object);
+        }
         #endregion
     }
     #region Definitions
@@ -376,13 +384,13 @@ namespace UMS.Serialization
         private SerializableMember() { }
         public SerializableMember(MemberInfo info, object value)
         {
-            if (value.GetType().IsPrimitive)
+            if (CustomSerializers.CanSerialize(value.GetType()))
             {
-                _value = value;
+                _value = new Reference(value);
             }
             else
             {
-                _value = new Reference(value);
+                _value = value;
             }            
         }
 
