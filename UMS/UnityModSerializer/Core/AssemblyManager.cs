@@ -29,8 +29,6 @@ namespace UMS.Core
             
             foreach (Assembly assembly in LoadedAssemblies)
             {
-                Debug.Log(assembly);
-
                 try
                 {
                     foreach (Type type in assembly.GetTypes())
