@@ -154,7 +154,7 @@ namespace UMS.Serialization
     }
     #region Definitions
 
-    //------------------Template------------------//
+    ///------------------Template------------------//
     //[Serializable]
     //[JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     //public class SerializableTYPE : Serializable<UNITY_TYPE, SERIALIZABLE_TYPE>
@@ -175,7 +175,7 @@ namespace UMS.Serialization
     //}
     //------------------------------------//
 
-    //------------------Serializable------------------//
+    ///------------------Serializable------------------//
     [Serializable]
     public abstract class Serializable<TFrom, TTo> : IModSerializer<TFrom, TTo>
     {
@@ -191,7 +191,7 @@ namespace UMS.Serialization
     }
     //------------------------------------//
 
-    //------------------UnityEngine.Object------------------//
+    ///------------------UnityEngine.Object------------------//
     [Serializable]
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public abstract class SerializableObject<TFrom, TTo> : Serializable<TFrom, TTo>, IModEntry where TFrom : UnityEngine.Object
@@ -221,7 +221,7 @@ namespace UMS.Serialization
     }
     //------------------------------------//
 
-    //------------------GameObject------------------//
+    ///------------------GameObject------------------//
     [Serializable]
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class SerializableGameObject : SerializableObject<GameObject, SerializableGameObject>
@@ -257,7 +257,7 @@ namespace UMS.Serialization
     }
     //------------------------------------//
 
-    //------------------Reference------------------//
+    ///------------------Reference------------------//
     [Serializable]
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class Reference : Serializable<object, Reference>
@@ -294,7 +294,7 @@ namespace UMS.Serialization
     }
     //------------------------------------//
 
-    //------------------Component------------------//
+    ///------------------Component------------------//
     [Serializable]
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class SerializableComponent : SerializableObject<Component, SerializableComponent>, IDeserializer<Component>
