@@ -303,14 +303,19 @@ namespace UMS.Serialization
         public SerializableComponent(Component obj) : base(obj)
         {
             _type = obj.GetType();
+            _fileName = string.Format("{0} - {1}", obj.gameObject.name, obj.GetType().Name);
         }
 
         public override string Extension { get { return "component"; } }
+        public override string FileName { get { return _fileName; } }
 
         public Type ComponentType { get { return _type; } }
 
         [JsonProperty]
         private Type _type;
+
+        [JsonIgnore]
+        private string _fileName;
 
         public void Deserialize(Component serializable)
         {
