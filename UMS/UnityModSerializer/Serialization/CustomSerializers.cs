@@ -177,14 +177,23 @@ namespace UMS.Serialization
 
     ///------------------Serializable------------------//
     [Serializable]
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public abstract class Serializable<TFrom, TTo> : IModSerializer<TFrom, TTo>
     {
-        [JsonIgnore]
         public Type NonSerializableType => typeof(TFrom);
-        [JsonIgnore]
         public Type SerializedType => typeof(TTo);
-        [JsonIgnore]
         public virtual int Priority => (int)Core.Priority.Medium;
+
+        public Serializable() { }
+        public Serializable(TFrom obj)
+        {
+            _id = ObjectManager.Add(obj);
+        }
+
+        public int ID { get { return _id; } protected set { _id = value; } }
+
+        [JsonProperty]
+        private int _id;
 
         public virtual TFrom Deserialize(TTo serializable) { return default(TFrom); }
         public virtual TTo Serialize(TFrom obj) { return default(TTo); }
@@ -197,15 +206,13 @@ namespace UMS.Serialization
     public abstract class SerializableObject<TFrom, TTo> : Serializable<TFrom, TTo>, IModEntry where TFrom : UnityEngine.Object
     {
         public SerializableObject() { }
-        public SerializableObject(UnityEngine.Object obj)
+        public SerializableObject(UnityEngine.Object obj) : base((TFrom)obj)
         {
             if (obj is null)
                 throw new NullReferenceException("Object cannot be null");
-
+            
             _name = obj.name;
             _hideFlags = (int)obj.hideFlags;
-
-            ObjectManager.Add(this);
         }
 
         public abstract string Extension { get; }
@@ -268,20 +275,8 @@ namespace UMS.Serialization
             if (obj == null)
                 throw new NullReferenceException("Object cannot be null");
 
-            if(obj is IModSerializer)
-            {
-                _id = ObjectManager.Add(obj);
-            }
-            else
-            {
-                _id = ObjectManager.Add(CustomSerializers.SerializeObject(obj));
-            }            
+            ID = ObjectManager.Add(obj);
         }
-
-        public int ID { get { return _id; } }
-
-        [JsonProperty]
-        private int _id;
         
         public override object Deserialize(Reference serializable)
         {

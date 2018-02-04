@@ -18,16 +18,16 @@ namespace UMS.Core
             filesToWrite = new Dictionary<string, string>();
             usedNames = new HashSet<string>();
 
-            foreach (ObjectData data in ObjectManager.Data)
+            foreach (KeyValuePair<int, object> keyValuePair in ObjectManager.Data)
             {
-                if (data.Object is IModEntry entry)
+                if (keyValuePair.Value is IModEntry entry)
                 {
-                    string json = JsonSerializer.ToJson(data.Object);
+                    string json = JsonSerializer.ToJson(keyValuePair.Value);
                     string name = Utility.GetValidName(entry.FileName, usedNames);
                     string extension = Utility.SanitizeExtension(entry.Extension);
                     string selectedName = string.Format("{0}.{1}", name, extension);
 
-                    AddToConfig(data.ID, selectedName);
+                    AddToConfig(keyValuePair.Key, selectedName);
 
                     usedNames.Add(name);
 
@@ -35,7 +35,7 @@ namespace UMS.Core
                 }
                 else
                 {
-                    UnityEngine.Debug.LogWarning("Tried to add " + data + " as a reference type, but it doesn't implement IModEntry");
+                    UnityEngine.Debug.LogWarning("Tried to add " + keyValuePair.Value + " as a reference type, but it doesn't implement IModEntry");
                 }
             }
         }

@@ -17,13 +17,12 @@ namespace UMS.Core
         public const string MENU_ITEM_ROOT = "Modding";
         public const string MENU_SERIALIZATION = "Serialization";
 
-        private static Regex EndNumberParanthesis = new Regex(@"\(\d\)$");
+        private static Regex EndNumberParanthesis = new Regex(@"\(\d+\)$");
 
-
-        //public static string GetObjectMemberName(string objName, string memberName)
-        //{
-        //    return string.Format("{0}.{1}", objName, memberName);
-        //}
+        public static string GetObjectMemberName(string objName, string memberName)
+        {
+            return string.Format("{0}.{1}", objName, memberName);
+        }
         //public static bool ContainsAttribute(MemberInfo member, Type type)
         //{
         //    return member.GetCustomAttributes(false).Any(x => type.IsAssignableFrom(x.GetType()));
@@ -85,10 +84,10 @@ namespace UMS.Core
 
         //    return members.Where(x => x._value != null).ToList();
         //}
-        //public static bool CanAccessMember(MemberInfo member)
-        //{
-        //    return !member.GetCustomAttributes(false).Any(x => x.GetType() == typeof(ObsoleteAttribute));
-        //}
+        public static bool CanAccessMember(MemberInfo member)
+        {
+            return !member.GetCustomAttributes(false).Any(x => x.GetType() == typeof(ObsoleteAttribute));
+        }
         //public static T[] Copy<T>(Array from)
         //{
         //    T[] array = new T[from.Length];
@@ -243,37 +242,7 @@ namespace UMS.Core
         }
         public static int GetID(object obj)
         {
-            if (obj == null)
-                return 0;
-
-            unchecked
-            {
-                int i = 17;
-
-                foreach (PropertyInfo info in obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
-                {
-                    //if (Serializer.IsBlocked(Utility.GetObjectMemberName(info.DeclaringType.Name, info.Name)))
-                    //    continue;
-
-                    MethodInfo method = info.GetGetMethod();
-
-                    if (method == null)
-                        continue;
-
-                    //if (!Utility.CanAccessMember(info))
-                    //    continue;
-
-                    try
-                    {
-                        i = i + info.GetValue(obj, null).GetHashCode() * 13;
-                    }
-                    catch (System.Exception)
-                    {
-                    }
-                }
-
-                return i;
-            }
+            return IDManager.GetID(obj);
         }
         public static string GetValidName(string preferredName, HashSet<string> blackList)
         {

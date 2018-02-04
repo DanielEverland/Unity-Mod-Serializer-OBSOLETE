@@ -40,10 +40,12 @@ namespace UMS.Serialization
         {
             AssemblyManager.Initialize();
 
+            IDManager.Initialize();
             ObjectManager.Initialize();
-            BehaviourManager.Initialize();
             CustomSerializers.Initialize();
+            BlockedTypes.Initialize();
 
+            BehaviourManager.Initialize();
             AssemblyManager.ExecuteReflection();
         }
         private static void InitializeSerialization()

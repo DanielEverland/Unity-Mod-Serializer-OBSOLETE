@@ -68,6 +68,7 @@
     <Compile Include="Core\Config.cs" />
     <Compile Include="Core\Debugging.cs" />
     <Compile Include="Core\Extensions.cs" />
+    <Compile Include="Core\IDManager.cs" />
     <Compile Include="Core\IModEntry.cs" />
     <Compile Include="Core\Member.cs" />
     <Compile Include="Core\Mod.cs" />
