@@ -209,7 +209,7 @@ namespace UMS.Serialization
         }
 
         public abstract string Extension { get; }
-        public string FileName { get { return Name; } }
+        public virtual string FileName { get { return Name; } }
 
         public string Name { get { return _name; } }
         public HideFlags HideFlags { get { return (HideFlags)_hideFlags; } }
