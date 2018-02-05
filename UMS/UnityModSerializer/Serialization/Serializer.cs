@@ -23,7 +23,7 @@ namespace UMS.Serialization
             }
 
             Initialize();
-
+            
             for (int i = 0; i < Selection.objects.Length; i++)
             {
                 UnityEngine.Object toSerialize = UnityEngine.Object.Instantiate(Selection.objects[i]);
@@ -38,15 +38,7 @@ namespace UMS.Serialization
 
         private static void Initialize()
         {
-            AssemblyManager.Initialize();
-
-            IDManager.Initialize();
-            ObjectManager.Initialize();
-            CustomSerializers.Initialize();
-            BlockedTypes.Initialize();
-
-            BehaviourManager.Initialize();
-            AssemblyManager.ExecuteReflection();
+            CoreManager.Initialize();
         }
         private static void InitializeSerialization()
         {

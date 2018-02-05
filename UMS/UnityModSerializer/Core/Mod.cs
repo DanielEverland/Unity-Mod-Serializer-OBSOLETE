@@ -1,5 +1,6 @@
 ﻿using Ionic.Zip;
 using System.Collections.Generic;
+using System.IO;
 using UMS.Serialization;
 
 namespace UMS.Core
@@ -57,35 +58,54 @@ namespace UMS.Core
                 zip.Save(path);
             }
         }
-        
+        public static Dictionary<int, object> Deserialize(string path)
+        {
+            Dictionary<string, string> files = new Dictionary<string, string>();
 
-        //public static Mod Deserialize(string path)
-        //{
-        //    Dictionary<string, string> files = new Dictionary<string, string>();
+            using (ZipFile zip = ZipFile.Read(path))
+            {
+                foreach (ZipEntry entry in zip)
+                {
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        entry.Extract(stream);
 
-        //    using (ZipFile zip = ZipFile.Read(path))
-        //    {
-        //        foreach (ZipEntry entry in zip)
-        //        {
-        //            using (MemoryStream stream = new MemoryStream())
-        //            {
-        //                entry.Extract(stream);
+                        stream.Position = 0;
+                        StreamReader sr = new StreamReader(stream);
 
-        //                stream.Position = 0;
-        //                StreamReader sr = new StreamReader(stream);
+                        files.Add(entry.FileName, sr.ReadToEnd());
+                    }
+                }
+            }
 
-        //                files.Add(Path.GetFileNameWithoutExtension(entry.FileName), sr.ReadToEnd());
-        //            }
-        //        }
-        //    }
+            if (!files.ContainsKey(CONFIG_NAME))
+                throw new System.NullReferenceException("No config file in " + path);
 
-        //    if (!files.ContainsKey(CONFIG_NAME))
-        //        throw new NullReferenceException("No config file in " + path);
+            Config config = JsonSerializer.ToObject<Config>(files[CONFIG_NAME]);
+            files.Remove(CONFIG_NAME);
 
-        //    Mod mod = JsonSerializer.ToObject<Mod>(files[CONFIG_NAME]);
-        //    files.Remove(CONFIG_NAME);
+            Dictionary<int, object> deserializedObjects = new Dictionary<int, object>();
+            foreach (KeyValuePair<string, string> file in files)
+            {
+                int id = -1;
 
-        //    return mod;
-        //}
+                try
+                {
+                    id = config.data.Find(x => x.localPath == file.Key).id;
+                }
+                catch (System.Exception)
+                {
+                    UnityEngine.Debug.LogError("Config file didn't contain " + file.Key);
+                    throw;
+                }
+                
+                object obj = JsonSerializer.ToObject(file.Value);
+
+                UnityEngine.Debug.Log(id + " - " + file.Value.Length);
+                deserializedObjects.Add(id, obj);
+            }
+
+            return deserializedObjects;
+        }
     }
 }

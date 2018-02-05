@@ -384,6 +384,9 @@ namespace UMS.Serialization
         private SerializableMember() { }
         public SerializableMember(MemberInfo info, object value)
         {
+            if (value == null)
+                return;
+
             if (CustomSerializers.CanSerialize(value.GetType()))
             {
                 _value = new Reference(value);

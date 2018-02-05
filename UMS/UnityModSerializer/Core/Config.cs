@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace UMS.Core
 {
@@ -12,11 +13,12 @@ namespace UMS.Core
         {
             data.Add(new Data(id, localPath));
         }
-
+        
         public List<Data> data = new List<Data>();
 
         public class Data
         {
+            public Data() { }
             public Data(int id, string localPath)
             {
                 this.id = id;
