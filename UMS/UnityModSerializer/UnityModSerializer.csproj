@@ -75,6 +75,12 @@
     <Compile Include="Core\Object.cs" />
     <Compile Include="Core\ObjectManager.cs" />
     <Compile Include="Core\Priority.cs" />
+    <Compile Include="Core\Types\Member.cs" />
+    <Compile Include="Core\Types\Reference.cs" />
+    <Compile Include="Core\Types\Serializable.cs" />
+    <Compile Include="Core\Types\SerializableComponent.cs" />
+    <Compile Include="Core\Types\SerializableGameObject.cs" />
+    <Compile Include="Core\Types\SerializableObject.cs" />
     <Compile Include="Core\Utility.cs" />
     <Compile Include="Deserialization\CustomConstructor.cs" />
     <Compile Include="Deserialization\Deserializer.cs" />

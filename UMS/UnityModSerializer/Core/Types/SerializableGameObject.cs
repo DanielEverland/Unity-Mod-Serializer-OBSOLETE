@@ -1,0 +1,69 @@
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UMS.Deserialization;
+using UnityEngine;
+
+namespace UMS.Core.Types
+{
+    [Serializable]
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    public class SerializableGameObject : SerializableObject<GameObject, SerializableGameObject>
+    {
+        public SerializableGameObject() { }
+        public SerializableGameObject(GameObject obj) : base(obj)
+        {
+            _components = new List<Reference>();
+            foreach (Component comp in obj.GetComponents<Component>())
+            {
+                if (comp == null)
+                    continue;
+
+                _components.Add(new Reference(comp));
+            }
+        }
+
+        public override string Extension => "gameObject";
+
+        public IList<Reference> Components { get { return _components; } }
+
+        [JsonProperty]
+        private List<Reference> _components;
+
+        public override GameObject Deserialize(SerializableGameObject serialized)
+        {
+            GameObject gameObject = new GameObject(serialized.Name);
+
+            foreach (Reference reference in serialized.Components)
+            {
+                if (!Deserializer.ContainsObject(reference.ID))
+                    continue;
+
+                Deserializer.GetSerializedObject<SerializableComponent>(reference.ID, serializableComponent =>
+                {
+                    Component component = GetComponent(serializableComponent.ComponentType, gameObject);
+                    serializableComponent.Deserialize(component);
+                });
+            }
+
+            return gameObject;
+        }
+        private Component GetComponent(Type type, GameObject obj)
+        {
+            if (type == typeof(Transform))
+            {
+                return obj.GetComponent<Transform>();
+            }
+            else
+            {
+                return obj.AddComponent(type);
+            }
+        }
+        public override SerializableGameObject Serialize(GameObject obj)
+        {
+            return new SerializableGameObject(obj);
+        }
+    }
+}
