@@ -30,6 +30,9 @@ namespace UMS.Core
         /// </summary>
         public static object CheckForConversion(object fromValue, Type toType)
         {
+            if (fromValue == null)
+                return null;
+
             if (converters.ContainsKey(toType))
             {
                 return converters[toType].Invoke(fromValue);
