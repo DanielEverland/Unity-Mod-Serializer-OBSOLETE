@@ -80,7 +80,11 @@
     <Compile Include="Core\Types\Serializable.cs" />
     <Compile Include="Core\Types\SerializableComponent.cs" />
     <Compile Include="Core\Types\SerializableGameObject.cs" />
+    <Compile Include="Core\Types\SerializableMaterial.cs" />
     <Compile Include="Core\Types\SerializableObject.cs" />
+    <Compile Include="Core\Types\SerializableShader.cs" />
+    <Compile Include="Core\Types\SerializableTexture.cs" />
+    <Compile Include="Core\Types\SerializableTexture2D.cs" />
     <Compile Include="Core\Utility.cs" />
     <Compile Include="Deserialization\CustomConstructor.cs" />
     <Compile Include="Deserialization\Deserializer.cs" />

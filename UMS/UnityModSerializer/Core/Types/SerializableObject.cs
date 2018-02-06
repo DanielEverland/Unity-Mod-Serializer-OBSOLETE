@@ -9,10 +9,11 @@ namespace UMS.Core.Types
 {
     [Serializable]
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public abstract class SerializableObject<TFrom, TTo> : Serializable<TFrom, TTo>, IModEntry where TFrom : UnityEngine.Object
+    public abstract class SerializableObject<TNonSerializable, TSerializable> : Serializable<TNonSerializable, TSerializable>,
+                                                                                            IModEntry where TNonSerializable : UnityEngine.Object
     {
         public SerializableObject() { }
-        public SerializableObject(UnityEngine.Object obj) : base((TFrom)obj)
+        public SerializableObject(UnityEngine.Object obj) : base((TNonSerializable)obj)
         {
             if (obj is null)
                 throw new NullReferenceException("Object cannot be null");
