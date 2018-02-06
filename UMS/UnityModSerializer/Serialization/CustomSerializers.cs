@@ -8,6 +8,7 @@ using UMS.Behaviour;
 using UnityEngine.Rendering;
 using UnityEngine;
 using UnityEditor;
+using Newtonsoft.Json.Linq;
 
 namespace UMS.Serialization
 {
@@ -95,7 +96,7 @@ namespace UMS.Serialization
             List<IModSerializer> validSerializers = new List<IModSerializer>(serializers.Where(predicate));
             
             if (validSerializers.Count == 0)
-                throw new NotImplementedException("Couldn't find any valid serializers");
+                throw new NotImplementedException("Couldn't find any valid serializers ");
             
             IModSerializer selectedSerializer = Utility.GetMostInherited(validSerializers);
             instance = selectedSerializer;
@@ -135,23 +136,51 @@ namespace UMS.Serialization
             if (serialized == null)
                 return default(T);
 
-            object instance;
-            MethodInfo info = QueryForDeserialization(x => x.SerializedType.IsAssignableFrom(serialized.GetType()) && x.NonSerializableType.IsAssignableFrom(typeof(T)), out instance);
+            if (!CanDeserialize(serialized.GetType()))
+                throw new InvalidOperationException("Cannot deserialize " + serialized + ", because it implements a custom deserializer");
 
-            return (T)info.Invoke(instance, new object[1] { serialized });
+            try
+            {
+                object instance;
+                MethodInfo info = QueryForDeserialization(x => x.SerializedType.IsAssignableFrom(serialized.GetType()) && x.NonSerializableType.IsAssignableFrom(typeof(T)), out instance);
+                return (T)info.Invoke(instance, new object[1] { serialized });
+            }
+            catch (Exception)
+            {
+                Debug.Log(string.Format("Datadump: ({0}){1} - (2)", serialized.GetType(), serialized, typeof(T)));
+                throw;
+            }
         }
         public static object DeserializeObject(object serialized)
         {
             if (serialized == null)
                 return null;
 
-            object instance;
-            MethodInfo info = QueryForDeserialization(x => x.SerializedType.IsAssignableFrom(serialized.GetType()), out instance);
-            
-            return info.Invoke(instance, new object[1] { serialized });
+            if (!CanDeserialize(serialized.GetType()))
+                throw new InvalidOperationException("Cannot deserialize " + serialized + ", because it implements a custom deserializer");
+
+            try
+            {
+                object instance;
+                MethodInfo info = QueryForDeserialization(x => x.SerializedType.IsAssignableFrom(serialized.GetType()), out instance);
+
+                return info.Invoke(instance, new object[1] { serialized });
+            }
+            catch (Exception)
+            {
+                Debug.Log(string.Format("Datadump: ({0}){1} - (2)", serialized.GetType(), serialized));
+                throw;
+            }
+        }
+        public static bool CanDeserialize(Type type)
+        {
+            return !type.GetInterfaces().Any(x => x == typeof(ICustomDeserializer));
         }
         public static bool CanSerialize(Type type)
         {
+            if (type.GetInterfaces().Any(x => x == typeof(ICustomSerializer)))
+                return false;
+
             return serializers.Any(x => x.NonSerializableType.IsAssignableFrom(type) && !IsPrimitive(x.NonSerializableType));
         }
         private static bool IsPrimitive(Type type)
@@ -172,7 +201,7 @@ namespace UMS.Serialization
     //    {
     //    }
 
-    //    public override UNITY_TYPE Deserialize(SerializableTYPE serializable)
+    //    public override UNITY_TYPE Deserialize(SerializableTYPE serialized)
     //    {
     //        return new UNITY_TYPE(serializable);
     //    }
@@ -203,8 +232,8 @@ namespace UMS.Serialization
         [JsonProperty]
         private int _id;
 
-        public virtual TFrom Deserialize(TTo serializable) { return default(TFrom); }
-        public virtual TTo Serialize(TFrom obj) { return default(TTo); }
+        public virtual TFrom Deserialize(TTo serializable) { throw new NotImplementedException(GetType().ToString()); }
+        public virtual TTo Serialize(TFrom obj) { throw new NotImplementedException(GetType().ToString()); }
     }
     //------------------------------------//
 
@@ -261,9 +290,34 @@ namespace UMS.Serialization
         [JsonProperty]
         private List<Reference> _components;
 
-        public override GameObject Deserialize(SerializableGameObject serializable)
+        public override GameObject Deserialize(SerializableGameObject serialized)
         {
-            return new GameObject(serializable.Name);
+            GameObject gameObject = new GameObject(serialized.Name);
+
+            foreach (Reference reference in serialized.Components)
+            {
+                if (!Deserializer.ContainsObject(reference.ID))
+                    continue;
+
+                Deserializer.GetSerializedObject<SerializableComponent>(reference.ID, serializableComponent =>
+                {
+                    Component component = GetComponent(serializableComponent.ComponentType, gameObject);
+                    serializableComponent.Deserialize(component);
+                });
+            }
+
+            return gameObject;
+        }
+        private Component GetComponent(Type type, GameObject obj)
+        {
+            if(type == typeof(Transform))
+            {
+                return obj.GetComponent<Transform>();
+            }
+            else
+            {
+                return obj.AddComponent(type);
+            }
         }
         public override SerializableGameObject Serialize(GameObject obj)
         {
@@ -286,10 +340,6 @@ namespace UMS.Serialization
             ID = ObjectManager.Add(obj);
         }
         
-        public override object Deserialize(Reference serializable)
-        {
-            throw new NotImplementedException();
-        }
         public override Reference Serialize(object obj)
         {
             return new Reference(obj);
@@ -316,6 +366,7 @@ namespace UMS.Serialization
         public override string FileName { get { return _fileName; } }
 
         public Type ComponentType { get { return _type; } }
+        public IList<SerializableMember> Members { get { return _members; } }
         
         [JsonProperty]
         private Type _type;
@@ -365,9 +416,15 @@ namespace UMS.Serialization
 
             return !BlockedTypes.IsBlocked(objectMemberValue);
         }
-        public void Deserialize(Component serializable)
+        public void Deserialize(Component target)
         {
-            throw new System.NotImplementedException();
+            if (target == null)
+                throw new System.NullReferenceException("Given component is null!");
+
+            foreach (SerializableMember member in _members)
+            {
+                member.Deserialize(target);
+            }
         }
         public override SerializableComponent Serialize(Component obj)
         {
@@ -387,6 +444,8 @@ namespace UMS.Serialization
             if (value == null)
                 return;
 
+            _memberName = info.Name;
+
             if (CustomSerializers.CanSerialize(value.GetType()))
             {
                 _value = new Reference(value);
@@ -397,12 +456,78 @@ namespace UMS.Serialization
             }            
         }
 
+        public string MemberName { get { return _memberName; } }
+        public object Value { get { return _value; } }
+
+        [JsonProperty]
+        private string _memberName;
         [JsonProperty]
         private object _value;
-
-        public void Deserialize(object serializable)
+        
+        public void Deserialize(object target)
         {
-            throw new NotImplementedException();
+            if (target == null)
+                throw new NullReferenceException("Given target for " + this + " is null!");
+            
+            Type declaredType = target.GetType();
+            MemberInfo member = Utility.GetMember(declaredType, _memberName);
+            
+            try
+            {
+                if (member is PropertyInfo property)
+                {
+                    AssignAsProperty(property, target);
+                    
+                }
+                else if (member is FieldInfo field)
+                {
+                    AssignAsField(field, target);
+                }
+            }
+            catch (Exception)
+            {
+                Debug.Log("Data dump: " + _memberName + ", " + _value + ", " + target);
+                throw;
+            }            
+        }
+        private void AssignAsField(FieldInfo info, object target)
+        {
+            _value = Utility.CheckForConversion(_value, info.FieldType);
+
+            if (!info.FieldType.IsAssignableFrom(_value.GetType()))
+                throw new ArgumentException("Type mismatch for field " + info + " - " + this);
+
+            info.SetValue(target, _value);
+        }
+        private void AssignAsProperty(PropertyInfo info, object target)
+        {
+            MethodInfo setter = info.GetSetMethod();
+
+            _value = Utility.CheckForConversion(_value, info.PropertyType);
+
+            if (setter == null)
+                throw new ArgumentException("No setter for property " + info + " - " + this);
+
+            if (!ParamatersMatch(setter))
+                throw new ArgumentException("Parameters don't match for " + info + " - " + this + " - Object: " + _value);
+            
+            info.SetValue(target, _value, null);
+        }
+        private bool ParamatersMatch(MethodInfo info)
+        {
+            ParameterInfo[] parameters = info.GetParameters();
+
+            if (parameters.Length != 1)
+                return false;
+
+            if (!parameters[0].ParameterType.IsAssignableFrom(_value.GetType()))
+                return false;
+
+            return true;
+        }
+        public override string ToString()
+        {
+            return string.Format("{0}: {1} ({2})", _memberName, _value, _value.GetType());
         }
     }
     //------------------------------------//

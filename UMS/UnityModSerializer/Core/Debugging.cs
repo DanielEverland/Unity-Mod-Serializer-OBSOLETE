@@ -6,7 +6,7 @@ namespace UMS.Core
 {
     public static class Debugging
     {
-        public const TraceLevel DEFAULT_TRACE_LEVEL = TraceLevel.Off;
+        public const TraceLevel DEFAULT_TRACE_LEVEL = TraceLevel.Error;
 
         public class EG_TraceLogger : ITraceWriter
         {

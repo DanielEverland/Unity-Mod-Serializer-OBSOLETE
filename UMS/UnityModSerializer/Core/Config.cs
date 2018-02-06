@@ -16,6 +16,7 @@ namespace UMS.Core
         
         public List<Data> data = new List<Data>();
 
+        [System.Serializable]
         public class Data
         {
             public Data() { }

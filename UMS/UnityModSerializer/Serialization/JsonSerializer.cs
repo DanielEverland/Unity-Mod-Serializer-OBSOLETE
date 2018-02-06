@@ -13,52 +13,64 @@ namespace UMS.Serialization
     public class JsonSerializer
     {
         private static int errorIndex;
-        private static JsonSerializerSettings serializeSettings = new JsonSerializerSettings()
+        private static JsonSerializerSettings SerializeSettings
         {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore,
-            TypeNameHandling = TypeNameHandling.All,
-            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-            TraceWriter = new Debugging.EG_TraceLogger(),
-            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-            ContractResolver = new OnlyFieldsContractResolver(),
-        };
+            get
+            {
+                if (_serializeSettings == null)
+                    CreateSerializeSettings();
 
-        private static JsonSerializerSettings deserializeSettings = new JsonSerializerSettings()
+                return _serializeSettings;
+            }
+        }
+        private static JsonSerializerSettings _serializeSettings;
+
+        private static JsonSerializerSettings DeserializeSettings
         {
-            NullValueHandling = NullValueHandling.Ignore,
-            TypeNameHandling = TypeNameHandling.All,
-            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-            TraceWriter = new Debugging.EG_TraceLogger(),
-        };
+            get
+            {
+                if (_deserializeSettings == null)
+                    CreateDeserializeSettings();
 
+                return _deserializeSettings;
+            }
+        }
+        private static JsonSerializerSettings _deserializeSettings;
+
+        ///------------------------------SERIALIZE SETTINGS------------------------------
+        private static void CreateSerializeSettings()
+        {
+            _serializeSettings = new JsonSerializerSettings();
+
+            _serializeSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            _serializeSettings.NullValueHandling = NullValueHandling.Ignore;
+            _serializeSettings.TypeNameHandling = TypeNameHandling.All;
+            _serializeSettings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
+            _serializeSettings.TraceWriter = new Debugging.EG_TraceLogger();
+            _serializeSettings.MetadataPropertyHandling = MetadataPropertyHandling.Ignore;
+            _serializeSettings.ContractResolver = new OnlyFieldsContractResolver();
+        }
+        ///------------------------------DESERIALIZE SETTINGS------------------------------
+        private static void CreateDeserializeSettings()
+        {
+            _deserializeSettings = new JsonSerializerSettings();
+
+            _deserializeSettings.NullValueHandling = NullValueHandling.Ignore;
+            _deserializeSettings.TypeNameHandling = TypeNameHandling.All;
+            _deserializeSettings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full;
+            _deserializeSettings.TraceWriter = new Debugging.EG_TraceLogger();
+            _deserializeSettings.ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor;
+        }
         public static string ToJson(object obj)
         {
-            return JsonConvert.SerializeObject(obj, Formatting.Indented, serializeSettings);
+            return JsonConvert.SerializeObject(obj, Formatting.Indented, SerializeSettings);
         }
         public static object ToObject(string json)
         {
             JObject jobject = ToObject<JObject>(json);
             Type type = jobject["$type"].ToObject<Type>();
 
-            object obj = jobject.ToObject(type);
-
-            if(obj is IModSerializer serializer)
-            {
-                try
-                {
-                    return CustomSerializers.DeserializeObject(obj);
-                }
-                catch (Exception)
-                {
-                    UnityEngine.Debug.LogError("Issue while deserializing object. Putting JSON on desktop");
-
-                    PasteJSONToDesktop(json);
-                    throw;
-                }                
-            }
-            
-            return obj;
+            return ToObject(json, type);
         }
         public static T ToObject<T>(string json)
         {
@@ -68,7 +80,7 @@ namespace UMS.Serialization
         {
             try
             {
-                return JsonConvert.DeserializeObject(json, type, deserializeSettings);
+                return JsonConvert.DeserializeObject(json, type, DeserializeSettings);
             }
             catch (Exception)
             {

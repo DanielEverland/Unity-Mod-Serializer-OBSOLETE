@@ -7,15 +7,16 @@ namespace UMS.Core
 {
     public static class Mod
     {
+        public static Config ConfigFile { get; private set; }
+
         private const string CONFIG_NAME = "config";
         
-        private static Config configFile;
         private static Dictionary<string, string> filesToWrite;
         private static HashSet<string> usedNames;
              
         public static void Initialize()
         {
-            configFile = new Config();
+            ConfigFile = new Config();
             filesToWrite = new Dictionary<string, string>();
             usedNames = new HashSet<string>();
 
@@ -42,11 +43,11 @@ namespace UMS.Core
         }
         private static void AddToConfig(int id, string name)
         {
-            configFile.Add(id, name);
+            ConfigFile.Add(id, name);
         }
         public static void Serialize(string path)
         {
-            filesToWrite.Add(CONFIG_NAME, JsonSerializer.ToJson(configFile));
+            filesToWrite.Add(CONFIG_NAME, JsonSerializer.ToJson(ConfigFile));
 
             using (ZipFile zip = new ZipFile())
             {
@@ -58,7 +59,7 @@ namespace UMS.Core
                 zip.Save(path);
             }
         }
-        public static Dictionary<int, object> Deserialize(string path)
+        public static Dictionary<string, string> Deserialize(string path)
         {
             Dictionary<string, string> files = new Dictionary<string, string>();
 
@@ -81,31 +82,10 @@ namespace UMS.Core
             if (!files.ContainsKey(CONFIG_NAME))
                 throw new System.NullReferenceException("No config file in " + path);
 
-            Config config = JsonSerializer.ToObject<Config>(files[CONFIG_NAME]);
+            ConfigFile = JsonSerializer.ToObject<Config>(files[CONFIG_NAME]);
             files.Remove(CONFIG_NAME);
 
-            Dictionary<int, object> deserializedObjects = new Dictionary<int, object>();
-            foreach (KeyValuePair<string, string> file in files)
-            {
-                int id = -1;
-
-                try
-                {
-                    id = config.data.Find(x => x.localPath == file.Key).id;
-                }
-                catch (System.Exception)
-                {
-                    UnityEngine.Debug.LogError("Config file didn't contain " + file.Key);
-                    throw;
-                }
-                
-                object obj = JsonSerializer.ToObject(file.Value);
-
-                UnityEngine.Debug.Log(id + " - " + file.Value.Length);
-                deserializedObjects.Add(id, obj);
-            }
-
-            return deserializedObjects;
+            return files;
         }
     }
 }
