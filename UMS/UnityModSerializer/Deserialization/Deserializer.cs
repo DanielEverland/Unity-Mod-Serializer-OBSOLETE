@@ -8,8 +8,10 @@ using UnityEngine;
 using UnityEditor;
 using UMS.Core;
 using UMS.Behaviour;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace UMS.Serialization
+namespace UMS.Deserialization
 {
     public static class Deserializer
     {
@@ -19,6 +21,8 @@ namespace UMS.Serialization
         private static Dictionary<int, List<ActionInstance>> _serializedObjectQueue;
         private static Dictionary<int, List<ActionInstance>> _deserializedObjectQueue;
 
+        private static List<JsonConverter> _converters;
+
         [MenuItem(itemName: Utility.MENU_ITEM_ROOT + "/Deserialize", priority = Utility.MENU_ITEM_PRIORITY)]
         private static void Deserialize()
         {
@@ -27,12 +31,32 @@ namespace UMS.Serialization
 
             Debug.Log("Finished deserializing");
         }
+        public static IList<JsonConverter> GetConverters()
+        {
+            return _converters;
+        }
         private static void Initialize()
         {
             _serializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
             _deserializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
+            _converters = new List<JsonConverter>();
+
+            BehaviourManager.OnBehaviourLoadedWithContext += BehaviourLoaded;
 
             CoreManager.Initialize();
+        }
+        private static void BehaviourLoaded(BehaviourBase behaviour, MemberInfo info)
+        {
+            if(behaviour is CustomConstructor constructor && info is MethodInfo method)
+            {
+                CustomConstructorLoaded(constructor, method);
+            }
+        }
+        private static void CustomConstructorLoaded(CustomConstructor customConstructor, MethodInfo info)
+        {
+            customConstructor.AssignMethod(info);
+
+            _converters.Add(new CustomConstructorConverter(customConstructor));
         }
         private static void ExecuteID(int id)
         {
@@ -166,17 +190,46 @@ namespace UMS.Serialization
 
             private void CreateSerializedObject()
             {
-                SerializedObject = JsonSerializer.ToObject(JSON);
+                SerializedObject = Serialization.JsonSerializer.ToObject(JSON);
             }
             private void CreateDeserializedObject()
             {
-                if(CustomSerializers.CanDeserialize(SerializedObject.GetType()))
-                    DeserializedObject = CustomSerializers.DeserializeObject(SerializedObject);
+                if(Serialization.CustomSerializers.CanDeserialize(SerializedObject.GetType()))
+                    DeserializedObject = Serialization.CustomSerializers.DeserializeObject(SerializedObject);
             }
             public void Deserialize()
             {
                 CreateSerializedObject();
                 CreateDeserializedObject();
+            }
+        }
+        private class CustomConstructorConverter : JsonConverter
+        {
+            private CustomConstructorConverter() { }
+            public CustomConstructorConverter(CustomConstructor customConstructor)
+            {
+                _customConstructor = customConstructor;
+            }
+
+            private readonly CustomConstructor _customConstructor;
+
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType.IsAssignableFrom(_customConstructor.TargetType);
+            }
+            public override bool CanWrite => false;
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                if(reader.TokenType == JsonToken.StartObject)
+                    JObject.Load(reader);
+
+                return _customConstructor.Method.Invoke(null, null);
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
             }
         }
     }

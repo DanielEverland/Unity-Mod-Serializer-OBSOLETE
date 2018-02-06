@@ -9,6 +9,7 @@ namespace UMS.Behaviour
 {
     public static class BehaviourManager
     {
+        public static event Action<BehaviourBase, MemberInfo> OnBehaviourLoadedWithContext;
         public static event Action<BehaviourBase> OnBehaviourLoaded;
         public static event Action OnFinishedInitializing;
 
@@ -66,9 +67,9 @@ namespace UMS.Behaviour
                 loader.Load(targetObj);
             }
 
-            AddBehaviour(attribute as BehaviourBase);
+            AddBehaviour(attribute as BehaviourBase, targetObj);
         }
-        private static void AddBehaviour(BehaviourBase behaviour)
+        private static void AddBehaviour<T>(BehaviourBase behaviour, T targetObject) where T : MemberInfo
         {
             if (behaviour == null)
                 return;
@@ -77,6 +78,9 @@ namespace UMS.Behaviour
 
             if (OnBehaviourLoaded != null && behaviour != null)
                 OnBehaviourLoaded.Invoke(behaviour);
+
+            if (OnBehaviourLoadedWithContext != null && behaviour != null)
+                OnBehaviourLoadedWithContext.Invoke(behaviour, targetObject);
         }
         private static void AddBehaviour<TKey, TValue>(Dictionary<TKey, TValue> dictionary, TKey key, TValue behaviour) where TValue : BehaviourBase
         {

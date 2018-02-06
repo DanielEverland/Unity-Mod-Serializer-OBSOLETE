@@ -76,6 +76,7 @@
     <Compile Include="Core\ObjectManager.cs" />
     <Compile Include="Core\Priority.cs" />
     <Compile Include="Core\Utility.cs" />
+    <Compile Include="Deserialization\CustomConstructor.cs" />
     <Compile Include="Deserialization\Deserializer.cs" />
     <Compile Include="Deserialization\ObjectCreator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

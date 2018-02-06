@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using UMS.Core;
+using UMS.Deserialization;
 
 namespace UMS.Serialization
 {
@@ -60,6 +61,11 @@ namespace UMS.Serialization
             _deserializeSettings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full;
             _deserializeSettings.TraceWriter = new Debugging.EG_TraceLogger();
             _deserializeSettings.ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor;
+            _deserializeSettings.Converters = GetDeserializationConverters();
+        }
+        private static IList<JsonConverter> GetDeserializationConverters()
+        {
+            return Deserializer.GetConverters();
         }
         public static string ToJson(object obj)
         {
