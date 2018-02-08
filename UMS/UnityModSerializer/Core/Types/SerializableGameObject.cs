@@ -21,7 +21,7 @@ namespace UMS.Core.Types
                 if (comp == null)
                     continue;
 
-                _components.Add(new Reference(comp));
+                _components.Add(Reference.Create(comp));
             }
         }
 

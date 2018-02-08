@@ -17,13 +17,13 @@ namespace UMS.Core.Types
         public SerializableMaterial() { }
         public SerializableMaterial(Material material)
         {
-            _shader = new Reference(material.shader);
+            _shader = Reference.Create(material.shader);
             _globalIlluminationFlags = (int)material.globalIlluminationFlags;
             _shaderKeywords = material.shaderKeywords;
             _renderQueue = material.renderQueue;
             _mainTextureScale = material.mainTextureScale;
             _mainTextureOffset = material.mainTextureOffset;
-            _mainTexture = new Reference(material.mainTexture);
+            _mainTexture = Reference.Create(material.mainTexture);
             _color = material.color;
             _enableInstancing = material.enableInstancing;
             _doubleSidedGI = material.doubleSidedGI;

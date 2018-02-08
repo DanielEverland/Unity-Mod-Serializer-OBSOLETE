@@ -23,7 +23,7 @@ namespace UMS.Core.Types
 
             if (CustomSerializers.CanSerialize(value.GetType()))
             {
-                _value = new Reference(value);
+                _value = Reference.Create(value);
             }
             else
             {
@@ -84,7 +84,7 @@ namespace UMS.Core.Types
                 throw new ArgumentException("No setter for property " + info + " - " + this);
 
             if (!ParamatersMatch(setter))
-                throw new ArgumentException("Parameters don't match for " + info + " - " + this + " - Object: " + _value);
+                throw new ArgumentException("Parameters don't match for " + info + " - Object: " + _value);
 
             info.SetValue(target, _value, null);
         }
