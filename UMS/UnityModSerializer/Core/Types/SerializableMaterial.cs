@@ -15,7 +15,7 @@ namespace UMS.Core.Types
         public override string Extension => "material";
 
         public SerializableMaterial() { }
-        public SerializableMaterial(Material material)
+        public SerializableMaterial(Material material) : base(material)
         {
             _shader = Reference.Create(material.shader);
             _globalIlluminationFlags = (int)material.globalIlluminationFlags;

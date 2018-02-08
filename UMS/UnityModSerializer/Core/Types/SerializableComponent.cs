@@ -39,6 +39,34 @@ namespace UMS.Core.Types
 
         private void AddMembers(Component comp)
         {
+            SerializeProperties(comp);
+            SerializeFields(comp);
+        }
+        private void SerializeFields(Component comp)
+        {
+            foreach (FieldInfo field in ComponentType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            {
+                try
+                {
+                    if (IsValid(field))
+                    {
+                        object fieldValue = field.GetValue(comp);
+
+                        if(fieldValue != null)
+                        {
+                            Add(field, fieldValue);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+        }
+        private void SerializeProperties(Component comp)
+        {
             foreach (PropertyInfo property in ComponentType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
                 try
@@ -49,7 +77,7 @@ namespace UMS.Core.Types
 
                         if (propertyValue != null)
                         {
-                            _members.Add(new SerializableMember(property, propertyValue));
+                            Add(property, propertyValue);
                         }
                     }
 
@@ -64,6 +92,16 @@ namespace UMS.Core.Types
                 }
             }
         }
+        private bool IsValid(FieldInfo info)
+        {
+            if (!info.IsPublic)
+            {
+                if (!info.GetCustomAttributes(true).Any(x => x.GetType() == typeof(SerializeField)))
+                    return false;
+            }
+
+            return IsValid((MemberInfo)info);
+        }
         private bool IsValid(PropertyInfo info)
         {
             if (info.GetSetMethod() == null)
@@ -76,6 +114,10 @@ namespace UMS.Core.Types
             string objectMemberValue = Utility.GetObjectMemberName(info.DeclaringType.Name, info.Name);
 
             return !BlockedTypes.IsBlocked(objectMemberValue);
+        }
+        private void Add(MemberInfo info, object value)
+        {
+            _members.Add(new SerializableMember(info, value));
         }
         public void Deserialize(Component target)
         {
