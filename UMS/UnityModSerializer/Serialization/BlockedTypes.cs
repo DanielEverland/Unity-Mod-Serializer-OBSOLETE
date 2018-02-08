@@ -26,7 +26,6 @@ namespace UMS.Serialization
             "MeshFilter.mesh",
             "Renderer.material",
             "Renderer.materials",
-            "Renderer.sharedMaterials",
             "Canvas.rootCanvas",
             "Graphic.canvas",
             "Transform.root",

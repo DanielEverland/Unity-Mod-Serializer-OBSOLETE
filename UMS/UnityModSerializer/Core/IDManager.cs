@@ -80,7 +80,16 @@ namespace UMS.Core
 
                     try
                     {
-                        int hash = info.GetValue(obj, null).GetHashCode();
+                        int hash = 0;
+                        
+                        if (info.PropertyType.IsArray)
+                        {
+                            hash = GetArrayID(info.GetValue(obj, null));
+                        }
+                        else
+                        {
+                            hash = GetObjectID(info.GetValue(obj, null));
+                        }
                         
                         memberValues?.Invoke(info, hash);
 
@@ -96,6 +105,24 @@ namespace UMS.Core
 
                 return i;
             }
+        }
+        private static int GetArrayID(object obj)
+        {
+            int i = 0;
+
+            unchecked
+            {
+                foreach (object item in obj as System.Collections.IEnumerable)
+                {
+                    i += item.GetHashCode() * 23;
+                }
+            }
+
+            return i;
+        }
+        private static int GetObjectID(object obj)
+        {
+            return obj.GetHashCode();
         }
         private class IDGeneratorAnalyzer
         {
