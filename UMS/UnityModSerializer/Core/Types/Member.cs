@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UMS.Serialization;
+using UMS.Deserialization;
 using UnityEngine;
 
 namespace UMS.Core.Types
@@ -47,6 +48,22 @@ namespace UMS.Core.Types
             Type declaredType = target.GetType();
             MemberInfo member = Utility.GetMember(declaredType, _memberName);
 
+            if (member == null)
+            {
+                return;
+            }
+
+            if(_value is Reference reference)
+            {
+                Deserializer.GetDeserializedObject(reference.ID, GetType(member), obj =>
+                {
+                    _value = obj;
+                    Deserialize(target);
+                });
+
+                return;
+            }
+
             try
             {
                 if (member is PropertyInfo property)
@@ -65,10 +82,25 @@ namespace UMS.Core.Types
                 throw;
             }
         }
+        private Type GetType(MemberInfo member)
+        {
+            if(member is PropertyInfo property)
+            {
+                return property.PropertyType;
+            }
+            else if(member is FieldInfo field)
+            {
+                return field.FieldType;
+            }
+            else
+            {
+                throw new NotImplementedException("Cannot get type of " + member.GetType());
+            }
+        }
         private void AssignAsField(FieldInfo info, object target)
         {
             _value = Utility.CheckForConversion(_value, info.FieldType);
-
+            
             if (!info.FieldType.IsAssignableFrom(_value.GetType()))
                 throw new ArgumentException("Type mismatch for field " + info + " - " + this);
 

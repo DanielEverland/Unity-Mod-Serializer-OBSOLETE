@@ -117,9 +117,9 @@ namespace UMS.Deserialization
         }
         public static void GetDeserializedObject<T>(int id, Action<T> action)
         {
-            GetDeserializedObject(id, new Action<object>(x => action((T)x)), typeof(T));
+            GetDeserializedObject(id, typeof(T), new Action<object>(x => action((T)x)));
         }
-        public static void GetDeserializedObject(int id, Action<object> action, Type type)
+        public static void GetDeserializedObject(int id, Type type, Action<object> action)
         {
             if (!_objectReferences.ContainsKey(id))
             {

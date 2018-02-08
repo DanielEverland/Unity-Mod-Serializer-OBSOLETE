@@ -33,7 +33,9 @@ namespace UMS.Core.Types
 
         public override Texture2D Deserialize(SerializableTexture2D serializable)
         {
-            Texture2D texture = new Texture2D(serializable._width, serializable._height, (TextureFormat)serializable._format, serializable._mipMapCount > 0);
+            Texture2D texture = new Texture2D(serializable._width, serializable._height, (TextureFormat)serializable._format, serializable._mipMapCount > 1);
+
+            texture.name = serializable.Name;
 
             texture.wrapMode = (TextureWrapMode)serializable._wrapMode;
             texture.wrapModeW = (TextureWrapMode)serializable._wrapModeW;
