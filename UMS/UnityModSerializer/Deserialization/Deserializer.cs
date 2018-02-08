@@ -215,7 +215,7 @@ namespace UMS.Deserialization
 
             public override bool CanConvert(Type objectType)
             {
-                return objectType.IsAssignableFrom(_customConstructor.TargetType);
+                return _customConstructor.TargetType.IsAssignableFrom(objectType);
             }
             public override bool CanWrite => false;
 
