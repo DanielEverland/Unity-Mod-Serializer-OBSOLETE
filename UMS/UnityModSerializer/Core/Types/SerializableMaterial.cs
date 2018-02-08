@@ -63,14 +63,21 @@ namespace UMS.Core.Types
             material.enableInstancing = serializable._enableInstancing;
             material.doubleSidedGI = serializable._doubleSidedGI;
 
-            Deserializer.GetDeserializedObject<Shader>(_shader.ID, shader =>
+            if(serializable._shader != null)
             {
-                material.shader = shader;
-            });
-            Deserializer.GetDeserializedObject<Texture>(_mainTexture.ID, texture =>
+                Deserializer.GetDeserializedObject<Shader>(serializable._shader.ID, shader =>
+                {
+                    material.shader = shader;
+                });
+            }            
+
+            if(serializable._mainTexture != null)
             {
-                material.mainTexture = texture;
-            });
+                Deserializer.GetDeserializedObject<Texture>(serializable._mainTexture.ID, texture =>
+                {
+                    material.mainTexture = texture;
+                });
+            }            
 
             return material;
         }
