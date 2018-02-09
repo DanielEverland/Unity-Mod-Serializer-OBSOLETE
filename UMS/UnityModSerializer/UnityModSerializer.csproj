@@ -81,6 +81,7 @@
     <Compile Include="Core\Types\SerializableComponent.cs" />
     <Compile Include="Core\Types\SerializableGameObject.cs" />
     <Compile Include="Core\Types\SerializableMaterial.cs" />
+    <Compile Include="Core\Types\SerializableMesh.cs" />
     <Compile Include="Core\Types\SerializableObject.cs" />
     <Compile Include="Core\Types\SerializableShader.cs" />
     <Compile Include="Core\Types\SerializableTexture.cs" />
