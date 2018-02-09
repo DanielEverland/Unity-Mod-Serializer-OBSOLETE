@@ -140,6 +140,9 @@ namespace UMS.Core
             {
                 foreach (object item in obj as System.Collections.IEnumerable)
                 {
+                    if (item == null)
+                        continue;
+
                     i += item.GetHashCode() * 23;
                 }
             }

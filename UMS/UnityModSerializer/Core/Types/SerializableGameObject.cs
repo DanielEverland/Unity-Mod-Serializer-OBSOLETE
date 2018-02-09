@@ -24,11 +24,18 @@ namespace UMS.Core.Types
 
                 _components.Add(Reference.Create(comp));
             }
+
+            _children = new List<Reference>();
+            foreach (Transform child in obj.transform)
+            {
+                _children.Add(Reference.Create(child.gameObject));
+            }
         }
 
         public override string Extension => "gameObject";
 
         public IList<Reference> Components { get { return _components; } }
+        public IList<Reference> Children { get { return _children; } }
 
         [JsonProperty]
         public bool _activeSelf;
@@ -40,6 +47,8 @@ namespace UMS.Core.Types
         public string _tag;
         [JsonProperty]
         private List<Reference> _components;
+        [JsonProperty]
+        private List<Reference> _children;
 
         public override GameObject Deserialize(SerializableGameObject serialized)
         {
@@ -59,6 +68,14 @@ namespace UMS.Core.Types
                 {
                     Component component = GetComponent(serializableComponent.ComponentType, gameObject);
                     serializableComponent.Deserialize(component);
+                });
+            }
+
+            foreach (Reference child in serialized.Children)
+            {
+                Deserializer.GetDeserializedObject<GameObject>(child.ID, instance =>
+                {
+                    instance.transform.SetParent(gameObject.transform);
                 });
             }
 
