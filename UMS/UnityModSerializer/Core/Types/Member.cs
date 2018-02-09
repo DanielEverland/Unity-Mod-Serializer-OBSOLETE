@@ -117,8 +117,18 @@ namespace UMS.Core.Types
         }
         private void AssignAsField(FieldInfo info, object target)
         {
-            if (!info.FieldType.IsAssignableFrom(_value.GetType()))
+            Type fieldType = info.FieldType;
+            Type valueType = _value.GetType();
+
+            if (fieldType.IsEnum)
+            {
+                if(!Enum.IsDefined(fieldType, _value))
+                    throw new ArgumentException("Type mismatch for field " + info + " - " + this);
+            }
+            else if(!info.FieldType.IsAssignableFrom(valueType))
+            {
                 throw new ArgumentException("Type mismatch for field " + info + " - " + this);
+            }                
 
             info.SetValue(target, _value);
         }
@@ -141,8 +151,17 @@ namespace UMS.Core.Types
             if (parameters.Length != 1)
                 return false;
 
-            if (!parameters[0].ParameterType.IsAssignableFrom(_value.GetType()))
+            Type parameterType = parameters[0].ParameterType;
+
+            if (parameterType.IsEnum)
+            {
+                if (!Enum.IsDefined(parameterType, _value))
+                    return false;
+            }
+            else if(!parameters[0].ParameterType.IsAssignableFrom(_value.GetType()))
+            {
                 return false;
+            }
 
             return true;
         }
