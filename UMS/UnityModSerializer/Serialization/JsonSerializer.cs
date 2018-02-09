@@ -64,7 +64,11 @@ namespace UMS.Serialization
         }
         private static IList<JsonConverter> GetDeserializationConverters()
         {
-            return Deserializer.GetConverters();
+            IList<JsonConverter> converters = Deserializer.GetConverters();
+
+            converters.Add(new NumberConverter());
+
+            return converters;
         }
         public static string ToJson(object obj)
         {
@@ -117,6 +121,45 @@ namespace UMS.Serialization
                 return false;
 
             return (obj.GetType().Attributes & TypeAttributes.Serializable) == TypeAttributes.Serializable;
+        }
+    }
+    public class NumberConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(int) || objectType == typeof(long) || objectType == typeof(Object);
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.StartObject)
+                JObject.Load(reader);
+
+            if (reader.Value == null)
+                return null;
+
+            string stringValue = reader.Value.ToString();
+            int intValue = -1;
+            long longValue = -1;
+
+            if (int.TryParse(stringValue, out intValue))
+            {
+                return intValue;
+            }
+            else if (long.TryParse(stringValue, out longValue))
+            {
+                return longValue;
+            }
+            else
+            {
+                return reader.Value;
+            }
+        }
+
+        public override bool CanWrite => false;
+        public override void WriteJson(JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
+        {
+            throw new NotImplementedException();
         }
     }
     public class OnlyFieldsContractResolver : DefaultContractResolver

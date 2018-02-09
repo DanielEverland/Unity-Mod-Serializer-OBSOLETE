@@ -69,7 +69,7 @@ namespace UMS.Core.Types
             Type declaredType = target.GetType();
             MemberInfo member = Utility.GetMember(declaredType, _memberName);
 
-            if (member == null)
+            if (member == null || _value == null)
                 return;
 
             if (_value is Reference reference)
@@ -117,8 +117,6 @@ namespace UMS.Core.Types
         }
         private void AssignAsField(FieldInfo info, object target)
         {
-            _value = Utility.CheckForConversion(_value, info.FieldType);
-
             if (!info.FieldType.IsAssignableFrom(_value.GetType()))
                 throw new ArgumentException("Type mismatch for field " + info + " - " + this);
 
@@ -127,8 +125,6 @@ namespace UMS.Core.Types
         private void AssignAsProperty(PropertyInfo info, object target)
         {
             MethodInfo setter = info.GetSetMethod();
-
-            _value = Utility.CheckForConversion(_value, info.PropertyType);
 
             if (setter == null)
                 throw new ArgumentException("No setter for property " + info + " - " + this);
@@ -155,3 +151,4 @@ namespace UMS.Core.Types
             return string.Format("{0}: {1} ({2})", _memberName, _value, _value.GetType());
         }
     }
+}

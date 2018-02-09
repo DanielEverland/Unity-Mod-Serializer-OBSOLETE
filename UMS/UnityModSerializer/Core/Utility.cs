@@ -15,39 +15,6 @@ namespace UMS.Core
 
         private static Regex EndNumberParanthesis = new Regex(@"\(\d+\)$");
 
-        private static readonly Dictionary<Type, Func<object, object>> converters = new Dictionary<Type, Func<object, object>>()
-        {
-            { typeof(Int32), ConvertToInt32 },
-        };
-
-        /// <summary>
-        /// Used to compensate for Json.NET deserializing certain values as a higher-bit version than what is expected.
-        /// For instance, this will occur when deserializing Int32 values - they'll be deserialized as Int64 types
-        /// </summary>
-        public static object CheckForConversion(object fromValue, Type toType)
-        {
-            if (fromValue == null)
-                return null;
-
-            if (converters.ContainsKey(toType))
-            {
-                return converters[toType].Invoke(fromValue);
-            }
-
-            return fromValue;
-        }
-        private static object ConvertToInt32(object fromValue)
-        {
-            string stringValue = fromValue.ToString();
-            int intValue = -1;
-
-            if (int.TryParse(stringValue, out intValue))
-            {
-                return intValue;
-            }
-
-            return fromValue;
-        }
         public static MemberInfo GetMember(Type type, string name)
         {
             Type toCheck = type;
