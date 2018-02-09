@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UMS.Deserialization;
 using UnityEngine;
 
@@ -31,7 +29,7 @@ namespace UMS.Core.Types
         public override string Extension => "gameObject";
 
         public IList<Reference> Components { get { return _components; } }
-        
+
         [JsonProperty]
         public bool _activeSelf;
         [JsonProperty]

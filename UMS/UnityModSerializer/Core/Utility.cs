@@ -1,12 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
-using UMS.Serialization;
-using static UMS.Serialization.CustomSerializers;
 
 namespace UMS.Core
 {
@@ -37,7 +33,7 @@ namespace UMS.Core
             {
                 return converters[toType].Invoke(fromValue);
             }
-            
+
             return fromValue;
         }
         private static object ConvertToInt32(object fromValue)
@@ -45,7 +41,7 @@ namespace UMS.Core
             string stringValue = fromValue.ToString();
             int intValue = -1;
 
-            if(int.TryParse(stringValue, out intValue))
+            if (int.TryParse(stringValue, out intValue))
             {
                 return intValue;
             }
@@ -121,7 +117,6 @@ namespace UMS.Core
 
                     int index = 0;
                     string strippedString = preferredName.Replace(match.Value, string.Empty);
-
 
                     foreach (Capture capture in match.Captures)
                     {

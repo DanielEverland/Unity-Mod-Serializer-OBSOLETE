@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using UnityEngine;
 
 namespace UMS.Core.Types
@@ -11,7 +7,7 @@ namespace UMS.Core.Types
     {
         public override string Extension => "texture";
 
-        public SerializableTexture2D() : base() { } 
+        public SerializableTexture2D() : base() { }
         public SerializableTexture2D(Texture2D texture) : base(texture)
         {
             _rawData = texture.GetRawTextureData();

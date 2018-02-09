@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using UMS.Serialization;
 using UnityEngine;
 
@@ -50,7 +49,7 @@ namespace UMS.Core.Types
                     {
                         object fieldValue = field.GetValue(comp);
 
-                        if(fieldValue != null)
+                        if (fieldValue != null)
                         {
                             Add(field, fieldValue);
                         }
@@ -58,7 +57,6 @@ namespace UMS.Core.Types
                 }
                 catch (Exception)
                 {
-
                     throw;
                 }
             }
@@ -78,7 +76,6 @@ namespace UMS.Core.Types
                             Add(property, propertyValue);
                         }
                     }
-
                 }
                 catch (NotSupportedException)
                 {

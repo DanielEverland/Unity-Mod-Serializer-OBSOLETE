@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Newtonsoft.Json;
 using UnityEngine;
-using UMS.Serialization;
-using UMS.Deserialization;
 using UnityEngine.Rendering;
-using Newtonsoft.Json;
 
 namespace UMS.Core.Types
 {
@@ -90,7 +84,7 @@ namespace UMS.Core.Types
             newMesh.triangles = serializable._triangles;
             newMesh.colors = serializable._colors;
             newMesh.colors32 = serializable._colors32;
-            
+
             return newMesh;
         }
     }

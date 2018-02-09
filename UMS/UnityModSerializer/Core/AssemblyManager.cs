@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace UMS.Core
 {
@@ -26,7 +24,7 @@ namespace UMS.Core
         {
             if (OnLoadType == null)
                 throw new NullReferenceException("No reflection analyzers loaded!");
-            
+
             foreach (Assembly assembly in LoadedAssemblies)
             {
                 try
@@ -45,7 +43,6 @@ namespace UMS.Core
                 {
                     throw;
                 }
-                
             }
 
             OnFinishedReflection?.Invoke();
@@ -58,7 +55,7 @@ namespace UMS.Core
 
             if (unityAssembly != null)
                 _toReturn.Add(unityAssembly);
-            
+
             Queue<string> toCheck = new Queue<string>();
             toCheck.Enqueue(Application.dataPath);
 

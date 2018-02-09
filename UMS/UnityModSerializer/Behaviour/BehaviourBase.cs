@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace UMS.Behaviour
 {
@@ -16,9 +12,9 @@ namespace UMS.Behaviour
         {
             _priority = priority;
         }
-        
+
         public int Priority { get { return _priority; } }
-        
+
         private readonly int _priority;
     }
 }

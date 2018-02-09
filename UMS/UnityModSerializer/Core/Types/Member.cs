@@ -1,12 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Collections;
-using System.Linq;
+using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
-using UMS.Serialization;
 using UMS.Deserialization;
+using UMS.Serialization;
 using UnityEngine;
 
 namespace UMS.Core.Types
@@ -46,7 +44,7 @@ namespace UMS.Core.Types
         private void AssignAsArray(object value)
         {
             List<object> objects = new List<object>();
-            
+
             foreach (object item in value as IEnumerable)
             {
                 objects.Add(GetSerializableObject(item));
@@ -76,7 +74,7 @@ namespace UMS.Core.Types
                 return;
             }
 
-            if(_value is Reference reference)
+            if (_value is Reference reference)
             {
                 Deserializer.GetDeserializedObject(reference.ID, GetType(member), obj =>
                 {
@@ -92,7 +90,6 @@ namespace UMS.Core.Types
                 if (member is PropertyInfo property)
                 {
                     AssignAsProperty(property, target);
-
                 }
                 else if (member is FieldInfo field)
                 {
@@ -107,11 +104,11 @@ namespace UMS.Core.Types
         }
         private Type GetType(MemberInfo member)
         {
-            if(member is PropertyInfo property)
+            if (member is PropertyInfo property)
             {
                 return property.PropertyType;
             }
-            else if(member is FieldInfo field)
+            else if (member is FieldInfo field)
             {
                 return field.FieldType;
             }
@@ -123,7 +120,7 @@ namespace UMS.Core.Types
         private void AssignAsField(FieldInfo info, object target)
         {
             _value = Utility.CheckForConversion(_value, info.FieldType);
-            
+
             if (!info.FieldType.IsAssignableFrom(_value.GetType()))
                 throw new ArgumentException("Type mismatch for field " + info + " - " + this);
 

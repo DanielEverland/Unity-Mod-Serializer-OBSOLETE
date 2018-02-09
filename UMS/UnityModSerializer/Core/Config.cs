@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
+﻿using System.Collections.Generic;
 
 namespace UMS.Core
 {
@@ -13,7 +9,7 @@ namespace UMS.Core
         {
             data.Add(new Data(id, localPath));
         }
-        
+
         public List<Data> data = new List<Data>();
 
         [System.Serializable]

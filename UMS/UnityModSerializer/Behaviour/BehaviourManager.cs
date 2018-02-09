@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using UMS.Core;
 
 namespace UMS.Behaviour
@@ -17,11 +16,10 @@ namespace UMS.Behaviour
 
         private static List<BehaviourBase> _loadedBehaviours;
 
-
         public static void Initialize()
         {
             _loadedBehaviours = new List<BehaviourBase>();
-            
+
             AssemblyManager.OnLoadType += type =>
             {
                 foreach (PropertyInfo property in type.GetProperties())
@@ -38,8 +36,8 @@ namespace UMS.Behaviour
                 {
                     Analyze(method);
                 }
-            };            
-            
+            };
+
             AssemblyManager.OnFinishedReflection += () =>
             {
                 HasInitialized = true;

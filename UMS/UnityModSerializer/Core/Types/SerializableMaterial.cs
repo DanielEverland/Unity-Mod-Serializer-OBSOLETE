@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using UMS.Deserialization;
+using UnityEngine;
 
 namespace UMS.Core.Types
 {
@@ -61,21 +57,21 @@ namespace UMS.Core.Types
             material.enableInstancing = serializable._enableInstancing;
             material.doubleSidedGI = serializable._doubleSidedGI;
 
-            if(serializable._shader != null)
+            if (serializable._shader != null)
             {
                 Deserializer.GetDeserializedObject<Shader>(serializable._shader.ID, shader =>
                 {
                     material.shader = shader;
                 });
-            }            
+            }
 
-            if(serializable._mainTexture != null)
+            if (serializable._mainTexture != null)
             {
                 Deserializer.GetDeserializedObject<Texture>(serializable._mainTexture.ID, texture =>
                 {
                     material.mainTexture = texture;
                 });
-            }            
+            }
 
             return material;
         }

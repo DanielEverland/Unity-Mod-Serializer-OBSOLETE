@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Reflection;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UMS.Behaviour;
-using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using UMS.Core;
 
 namespace UMS.Serialization
 {
@@ -31,7 +25,7 @@ namespace UMS.Serialization
             "Transform.root",
             "Component.rigidbody",
         };
-        #endregion
+        #endregion Definitions
 
         #region Manager
         public static void Initialize()
@@ -40,7 +34,7 @@ namespace UMS.Serialization
         }
         private static void OnBehaviourLoaded(BehaviourBase behaviour)
         {
-            if(behaviour is TypeBlocker typeBlocker)
+            if (behaviour is TypeBlocker typeBlocker)
             {
                 foreach (Type type in typeBlocker.TypeFunction())
                 {
@@ -48,7 +42,7 @@ namespace UMS.Serialization
                         _blockedTypes.Add(type);
                 }
             }
-            else if(behaviour is MemberBlocker memberBlocker)
+            else if (behaviour is MemberBlocker memberBlocker)
             {
                 foreach (string member in memberBlocker.MemberFunction())
                 {
@@ -69,6 +63,6 @@ namespace UMS.Serialization
         {
             return _blockedMembers.Contains(member);
         }
-        #endregion
+        #endregion Manager
     }
 }

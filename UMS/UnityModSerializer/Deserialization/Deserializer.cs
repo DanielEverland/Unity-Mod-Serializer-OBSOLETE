@@ -1,15 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-using UMS.Core;
-using UMS.Behaviour;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using UMS.Behaviour;
+using UMS.Core;
+using UnityEditor;
+using UnityEngine;
 
 namespace UMS.Deserialization
 {
@@ -47,7 +44,7 @@ namespace UMS.Deserialization
         }
         private static void BehaviourLoaded(BehaviourBase behaviour, MemberInfo info)
         {
-            if(behaviour is CustomConstructor constructor && info is MethodInfo method)
+            if (behaviour is CustomConstructor constructor && info is MethodInfo method)
             {
                 CustomConstructorLoaded(constructor, method);
             }
@@ -62,10 +59,10 @@ namespace UMS.Deserialization
         {
             ObjectEntry entry = _objectReferences[id];
 
-            if(_serializedObjectQueue.ContainsKey(id))
+            if (_serializedObjectQueue.ContainsKey(id))
                 ExecuteActions(_serializedObjectQueue[id], entry.SerializedObject);
 
-            if(_deserializedObjectQueue.ContainsKey(id))
+            if (_deserializedObjectQueue.ContainsKey(id))
                 ExecuteActions(_deserializedObjectQueue[id], entry.DeserializedObject);
         }
         private static void ExecuteActions(IList<ActionInstance> actions, object obj)
@@ -105,8 +102,8 @@ namespace UMS.Deserialization
             {
                 throw new NullReferenceException("ID " + id + " wasn't recognized by the config file");
             }
-            
-            if(_objectReferences[id].SerializedObject == null)
+
+            if (_objectReferences[id].SerializedObject == null)
             {
                 Subscribe(id, new ActionInstance(action, type), _serializedObjectQueue);
             }
@@ -139,7 +136,7 @@ namespace UMS.Deserialization
         {
             _objectReferences = new Dictionary<int, ObjectEntry>();
             _serializedData = Mod.Deserialize(@"C:/Users/Daniel/Desktop/New Mod.mod");
-            
+
             foreach (KeyValuePair<string, string> file in _serializedData)
             {
                 int id = -1;
@@ -154,7 +151,7 @@ namespace UMS.Deserialization
                     throw;
                 }
 
-                if(!_objectReferences.ContainsKey(id))
+                if (!_objectReferences.ContainsKey(id))
                     _objectReferences.Add(id, new ObjectEntry(file.Value));
             }
 
@@ -182,7 +179,7 @@ namespace UMS.Deserialization
             {
                 JSON = json;
             }
-            
+
             public string JSON { get; private set; }
 
             public object SerializedObject { get; set; }
@@ -194,7 +191,7 @@ namespace UMS.Deserialization
             }
             private void CreateDeserializedObject()
             {
-                if(Serialization.CustomSerializers.CanDeserialize(SerializedObject.GetType()))
+                if (Serialization.CustomSerializers.CanDeserialize(SerializedObject.GetType()))
                     DeserializedObject = Serialization.CustomSerializers.DeserializeObject(SerializedObject);
             }
             public void Deserialize()
@@ -221,7 +218,7 @@ namespace UMS.Deserialization
 
             public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
             {
-                if(reader.TokenType == JsonToken.StartObject)
+                if (reader.TokenType == JsonToken.StartObject)
                     JObject.Load(reader);
 
                 return _customConstructor.Method.Invoke(null, null);

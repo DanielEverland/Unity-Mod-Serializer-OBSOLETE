@@ -10,10 +10,10 @@ namespace UMS.Core
         public static Config ConfigFile { get; private set; }
 
         private const string CONFIG_NAME = "config";
-        
+
         private static Dictionary<string, string> filesToWrite;
         private static HashSet<string> usedNames;
-             
+
         public static void Initialize()
         {
             ConfigFile = new Config();

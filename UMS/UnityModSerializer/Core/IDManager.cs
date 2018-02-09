@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using UMS.Serialization;
 
 namespace UMS.Core
@@ -23,7 +21,7 @@ namespace UMS.Core
             {
                 UnityEngine.Debug.LogWarning("Object " + obj + " has been blocked. Returning -1");
                 return -1;
-            }                
+            }
 
             return GenerateID(obj, true, null);
         }
@@ -33,7 +31,7 @@ namespace UMS.Core
 
             if (_objectLookup.ContainsKey(hash))
             {
-                if(_objectLookup[hash] != id)
+                if (_objectLookup[hash] != id)
                 {
                     FlagImproperID(obj, id, _objectLookup[hash]);
                 }
@@ -81,7 +79,7 @@ namespace UMS.Core
                     try
                     {
                         int hash = 0;
-                        
+
                         if (info.PropertyType.IsArray)
                         {
                             hash = GetArrayID(info.GetValue(obj, null));
@@ -90,7 +88,7 @@ namespace UMS.Core
                         {
                             hash = GetObjectID(info.GetValue(obj, null));
                         }
-                        
+
                         memberValues?.Invoke(info, hash);
 
                         i = i + hash * 13;
@@ -100,7 +98,7 @@ namespace UMS.Core
                     }
                 }
 
-                if(doCache)
+                if (doCache)
                     CacheID(obj, i);
 
                 return i;
@@ -154,7 +152,7 @@ namespace UMS.Core
             }
             private void OutputResults()
             {
-                if(_descrepencies.Count == 0)
+                if (_descrepencies.Count == 0)
                 {
                     UnityEngine.Debug.LogWarning("Couldn't find any descrepencies");
                 }
@@ -174,7 +172,7 @@ namespace UMS.Core
 
                 if (_values.ContainsKey(info))
                 {
-                    if(_values[info] != hash)
+                    if (_values[info] != hash)
                     {
                         _blacklistedMembers.Add(info);
                         _descrepencies.Add(new Descrepency(info, hash, _values[info]));

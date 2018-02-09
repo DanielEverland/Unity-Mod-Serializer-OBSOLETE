@@ -1,11 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Collections.Generic;
-using Newtonsoft.Json;
 using UMS.Core;
 using UnityEngine;
-using UMS.Deserialization;
 
 namespace UMS.Serialization
 {
@@ -29,11 +27,11 @@ namespace UMS.Serialization
             {
                 IModSerializer serializer = Activator.CreateInstance(type) as IModSerializer;
 
-                if(serializers.Any(x => Compare(x, serializer)))
+                if (serializers.Any(x => Compare(x, serializer)))
                 {
                     IModSerializer other = serializers.Find(x => Compare(x, serializer));
 
-                    if(other.Priority < serializer.Priority)
+                    if (other.Priority < serializer.Priority)
                     {
                         serializers.Remove(other);
                         serializers.Add(serializer);
@@ -42,7 +40,7 @@ namespace UMS.Serialization
                 else
                 {
                     serializers.Add(serializer);
-                }                
+                }
             }
         }
         private static bool ParametersMatch(ParameterInfo[] parameters, Type[] types)
@@ -78,7 +76,6 @@ namespace UMS.Serialization
                 if (!ParametersMatch(methodParameters, parameters))
                     continue;
 
-
                 return method;
             }
 
@@ -90,10 +87,10 @@ namespace UMS.Serialization
                 throw new NullReferenceException("Serializers not initialized");
 
             List<IModSerializer> validSerializers = new List<IModSerializer>(serializers.Where(predicate));
-            
+
             if (validSerializers.Count == 0)
                 throw new NotImplementedException("Couldn't find any valid serializers ");
-            
+
             IModSerializer selectedSerializer = Utility.GetMostInherited(validSerializers);
             instance = selectedSerializer;
 
@@ -125,7 +122,7 @@ namespace UMS.Serialization
             object instance;
             MethodInfo info = QueryForSerialization(x => x.NonSerializableType.IsAssignableFrom(fromObject.GetType()), out instance);
 
-            return info.Invoke(instance, new object[1] { fromObject});
+            return info.Invoke(instance, new object[1] { fromObject });
         }
         public static T DeserializeObject<T>(object serialized)
         {

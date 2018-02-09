@@ -1,13 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UMS.Core;
 using UnityEditor;
-using UMS.Core;
-using UMS.Behaviour;
+using UnityEngine;
 
 namespace UMS.Serialization
 {
@@ -23,7 +16,7 @@ namespace UMS.Serialization
             }
 
             Initialize();
-            
+
             for (int i = 0; i < Selection.objects.Length; i++)
             {
                 UnityEngine.Object toSerialize = UnityEngine.Object.Instantiate(Selection.objects[i]);
