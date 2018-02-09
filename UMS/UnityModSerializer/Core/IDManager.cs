@@ -59,42 +59,20 @@ namespace UMS.Core
             unchecked
             {
                 int i = 17;
+                int buffer = -1;
 
-                foreach (PropertyInfo info in obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+                foreach (PropertyInfo property in obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
                 {
-                    if (BlockedTypes.IsBlocked(Utility.GetObjectMemberName(info.DeclaringType.Name, info.Name)))
-                        continue;
-
-                    if (BlockedTypes.IsBlocked(info.PropertyType))
-                        continue;
-
-                    MethodInfo method = info.GetGetMethod();
-
-                    if (method == null)
-                        continue;
-
-                    if (!Utility.CanAccessMember(info))
-                        continue;
-
-                    try
+                    if(GetPropertyHash(property, obj, memberValues, ref buffer))
                     {
-                        int hash = 0;
-
-                        if (info.PropertyType.IsArray)
-                        {
-                            hash = GetArrayID(info.GetValue(obj, null));
-                        }
-                        else
-                        {
-                            hash = GetObjectID(info.GetValue(obj, null));
-                        }
-
-                        memberValues?.Invoke(info, hash);
-
-                        i = i + hash * 13;
+                        i += buffer * 23;
                     }
-                    catch (System.Exception)
+                }
+                foreach (FieldInfo field in obj.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                {
+                    if (GetFieldHash(field, obj, memberValues, ref buffer))
                     {
+                        i += buffer * 61;
                     }
                 }
 
@@ -103,6 +81,56 @@ namespace UMS.Core
 
                 return i;
             }
+        }
+        private static bool GetFieldHash(FieldInfo field, object obj, Action<MemberInfo, int> memberValues, ref int i)
+        {
+            if (BlockedTypes.IsBlocked(Utility.GetObjectMemberName(field)))
+                return false;
+
+            if (BlockedTypes.IsBlocked(field.FieldType))
+                return false;
+
+            if (field.FieldType.IsArray)
+            {
+                i = GetArrayID(field.GetValue(obj));
+            }
+            else
+            {
+                i = GetObjectID(field.GetValue(obj));
+            }
+
+            memberValues?.Invoke(field, i);
+
+            return true;
+        }
+        private static bool GetPropertyHash(PropertyInfo property, object obj, Action<MemberInfo, int> memberValues, ref int i)
+        {
+            if (BlockedTypes.IsBlocked(Utility.GetObjectMemberName(property)))
+                return false;
+
+            if (BlockedTypes.IsBlocked(property.PropertyType))
+                return false;
+
+            MethodInfo method = property.GetGetMethod();
+
+            if (method == null)
+                return false;
+
+            if (!Utility.CanAccessMember(property))
+                return false;
+            
+            if (property.PropertyType.IsArray)
+            {
+                i = GetArrayID(property.GetValue(obj, null));
+            }
+            else
+            {
+                i = GetObjectID(property.GetValue(obj, null));
+            }
+
+            memberValues?.Invoke(property, i);
+
+            return true;
         }
         private static int GetArrayID(object obj)
         {
@@ -120,6 +148,9 @@ namespace UMS.Core
         }
         private static int GetObjectID(object obj)
         {
+            if (obj == null)
+                return 0;
+
             return obj.GetHashCode();
         }
         private class IDGeneratorAnalyzer

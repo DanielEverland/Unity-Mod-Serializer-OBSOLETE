@@ -32,7 +32,7 @@ namespace UMS.Core
 
             return null;
         }
-        public static string GetObjectMEmberName(MemberInfo info)
+        public static string GetObjectMemberName(MemberInfo info)
         {
             return GetObjectMemberName(info.DeclaringType.Name, info.Name);
         }
