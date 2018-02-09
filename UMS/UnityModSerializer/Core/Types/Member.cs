@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -22,13 +23,13 @@ namespace UMS.Core.Types
 
             _memberName = info.Name;
 
-            if (CustomSerializers.CanSerialize(value.GetType()))
+            if (value.GetType().IsArray)
             {
-                _value = Reference.Create(value);
+                AssignAsArray(value);
             }
             else
             {
-                _value = value;
+                AssignAsSingular(value);
             }
         }
 
@@ -40,6 +41,30 @@ namespace UMS.Core.Types
         [JsonProperty]
         private object _value;
 
+        private void AssignAsSingular(object value)
+        {
+            _value = GetSerializableObject(value);
+        }
+        private void AssignAsArray(object value)
+        {
+            List<object> objects = new List<object>();
+            
+            foreach (object item in value as IEnumerable)
+            {
+                objects.Add(GetSerializableObject(item));
+            }
+
+            _value = objects.ToArray();
+        }
+        private object GetSerializableObject(object obj)
+        {
+            if (CustomSerializers.CanSerialize(obj.GetType()))
+            {
+                return Reference.Create(obj);
+            }
+
+            return obj;
+        }
         public void Deserialize(object target)
         {
             if (target == null)
