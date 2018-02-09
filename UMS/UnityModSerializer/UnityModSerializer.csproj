@@ -58,11 +58,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Behaviour\BehaviourException.cs" />
     <Compile Include="Behaviour\BehaviourManager.cs" />
     <Compile Include="Behaviour\IBehaviourLoader.cs" />
     <Compile Include="Behaviour\MemberBlocker.cs" />
-    <Compile Include="Behaviour\TypeBehaviour.cs" />
     <Compile Include="Core\AssemblyManager.cs" />
     <Compile Include="Core\Component.cs" />
     <Compile Include="Core\Config.cs" />
