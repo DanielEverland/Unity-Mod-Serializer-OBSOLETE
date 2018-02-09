@@ -19,18 +19,18 @@ namespace UMS.Core.Types
                 throw new NullReferenceException("Object cannot be null");
 
             _name = obj.name;
-            _hideFlags = (int)obj.hideFlags;
+            _hideFlags = obj.hideFlags;
         }
 
         public abstract string Extension { get; }
         public virtual string FileName { get { return Name; } }
 
         public string Name { get { return _name; } }
-        public HideFlags HideFlags { get { return (HideFlags)_hideFlags; } }
+        public HideFlags HideFlags { get { return _hideFlags; } }
 
         [JsonProperty]
         private string _name;
         [JsonProperty]
-        private int _hideFlags;
+        private HideFlags _hideFlags;
     }
 }

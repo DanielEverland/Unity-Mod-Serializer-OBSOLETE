@@ -15,6 +15,11 @@ namespace UMS.Core.Types
         public SerializableGameObject() { }
         public SerializableGameObject(GameObject obj) : base(obj)
         {
+            _activeSelf = obj.activeSelf;
+            _layer = obj.layer;
+            _isStatic = obj.isStatic;
+            _tag = obj.tag;
+
             _components = new List<Reference>();
             foreach (Component comp in obj.GetComponents<Component>())
             {
@@ -31,10 +36,23 @@ namespace UMS.Core.Types
 
         [JsonProperty]
         private List<Reference> _components;
+        [JsonProperty]
+        public bool _activeSelf;
+        [JsonProperty]
+        public int _layer;
+        [JsonProperty]
+        public bool _isStatic;
+        [JsonProperty]
+        public string _tag;
 
         public override GameObject Deserialize(SerializableGameObject serialized)
         {
             GameObject gameObject = new GameObject(serialized.Name);
+
+            gameObject.SetActive(serialized._activeSelf);
+            gameObject.layer = serialized._layer;
+            gameObject.isStatic = serialized._isStatic;
+            gameObject.tag = serialized._tag;
 
             foreach (Reference reference in serialized.Components)
             {
