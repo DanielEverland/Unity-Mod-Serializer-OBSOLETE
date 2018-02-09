@@ -8,8 +8,6 @@ using UnityEngine;
 
 namespace UMS.Core.Types
 {
-    [Serializable]
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class SerializableGameObject : SerializableObject<GameObject, SerializableGameObject>
     {
         public SerializableGameObject() { }
@@ -33,9 +31,7 @@ namespace UMS.Core.Types
         public override string Extension => "gameObject";
 
         public IList<Reference> Components { get { return _components; } }
-
-        [JsonProperty]
-        private List<Reference> _components;
+        
         [JsonProperty]
         public bool _activeSelf;
         [JsonProperty]
@@ -44,6 +40,8 @@ namespace UMS.Core.Types
         public bool _isStatic;
         [JsonProperty]
         public string _tag;
+        [JsonProperty]
+        private List<Reference> _components;
 
         public override GameObject Deserialize(SerializableGameObject serialized)
         {

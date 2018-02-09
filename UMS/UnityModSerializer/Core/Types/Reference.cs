@@ -6,7 +6,6 @@ using System.Text;
 
 namespace UMS.Core.Types
 {
-    [Serializable]
     public class Reference : Serializable<object, Reference>
     {
         public Reference() { }

@@ -9,8 +9,6 @@ using UnityEngine;
 
 namespace UMS.Core.Types
 {
-    [Serializable]
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class SerializableComponent : SerializableObject<Component, SerializableComponent>, IDeserializer<Component>
     {
         public SerializableComponent() { }

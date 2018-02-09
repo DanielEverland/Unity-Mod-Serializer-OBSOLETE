@@ -7,8 +7,6 @@ using Newtonsoft.Json;
 
 namespace UMS.Core.Types
 {
-    [Serializable]
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class SerializableShader : SerializableObject<Shader, SerializableShader>
     {
         public SerializableShader() { }

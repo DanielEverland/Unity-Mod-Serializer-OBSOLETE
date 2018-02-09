@@ -7,8 +7,6 @@ using Newtonsoft.Json;
 
 namespace UMS.Core.Types
 {
-    [Serializable]
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public abstract class SerializableTexture<TFrom, TTo> : SerializableObject<TFrom, TTo> where TFrom : UnityEngine.Object
     {
         public SerializableTexture() { }

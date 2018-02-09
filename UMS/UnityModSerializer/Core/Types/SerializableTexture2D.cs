@@ -7,8 +7,6 @@ using UnityEngine;
 
 namespace UMS.Core.Types
 {
-    [Serializable]
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class SerializableTexture2D : SerializableTexture<Texture2D, SerializableTexture2D>
     {
         public override string Extension => "texture";

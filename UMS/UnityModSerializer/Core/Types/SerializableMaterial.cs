@@ -8,8 +8,6 @@ using UMS.Deserialization;
 
 namespace UMS.Core.Types
 {
-    [Serializable]
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class SerializableMaterial : SerializableObject<Material, SerializableMaterial>
     {
         public override string Extension => "material";

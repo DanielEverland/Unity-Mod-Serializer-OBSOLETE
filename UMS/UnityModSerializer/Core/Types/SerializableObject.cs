@@ -7,8 +7,6 @@ using UnityEngine;
 
 namespace UMS.Core.Types
 {
-    [Serializable]
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public abstract class SerializableObject<TNonSerializable, TSerializable> : Serializable<TNonSerializable, TSerializable>,
                                                                                             IModEntry where TNonSerializable : UnityEngine.Object
     {
