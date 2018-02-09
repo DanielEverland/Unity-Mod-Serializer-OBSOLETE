@@ -54,7 +54,7 @@ namespace UMS.Core
 
             while (toCheck != null && toCheck != typeof(object))
             {
-                foreach (MemberInfo info in type.GetMembers(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly))
+                foreach (MemberInfo info in type.GetMembers(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
                 {
                     if (info.Name == name)
                         return info;
@@ -64,6 +64,10 @@ namespace UMS.Core
             }
 
             return null;
+        }
+        public static string GetObjectMEmberName(MemberInfo info)
+        {
+            return GetObjectMemberName(info.DeclaringType.Name, info.Name);
         }
         public static string GetObjectMemberName(string objName, string memberName)
         {

@@ -70,9 +70,7 @@ namespace UMS.Core.Types
             MemberInfo member = Utility.GetMember(declaredType, _memberName);
 
             if (member == null)
-            {
                 return;
-            }
 
             if (_value is Reference reference)
             {
@@ -136,7 +134,7 @@ namespace UMS.Core.Types
                 throw new ArgumentException("No setter for property " + info + " - " + this);
 
             if (!ParamatersMatch(setter))
-                throw new ArgumentException("Parameters don't match for " + info + " - Object: " + _value);
+                throw new ArgumentException("Parameters don't match for " + info + " - Value: " + _value + "(" + _value.GetType() + ")");
 
             info.SetValue(target, _value, null);
         }
@@ -157,4 +155,3 @@ namespace UMS.Core.Types
             return string.Format("{0}: {1} ({2})", _memberName, _value, _value.GetType());
         }
     }
-}
