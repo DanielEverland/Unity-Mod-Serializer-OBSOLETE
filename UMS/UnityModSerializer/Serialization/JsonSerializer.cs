@@ -127,7 +127,9 @@ namespace UMS.Serialization
     {
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(int) || objectType == typeof(long) || objectType == typeof(Object);
+            return objectType == typeof(int) || objectType == typeof(long)
+                || objectType == typeof(float) || objectType == typeof(double)
+                || objectType == typeof(Object);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
@@ -137,23 +139,40 @@ namespace UMS.Serialization
 
             if (reader.Value == null)
                 return null;
+            
 
             string stringValue = reader.Value.ToString();
-            int intValue = -1;
-            long longValue = -1;
+            
+            if(reader.ValueType == typeof(Int64))
+            {
+                int intValue = -1;
+                long longValue = -1;
 
-            if (int.TryParse(stringValue, out intValue))
-            {
-                return intValue;
+                if (int.TryParse(stringValue, out intValue))
+                {
+                    return intValue;
+                }
+                else if (long.TryParse(stringValue, out longValue))
+                {
+                    return longValue;
+                }
             }
-            else if (long.TryParse(stringValue, out longValue))
+            else if(reader.ValueType == typeof(double))
             {
-                return longValue;
+                float floatValue = -1;
+                double doubleValue = -1;
+
+                if (float.TryParse(stringValue, out floatValue))
+                {
+                    return floatValue;
+                }
+                else if (double.TryParse(stringValue, out doubleValue))
+                {
+                    return doubleValue;
+                }
             }
-            else
-            {
-                return reader.Value;
-            }
+            
+            return reader.Value;
         }
 
         public override bool CanWrite => false;
