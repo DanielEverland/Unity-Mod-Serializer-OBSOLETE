@@ -54,6 +54,9 @@ namespace UMS.Core.Types
         }
         private object GetSerializableObject(object obj)
         {
+            if (obj == null)
+                return null;
+
             if (CustomSerializers.CanSerialize(obj.GetType()))
             {
                 return Reference.Create(obj);
