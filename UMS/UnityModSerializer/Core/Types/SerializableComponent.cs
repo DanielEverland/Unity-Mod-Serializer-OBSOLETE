@@ -63,7 +63,7 @@ namespace UMS.Core.Types
         }
         private void SerializeProperties(Component comp)
         {
-            foreach (PropertyInfo property in ComponentType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+            foreach (PropertyInfo property in ComponentType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
                 try
                 {

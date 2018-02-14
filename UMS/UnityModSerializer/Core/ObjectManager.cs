@@ -26,6 +26,9 @@ namespace UMS.Core
 
             if (!_data.ContainsKey(id))
             {
+                //The two lines cannot be merged!
+                //We add the ID before the value because SerializeObject might call constructors that checks whether an ID exists
+                //This is done to prevent infinite loops. Once an object ID has been added, we only want to serialize it once, and use its ID as a reference
                 _data.Add(id, null);
 
                 _data[id] = CustomSerializers.SerializeObject(obj);

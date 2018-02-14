@@ -19,7 +19,7 @@ namespace UMS.Serialization
 
             for (int i = 0; i < Selection.objects.Length; i++)
             {
-                UnityEngine.Object toSerialize = UnityEngine.Object.Instantiate(Selection.objects[i]);
+                Object toSerialize = Object.Instantiate(Selection.objects[i]);
 
                 CustomSerializers.SerializeObject(toSerialize);
             }
