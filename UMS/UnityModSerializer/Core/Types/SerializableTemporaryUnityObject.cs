@@ -97,9 +97,9 @@ namespace UMS.Core.Types
 
             foreach (Initializer initializer in initializers)
             {
-                if (initializer.IsValid(_type))
+                if (initializer.IsValid(serializable._type))
                 {
-                    obj = initializer.Initialize(_type, _members);
+                    obj = initializer.Initialize(serializable._type, _members);
                     break;
                 }
             }
@@ -107,7 +107,12 @@ namespace UMS.Core.Types
             if (obj == null)
                 throw new NullReferenceException();
 
-            return (UnityEngine.Object)obj;
+            UnityEngine.Object unityObject = (UnityEngine.Object)obj;
+            
+            unityObject.hideFlags = serializable.HideFlags;
+            unityObject.name = serializable.Name;
+
+            return unityObject;
         }
 
         private bool IsValid(MemberInfo info)
