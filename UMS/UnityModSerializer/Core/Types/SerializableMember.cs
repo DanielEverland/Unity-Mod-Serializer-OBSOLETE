@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -86,16 +87,8 @@ namespace UMS.Core.Types
             if (member == null || Value == null)
                 return;
 
-            if (Value is Reference reference)
-            {
-                Deserializer.GetDeserializedObject(reference.ID, GetType(member), obj =>
-                {
-                    Value = obj;
-                    Deserialize(target);
-                });
-
+            if (ValueIsReference(member, target))
                 return;
-            }
 
             try
             {
@@ -113,6 +106,41 @@ namespace UMS.Core.Types
                 Debug.Log("Data dump: " + _memberName + ", " + Value + ", " + target);
                 throw;
             }
+        }
+        private bool ValueIsReference(MemberInfo member, object target)
+        {
+            if (Value.GetType().IsArray)
+            {
+                Array array = (Array)Value;
+
+                if(array.Length > 0)
+                {
+                    Type elementType = array.GetValue(0).GetType();
+
+                    if(elementType == typeof(Reference))
+                    {
+                        ArrayDeserializationHandler.Create(array, obj =>
+                        {
+                            Value = obj;
+                            Deserialize(target);
+                        });
+                        
+                        return true;
+                    }
+                }
+            }
+            else if(Value is Reference reference)
+            {
+                Deserializer.GetDeserializedObject(reference.ID, GetType(member), obj =>
+                {
+                    Value = obj;
+                    Deserialize(target);
+                });
+
+                return true;
+            }
+
+            return false;
         }
         private Type GetType(MemberInfo member)
         {
@@ -182,6 +210,76 @@ namespace UMS.Core.Types
         public override string ToString()
         {
             return string.Format("{0}: {1} ({2})", _memberName, Value, Value.GetType());
+        }
+        private class ArrayDeserializationHandler
+        {
+            private ArrayDeserializationHandler(Array array, Action<object> onDeserialized)
+            {
+                this.onDeserialized = onDeserialized;
+                deserializedObjects = new List<object>();
+                
+                for (int i = 0; i < array.Length; i++)
+                {
+                    object obj = array.GetValue(i);
+
+                    if(obj != null && obj is Reference reference)
+                    {
+                        targetObjectCount++;
+
+                        Deserializer.GetDeserializedObject(reference.ID, reference.NonSerializableType, x => AddObject(x));
+                    }
+                }
+
+                finishedInitializing = true;
+                CheckIfDone();
+            }
+
+            private Action<object> onDeserialized;
+            private List<object> deserializedObjects;
+            private bool finishedInitializing;
+            private int targetObjectCount;
+
+            private void AddObject(object obj)
+            {
+                deserializedObjects.Add(obj);
+
+                CheckIfDone();
+            }
+
+            private void CheckIfDone()
+            {
+                if (!finishedInitializing)
+                    return;
+
+                if(deserializedObjects.Count == targetObjectCount)
+                {
+                    onDeserialized?.Invoke(CreateArray());
+                }
+            }
+            private Array CreateArray()
+            {
+                if (deserializedObjects.Count == 0)
+                    throw new NullReferenceException();
+
+                Type targetType = deserializedObjects[0].GetType();
+
+                if (deserializedObjects.Any(x => x.GetType() != targetType))
+                    throw new InvalidCastException();
+
+                Array array = Array.CreateInstance(targetType, deserializedObjects.Count);
+
+                for (int i = 0; i < deserializedObjects.Count; i++)
+                {
+                    array.SetValue(deserializedObjects[i], i);
+                }
+
+                return array;
+            }
+
+            public static ArrayDeserializationHandler Create(Array array, Action<object> onDeserialized)
+            {
+                return new ArrayDeserializationHandler(array, onDeserialized);
+            }
         }
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
         private class MemberObject
