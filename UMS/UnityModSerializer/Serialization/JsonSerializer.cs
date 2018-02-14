@@ -47,7 +47,6 @@ namespace UMS.Serialization
             _serializeSettings.TypeNameHandling = TypeNameHandling.All;
             _serializeSettings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
             _serializeSettings.TraceWriter = new Debugging.EG_TraceLogger();
-            _serializeSettings.MetadataPropertyHandling = MetadataPropertyHandling.Ignore;
             _serializeSettings.ContractResolver = new OnlyFieldsContractResolver();
         }
         ///------------------------------DESERIALIZE SETTINGS------------------------------
@@ -57,7 +56,7 @@ namespace UMS.Serialization
 
             _deserializeSettings.NullValueHandling = NullValueHandling.Ignore;
             _deserializeSettings.TypeNameHandling = TypeNameHandling.All;
-            _deserializeSettings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full;
+            _deserializeSettings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
             _deserializeSettings.TraceWriter = new Debugging.EG_TraceLogger();
             _deserializeSettings.ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor;
             _deserializeSettings.Converters = GetDeserializationConverters();
@@ -127,38 +126,45 @@ namespace UMS.Serialization
     {
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(int) || objectType == typeof(long)
-                || objectType == typeof(float) || objectType == typeof(double)
-                || objectType == typeof(Object);
+            return objectType == typeof(int) || objectType == typeof(long) || objectType == typeof(uint) || objectType == typeof(ulong)
+                || objectType == typeof(float) || objectType == typeof(double) || objectType.IsEnum;
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
         {
-            if (reader.TokenType == JsonToken.StartObject)
-                JObject.Load(reader);
-
-            if (reader.Value == null)
-                return null;
-            
-
-            string stringValue = reader.Value.ToString();
-            
-            if(reader.ValueType == typeof(Int64))
+            if(reader.TokenType == JsonToken.Integer)
             {
-                int intValue = -1;
-                long longValue = -1;
+                string stringValue = reader.Value.ToString();
+                int intValue;
+                uint uIntValue;
+                long longValue;
+                ulong ulongValue;
 
                 if (int.TryParse(stringValue, out intValue))
                 {
                     return intValue;
                 }
+                else if(uint.TryParse(stringValue, out uIntValue))
+                {
+                    return uIntValue;
+                }
                 else if (long.TryParse(stringValue, out longValue))
                 {
                     return longValue;
                 }
+                else if(ulong.TryParse(stringValue, out ulongValue))
+                {
+                    return ulongValue;
+                }
+                else
+                {
+                    UnityEngine.Debug.LogWarning("Couldn't convert " + stringValue + " to integer");
+                }
             }
-            else if(reader.ValueType == typeof(double))
+            else if(reader.TokenType == JsonToken.Float)
             {
+                string stringValue = reader.Value.ToString();
+                
                 float floatValue = -1;
                 double doubleValue = -1;
 
@@ -171,8 +177,9 @@ namespace UMS.Serialization
                     return doubleValue;
                 }
             }
-            
-            return reader.Value;
+
+            UnityEngine.Debug.LogWarning("Couldn't convert " + objectType);
+            return null;
         }
 
         public override bool CanWrite => false;
