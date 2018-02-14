@@ -209,13 +209,5 @@ namespace UMS.Core.Types
                 return parameterObjects.ToArray();
             }
         }
-        private enum InitializationMethod : uint
-        {
-            None = 0,
-
-            EmptyConstructor = 1,
-            ConstructorWithArguments = 2,
-            StaticFunction = 3,
-        }
     }
 }
