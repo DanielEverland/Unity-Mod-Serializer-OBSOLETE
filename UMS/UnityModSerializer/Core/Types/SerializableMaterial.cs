@@ -62,6 +62,7 @@ namespace UMS.Core.Types
                 Deserializer.GetDeserializedObject<Shader>(serializable._shader.ID, shader =>
                 {
                     material.shader = shader;
+                    material.name = shader.name;
                 });
             }
 
