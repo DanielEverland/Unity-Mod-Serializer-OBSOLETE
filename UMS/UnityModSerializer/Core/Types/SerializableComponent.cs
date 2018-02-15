@@ -118,6 +118,8 @@ namespace UMS.Core.Types
         {
             if (target == null)
                 throw new System.NullReferenceException("Given component is null!");
+            
+            base.Deserialize(target);
 
             foreach (SerializableMember member in _members)
             {

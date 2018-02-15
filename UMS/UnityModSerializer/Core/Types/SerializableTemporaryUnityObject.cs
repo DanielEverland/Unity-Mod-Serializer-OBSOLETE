@@ -108,9 +108,8 @@ namespace UMS.Core.Types
                 throw new NullReferenceException();
 
             UnityEngine.Object unityObject = (UnityEngine.Object)obj;
-            
-            unityObject.hideFlags = serializable.HideFlags;
-            unityObject.name = serializable.Name;
+
+            serializable.Deserialize(unityObject);
 
             return unityObject;
         }

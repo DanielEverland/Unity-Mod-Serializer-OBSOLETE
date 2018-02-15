@@ -29,7 +29,7 @@ namespace UMS.Core.Types
         {
             Texture2D texture = new Texture2D(serializable._width, serializable._height, (TextureFormat)serializable._format, serializable._mipMapCount > 1);
 
-            texture.name = serializable.Name;
+            serializable.Deserialize(texture);
 
             texture.wrapMode = (TextureWrapMode)serializable._wrapMode;
             texture.wrapModeW = (TextureWrapMode)serializable._wrapModeW;

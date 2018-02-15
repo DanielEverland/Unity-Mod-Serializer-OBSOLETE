@@ -67,7 +67,7 @@ namespace UMS.Core.Types
         {
             Mesh newMesh = new Mesh();
 
-            newMesh.name = serializable.Name;
+            serializable.Deserialize(newMesh);
 
             newMesh.indexFormat = serializable._indexFormat;
             newMesh.boneWeights = serializable._boneWeights;

@@ -54,6 +54,8 @@ namespace UMS.Core.Types
         {
             GameObject gameObject = new GameObject(serialized.Name);
 
+            serialized.Deserialize(gameObject);
+
             gameObject.SetActive(serialized._activeSelf);
             gameObject.layer = serialized._layer;
             gameObject.isStatic = serialized._isStatic;

@@ -27,5 +27,11 @@ namespace UMS.Core.Types
         private string _name;
         [JsonProperty]
         private HideFlags _hideFlags;
+        
+        protected void Deserialize(UnityEngine.Object obj)
+        {
+            obj.name = Name;
+            obj.hideFlags = HideFlags;
+        }
     }
 }
