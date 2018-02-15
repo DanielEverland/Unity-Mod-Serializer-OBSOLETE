@@ -72,6 +72,7 @@
     <Compile Include="Core\Mod.cs" />
     <Compile Include="Core\ObjectManager.cs" />
     <Compile Include="Core\Priority.cs" />
+    <Compile Include="Core\Types\SerializableFont.cs" />
     <Compile Include="Core\Types\SerializableMember.cs" />
     <Compile Include="Core\Types\Reference.cs" />
     <Compile Include="Core\Types\Serializable.cs" />
