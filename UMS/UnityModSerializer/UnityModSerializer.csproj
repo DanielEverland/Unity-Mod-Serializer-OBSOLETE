@@ -62,6 +62,7 @@
     <Compile Include="Behaviour\IBehaviourLoader.cs" />
     <Compile Include="Behaviour\MemberBlocker.cs" />
     <Compile Include="Core\AssemblyManager.cs" />
+    <Compile Include="Core\CloneManager.cs" />
     <Compile Include="Core\Config.cs" />
     <Compile Include="Core\CoreManager.cs" />
     <Compile Include="Core\Debugging.cs" />

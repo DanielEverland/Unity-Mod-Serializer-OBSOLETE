@@ -26,6 +26,7 @@ namespace UMS.Deserialization
             Initialize();
             ExecuteDeserialization();
 
+            CoreManager.FinishedSerialization();
             Debug.Log("Finished deserializing");
         }
         public static IList<JsonConverter> GetConverters()

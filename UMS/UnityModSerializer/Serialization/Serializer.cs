@@ -19,13 +19,14 @@ namespace UMS.Serialization
 
             for (int i = 0; i < Selection.objects.Length; i++)
             {
-                Object toSerialize = Object.Instantiate(Selection.objects[i]);
+                Object toSerialize = CloneManager.GetClone(Selection.objects[i]);
 
                 CustomSerializers.SerializeObject(toSerialize);
             }
 
             InitializeSerialization();
 
+            CoreManager.FinishedSerialization();
             Debug.Log("Finished serializing");
         }
 

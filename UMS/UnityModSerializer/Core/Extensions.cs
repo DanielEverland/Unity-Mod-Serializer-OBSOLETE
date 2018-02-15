@@ -5,6 +5,13 @@ namespace UMS.Core
 {
     public static class Extensions
     {
+        public static T GetAndRemove<T>(this IList<T> collection, int index)
+        {
+            T obj = collection[index];
+            collection.Remove(obj);
+
+            return obj;
+        }
         public static void Output<T>(this IEnumerable<T> collection)
         {
             foreach (T obj in collection)
