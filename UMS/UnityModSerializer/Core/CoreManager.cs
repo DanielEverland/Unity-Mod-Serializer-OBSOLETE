@@ -6,12 +6,19 @@ namespace UMS.Core
     public static class CoreManager
     {
         /// <summary>
+        /// This is called when serialization or deserialization is initiated
+        /// </summary>
+        public static event System.Action OnSerializationStarted;
+
+        /// <summary>
         /// This is called when serialization or deserialization is complete
         /// </summary>
         public static event System.Action OnSerializationCompleted;
 
         public static void Initialize()
         {
+            OnSerializationStarted?.Invoke();
+
             AssemblyManager.Initialize();
 
             IDManager.Initialize();
