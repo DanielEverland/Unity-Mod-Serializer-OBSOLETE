@@ -76,6 +76,8 @@ namespace UMS.Serialization
                 if (!ParametersMatch(methodParameters, parameters))
                     continue;
 
+                Debugging.Verbose("Returning method " + method);
+
                 return method;
             }
 
@@ -94,20 +96,28 @@ namespace UMS.Serialization
             IModSerializer selectedSerializer = Utility.GetMostInherited(validSerializers);
             instance = selectedSerializer;
 
+            Debugging.Verbose("Found top-most serializer " + selectedSerializer);
+
             return GetMethod(selectedSerializer.GetType(), toType(selectedSerializer), returnType(selectedSerializer));
         }
         private static MethodInfo QueryForSerialization(Func<IModSerializer, bool> predicate, out object instance)
         {
+            Debugging.Info("Processing Serialization Query for " + predicate);
+
             return Query(predicate, x => { return x.SerializedType; }, x => { return x.NonSerializableType; }, out instance);
         }
         private static MethodInfo QueryForDeserialization(Func<IModSerializer, bool> predicate, out object instance)
         {
+            Debugging.Info("Processing Deserialization Query for " + predicate);
+
             return Query(predicate, x => { return x.NonSerializableType; }, x => { return x.SerializedType; }, out instance);
         }
         public static T SerializeObject<T>(object fromObject)
         {
             if (fromObject == null)
                 return default(T);
+
+            Debugging.Info("Serializing " + fromObject);
 
             object instance;
             MethodInfo info = QueryForSerialization(x => x.NonSerializableType.IsAssignableFrom(fromObject.GetType()) && x.SerializedType.IsAssignableFrom(typeof(T)), out instance);
@@ -118,6 +128,8 @@ namespace UMS.Serialization
         {
             if (fromObject == null)
                 return null;
+
+            Debugging.Info("Serializing " + fromObject);
 
             object instance;
             MethodInfo info = QueryForSerialization(x => x.NonSerializableType.IsAssignableFrom(fromObject.GetType()), out instance);
@@ -134,6 +146,8 @@ namespace UMS.Serialization
 
             try
             {
+                Debugging.Info("Deserializing " + serialized);
+
                 object instance;
                 MethodInfo info = QueryForDeserialization(x => x.SerializedType.IsAssignableFrom(serialized.GetType()) && x.NonSerializableType.IsAssignableFrom(typeof(T)), out instance);
                 return (T)info.Invoke(instance, new object[1] { serialized });
@@ -154,6 +168,8 @@ namespace UMS.Serialization
 
             try
             {
+                Debugging.Info("Deserializing " + serialized);
+
                 object instance;
                 MethodInfo info = QueryForDeserialization(x => x.SerializedType.IsAssignableFrom(serialized.GetType()), out instance);
 

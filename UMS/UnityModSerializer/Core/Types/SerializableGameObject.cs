@@ -22,12 +22,16 @@ namespace UMS.Core.Types
                 if (comp == null)
                     continue;
 
+                Debugging.Info("Serializing component " + comp + " of " + obj);
+
                 _components.Add(Reference.Create(comp));
             }
 
             _children = new List<Reference>();
             foreach (Transform child in obj.transform)
             {
+                Debugging.Info("Serializing child " + child + " of " + obj);
+
                 _children.Add(Reference.Create(child.gameObject));
             }
         }

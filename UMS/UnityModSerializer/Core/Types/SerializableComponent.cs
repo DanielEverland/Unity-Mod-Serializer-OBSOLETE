@@ -45,6 +45,8 @@ namespace UMS.Core.Types
             {
                 try
                 {
+                    Debugging.Verbose("Found field " + Utility.GetObjectMemberName(field));
+
                     if (IsValid(field))
                     {
                         object fieldValue = field.GetValue(comp);
@@ -53,6 +55,10 @@ namespace UMS.Core.Types
                         {
                             Add(field, fieldValue);
                         }
+                    }
+                    else
+                    {
+                        Debugging.Verbose("Skipping " + Utility.GetObjectMemberName(field) + " because it's invalid");
                     }
                 }
                 catch (Exception)
@@ -67,6 +73,8 @@ namespace UMS.Core.Types
             {
                 try
                 {
+                    Debugging.Verbose("Found property " + Utility.GetObjectMemberName(property));
+
                     if (IsValid(property))
                     {
                         object propertyValue = property.GetValue(comp, null);
@@ -75,6 +83,10 @@ namespace UMS.Core.Types
                         {
                             Add(property, propertyValue);
                         }
+                    }
+                    else
+                    {
+                        Debugging.Verbose("Skipping " + Utility.GetObjectMemberName(property) + " because it's invalid");
                     }
                 }
                 catch (NotSupportedException)
@@ -112,6 +124,11 @@ namespace UMS.Core.Types
         }
         private void Add(MemberInfo info, object value)
         {
+            if (value == null)
+                throw new NullReferenceException();
+
+            Debugging.Verbose("Adding member " + Utility.GetObjectMemberName(info) + " with value " + value);
+                 
             _members.Add(new SerializableMember(info, value));
         }
         public void Deserialize(Component target)
