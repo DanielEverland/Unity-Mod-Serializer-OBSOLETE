@@ -1,12 +1,26 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using UMS.Serialization;
+using UMS.Behaviour;
 
 namespace UMS.Core
 {
     public class IDManager
     {
+        private static CustomIDGeneratorManager IDGeneratorManager
+        {
+            get
+            {
+                if (_customIDGeneratorManager == null)
+                    _customIDGeneratorManager = new CustomIDGeneratorManager();
+
+                return _customIDGeneratorManager;
+            }
+        }
+        private static CustomIDGeneratorManager _customIDGeneratorManager;
+
         private static Dictionary<int, int> _objectLookup;
         private static HashSet<int> _blockedIDs;
 
@@ -19,11 +33,19 @@ namespace UMS.Core
         {
             if (_blockedIDs.Contains(obj.GetHashCode()))
             {
-                UnityEngine.Debug.LogWarning("Object " + obj + " has been blocked. Returning -1");
+                Debugging.Warning("Object " + obj + " has been blocked. Returning -1");
                 return -1;
             }
 
             return GenerateID(obj, true, null);
+        }
+        private static int GetCustomID(object obj)
+        {
+            return IDGeneratorManager.GetID(obj);
+        }
+        private static bool CustomGeneratorExists(Type type)
+        {
+            return IDGeneratorManager.ContainsGenerator(type);
         }
         private static void CacheID(object obj, int id)
         {
@@ -56,6 +78,28 @@ namespace UMS.Core
             if (obj == null)
                 return -1;
 
+            int id = GetID(obj, memberValues);
+
+            if (doCache)
+                CacheID(obj, id);
+
+            return id;
+        }
+        private static int GetID(object obj, Action<MemberInfo, int> memberValues)
+        {
+            if (CustomGeneratorExists(obj.GetType()))
+            {
+                Debugging.Verbose("Using custom ID generator for " + obj.GetType());
+
+                return GetCustomID(obj);
+            }
+            else
+            {
+                return GenerateNewID(obj, memberValues);
+            }
+        }
+        private static int GenerateNewID(object obj, Action<MemberInfo, int> memberValues)
+        {
             unchecked
             {
                 int i = 17;
@@ -75,9 +119,6 @@ namespace UMS.Core
                         i += buffer * 61;
                     }
                 }
-
-                if (doCache)
-                    CacheID(obj, i);
 
                 return i;
             }
@@ -177,6 +218,40 @@ namespace UMS.Core
                 return 0;
 
             return obj.GetHashCode();
+        }
+        private class CustomIDGeneratorManager
+        {
+            public CustomIDGeneratorManager()
+            {
+                _generators = new Dictionary<Type, CustomIDGenerator>();
+
+                if (BehaviourManager.HasInitialized)
+                {
+                    GetGenerators();
+                }
+                else
+                {
+                    BehaviourManager.OnFinishedInitializing += GetGenerators;
+                }
+            }
+
+            private Dictionary<Type, CustomIDGenerator> _generators;
+
+            public bool ContainsGenerator(Type type)
+            {
+                return _generators.ContainsKey(type);
+            }
+            public int GetID(object obj)
+            {
+                return _generators[obj.GetType()].GetID(obj);
+            }
+            private void GetGenerators()
+            {
+                foreach (CustomIDGenerator generator in BehaviourManager.GetBehaviours<CustomIDGenerator>())
+                {
+                    _generators.Add(generator.Type, generator);
+                }
+            }
         }
         private class IDGeneratorAnalyzer
         {
