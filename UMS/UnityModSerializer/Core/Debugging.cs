@@ -6,7 +6,7 @@ namespace UMS.Core
 {
     public static class Debugging
     {
-        public const TraceLevel DEFAULT_TRACE_LEVEL = TraceLevel.Error;
+        public const TraceLevel DEFAULT_TRACE_LEVEL = TraceLevel.Warning;
 
         private static EG_TraceLogger Logger
         {
