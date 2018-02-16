@@ -57,7 +57,7 @@ namespace UMS.Core
             }
             public bool IsEnabled(TraceLevel level)
             {
-                return (int)level >= (int)LevelFilter;
+                return (int)level <= (int)LevelFilter;
             }
 
             private Action<string> GetLogger(TraceLevel level)
