@@ -90,13 +90,24 @@ namespace UMS.Core
             if (BlockedTypes.IsBlocked(field.FieldType))
                 return false;
 
-            if (field.FieldType.IsArray)
+            try
             {
-                i = GetArrayID(field.GetValue(obj));
+                if (field.FieldType.IsArray)
+                {
+                    i = GetArrayID(field.GetValue(obj));
+                }
+                else
+                {
+                    i = GetObjectID(field.GetValue(obj));
+                }
             }
-            else
+            catch (TargetException)
             {
-                i = GetObjectID(field.GetValue(obj));
+                throw;
+            }
+            catch (Exception)
+            {
+                return false;
             }
 
             memberValues?.Invoke(field, i);
@@ -118,14 +129,25 @@ namespace UMS.Core
 
             if (!Utility.CanAccessMember(property))
                 return false;
-            
-            if (property.PropertyType.IsArray)
+
+            try
             {
-                i = GetArrayID(property.GetValue(obj, null));
+                if (property.PropertyType.IsArray)
+                {
+                    i = GetArrayID(property.GetValue(obj, null));
+                }
+                else
+                {
+                    i = GetObjectID(property.GetValue(obj, null));
+                }
             }
-            else
+            catch (TargetException)
             {
-                i = GetObjectID(property.GetValue(obj, null));
+                throw;
+            }
+            catch (Exception)
+            {
+                return false;
             }
 
             memberValues?.Invoke(property, i);
