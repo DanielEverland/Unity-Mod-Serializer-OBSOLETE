@@ -8,10 +8,10 @@ using UMS.Deserialization;
 
 namespace UMS.Core.Types
 {
-    public class SerializableSprite : SerializableObject<Sprite, SerializableSprite>
+    public class SerializableSprite : SerializableObject<Sprite, SerializableSprite>, IAsynchronousDeserializer<SerializableSprite>
     {
         public override string Extension => "sprite";
-
+        
         public SerializableSprite() { }
         public SerializableSprite(Sprite sprite) : base(sprite)
         {
@@ -25,22 +25,26 @@ namespace UMS.Core.Types
         [JsonProperty]
         private Reference _texture;
         [JsonProperty]
-        private Rect _rect;
+        private SerializableRect _rect;
         [JsonProperty]
         private Vector2 _pivot;
         [JsonProperty]
         private float _pixelsPerUnit;
         [JsonProperty]
         private Vector4 _border;
-
-        public override Sprite Deserialize(SerializableSprite serializable)
+        
+        public void AsynchronousDeserialization(Action<object> action, SerializableSprite serialized)
         {
-            Sprite sprite = new Sprite();
-
-            Deserializer.GetDeserializedObject<Texture2D>(serializable._texture.ID, texture =>
+            Deserializer.GetDeserializedObject<Texture2D>(serialized._texture.ID, texture =>
             {
-                sprite = Sprite.Create(texture, serializable._rect, serializable._pivot, serializable._pixelsPerUnit, 0, SpriteMeshType.Tight, serializable._border);
+                action(CreateSprite(serialized, texture));
             });
+        }
+        private Sprite CreateSprite(SerializableSprite serialized, Texture2D texture)
+        {
+            Sprite sprite = Sprite.Create(texture, serialized._rect, serialized._pivot);
+
+            serialized.Deserialize(sprite);
 
             return sprite;
         }
