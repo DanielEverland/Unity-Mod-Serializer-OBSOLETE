@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using UMS.Core;
 using UnityEngine;
+using UMS.Deserialization;
 
 namespace UMS.Serialization
 {
@@ -136,10 +137,13 @@ namespace UMS.Serialization
 
             return info.Invoke(instance, new object[1] { fromObject });
         }
-        public static T DeserializeObject<T>(object serialized)
+        public static void DeserializeObject<T>(object serialized, Action<T> callback)
         {
             if (serialized == null)
-                return default(T);
+            {
+                callback(default(T));
+                return;
+            }                
 
             if (!CanDeserialize(serialized.GetType()))
                 throw new InvalidOperationException("Cannot deserialize " + serialized + ", because it implements a custom deserializer");
@@ -147,10 +151,9 @@ namespace UMS.Serialization
             try
             {
                 Debugging.Info("Deserializing " + serialized);
-
-                object instance;
-                MethodInfo info = QueryForDeserialization(x => x.SerializedType.IsAssignableFrom(serialized.GetType()) && x.NonSerializableType.IsAssignableFrom(typeof(T)), out instance);
-                return (T)info.Invoke(instance, new object[1] { serialized });
+                
+                Deserialize(x =>  x.SerializedType.IsAssignableFrom(serialized.GetType()) && x.NonSerializableType.IsAssignableFrom(typeof(T)), 
+                                            serialized, x => { callback((T)x); });
             }
             catch (Exception)
             {
@@ -158,10 +161,13 @@ namespace UMS.Serialization
                 throw;
             }
         }
-        public static object DeserializeObject(object serialized)
+        public static void DeserializeObject(object serialized, Action<object> callback)
         {
             if (serialized == null)
-                return null;
+            {
+                callback(null);
+                return;
+            }
 
             if (!CanDeserialize(serialized.GetType()))
                 throw new InvalidOperationException("Cannot deserialize " + serialized + ", because it implements a custom deserializer");
@@ -170,16 +176,82 @@ namespace UMS.Serialization
             {
                 Debugging.Info("Deserializing " + serialized);
 
-                object instance;
-                MethodInfo info = QueryForDeserialization(x => x.SerializedType.IsAssignableFrom(serialized.GetType()), out instance);
-
-                return info.Invoke(instance, new object[1] { serialized });
+                Deserialize(x => x.SerializedType.IsAssignableFrom(serialized.GetType()), serialized, callback);
             }
             catch (Exception)
             {
                 Debug.Log(string.Format("Datadump: ({0}){1} - (2)", serialized.GetType(), serialized));
                 throw;
             }
+        }
+        private static void Deserialize(Func<IModSerializer, bool> predicate, object serialized, Action<object> callback)
+        {
+            if(serialized is IAsynchronousDeserializer)
+            {
+                bool failed = !TryCallGenericInterface(callback, serialized, serialized);
+
+                if (failed)
+                {
+                    Debugging.Error("Unsuccessfully attempted to asynchronously call " + serialized);
+                }
+            }
+            else
+            {
+                object instance;
+                MethodInfo info = QueryForDeserialization(predicate, out instance);
+
+                callback(info.Invoke(instance, new object[1] { serialized }));
+            }            
+        }
+        private static bool TryCallGenericInterface(Action<object> callback, object serialized, object target)
+        {
+            Type[] interfaces = target.GetType().GetInterfaces();
+
+            Debugging.Verbose("Getting interfaces from " + target.GetType());
+
+            for (int i = 0; i < interfaces.Length; i++)
+            {
+                Type currentInterface = interfaces[i];
+
+                Debugging.Verbose("Checking interface " + currentInterface);
+
+                if (typeof(IAsynchronousDeserializer).IsAssignableFrom(currentInterface) && currentInterface.IsGenericType)
+                {
+                    MethodInfo function = target.GetType().GetMethod("AsynchronousDeserialization");
+                    ParameterInfo[] arguments = function.GetParameters();
+
+                    Type firstParameterType = arguments[0].ParameterType;
+                    Type secondParameterType = arguments[1].ParameterType;
+
+                    Debugging.Verbose("Arg count: " + arguments.Length);
+                    for (int x = 0; x < arguments.Length; x++)
+                    {
+                        Debugging.Verbose("Argument " + x + ": " + arguments[x]);
+                    }
+
+                    if (!callback.Method.GetParameters()[0].ParameterType.IsAssignableFrom(firstParameterType))
+                    {
+                        Debug.LogWarning("Cannot assign " + callback + " from " + firstParameterType);
+                        break;
+                    }
+
+                    if(secondParameterType != serialized.GetType())
+                    {
+                        Debug.LogWarning("Serialized type mismatch " + secondParameterType + " - " + serialized.GetType());
+                        break;
+                    }
+                    
+                    Debugging.Info("Successfully calling asynchronous function");
+                    function.Invoke(target, new object[2] { callback, serialized });
+                    return true;
+                }
+                else
+                {
+                    Debugging.Verbose("Skipping interface " + currentInterface + " IsGeneric: " + currentInterface.IsGenericType);
+                }
+            }
+
+            return false;
         }
         public static bool CanDeserialize(Type type)
         {

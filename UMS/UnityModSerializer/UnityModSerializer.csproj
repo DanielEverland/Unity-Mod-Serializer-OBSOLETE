@@ -89,6 +89,7 @@
     <Compile Include="Core\Utility.cs" />
     <Compile Include="Deserialization\CustomConstructor.cs" />
     <Compile Include="Deserialization\Deserializer.cs" />
+    <Compile Include="Deserialization\IAsynchronousDeserializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\BlockedTypes.cs" />
     <Compile Include="Serialization\CustomSerializers.cs" />

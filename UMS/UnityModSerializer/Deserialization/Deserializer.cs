@@ -63,7 +63,7 @@ namespace UMS.Deserialization
             if (_serializedObjectQueue.ContainsKey(id))
                 ExecuteActions(_serializedObjectQueue[id], entry.SerializedObject);
 
-            if (_deserializedObjectQueue.ContainsKey(id))
+            if (_deserializedObjectQueue.ContainsKey(id) && entry.DeserializedObject != null)
                 ExecuteActions(_deserializedObjectQueue[id], entry.DeserializedObject);
         }
         private static void ExecuteActions(IList<ActionInstance> actions, object obj)
@@ -153,7 +153,7 @@ namespace UMS.Deserialization
                 }
 
                 if (!_objectReferences.ContainsKey(id))
-                    _objectReferences.Add(id, new ObjectEntry(file.Value));
+                    _objectReferences.Add(id, new ObjectEntry(file.Value, id));
             }
 
             foreach (KeyValuePair<int, ObjectEntry> keyValuePair in _objectReferences)
@@ -176,15 +176,18 @@ namespace UMS.Deserialization
         }
         private class ObjectEntry
         {
-            public ObjectEntry(string json)
+            public ObjectEntry(string json, int ID)
             {
                 JSON = json;
+
+                this.ID = ID;
             }
 
             public string JSON { get; private set; }
 
             public object SerializedObject { get; set; }
             public object DeserializedObject { get; set; }
+            public int ID { get; set; }
 
             private void CreateSerializedObject()
             {
@@ -193,7 +196,15 @@ namespace UMS.Deserialization
             private void CreateDeserializedObject()
             {
                 if (Serialization.CustomSerializers.CanDeserialize(SerializedObject.GetType()))
-                    DeserializedObject = Serialization.CustomSerializers.DeserializeObject(SerializedObject);
+                {
+                    Serialization.CustomSerializers.DeserializeObject(SerializedObject, AssignDeserializedObject);
+                }
+            }
+            private void AssignDeserializedObject(object obj)
+            {
+                DeserializedObject = obj;
+
+                ExecuteID(ID);
             }
             public void Deserialize()
             {
