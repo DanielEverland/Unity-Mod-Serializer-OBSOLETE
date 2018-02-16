@@ -24,6 +24,7 @@ namespace UMS.Serialization
             "Graphic.canvas",
             "Transform.root",
             "Component.rigidbody",
+            "Graphic.m_Material",
         };
         #endregion Definitions
 
