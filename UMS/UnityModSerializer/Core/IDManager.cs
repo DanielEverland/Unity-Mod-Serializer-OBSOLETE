@@ -60,12 +60,13 @@ namespace UMS.Core
             }
             else
             {
+                Debugging.Info("ID for obj " + obj + " is " + id);
                 _objectLookup.Add(hash, id);
             }
         }
         private static void FlagImproperID(object obj, int a, int b)
         {
-            UnityEngine.Debug.LogError(string.Format("Found improper implementation of ID for {0} - {1}|{2}", obj, a, b));
+            Debugging.Error(string.Format("Found improper implementation of ID for {0} - {1}|{2}", obj, a, b));
 
             _blockedIDs.Add(obj.GetHashCode());
 
