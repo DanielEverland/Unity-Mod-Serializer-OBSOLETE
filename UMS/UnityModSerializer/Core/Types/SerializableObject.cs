@@ -10,7 +10,7 @@ namespace UMS.Core.Types
         public SerializableObject() { }
         public SerializableObject(UnityEngine.Object obj) : base((TNonSerializable)obj)
         {
-            if (obj is null)
+            if (obj == null)
                 throw new NullReferenceException("Object cannot be null");
 
             _name = obj.name;
