@@ -20,6 +20,9 @@ namespace UMS.Core
             if (obj == null)
                 return true;
 
+            if (obj.ToString() == "null")
+                return true;
+
             return !Serialization.CustomValidityComparers.IsValid(obj);
         }
         public static MemberInfo GetMember(Type type, string name)

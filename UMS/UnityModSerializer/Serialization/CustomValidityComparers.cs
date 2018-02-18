@@ -28,19 +28,7 @@ namespace UMS.Serialization
 
             return Container.IsValid(obj);
         }
-
-        [TypeValidityComparer(typeof(Sprite))]
-        public class SpriteValidityComparer : IValidityComparer<Sprite>
-        {
-            public bool IsValid(Sprite obj)
-            {
-                if (obj.ToString() == "null")
-                    return false;
-
-                return true;
-            }
-        }
-
+        
         private class ValidityContainer
         {
             public ValidityContainer()
