@@ -117,9 +117,7 @@ namespace UMS.Serialization
         {
             if (fromObject == null)
                 return default(T);
-
-            Debugging.Info("Serializing " + fromObject);
-
+            
             object instance;
             MethodInfo info = QueryForSerialization(x => x.NonSerializableType.IsAssignableFrom(fromObject.GetType()) && x.SerializedType.IsAssignableFrom(typeof(T)), out instance);
 
@@ -129,9 +127,7 @@ namespace UMS.Serialization
         {
             if (fromObject == null)
                 return null;
-
-            Debugging.Info("Serializing " + fromObject);
-
+            
             object instance;
             MethodInfo info = QueryForSerialization(x => x.NonSerializableType.IsAssignableFrom(fromObject.GetType()), out instance);
 
