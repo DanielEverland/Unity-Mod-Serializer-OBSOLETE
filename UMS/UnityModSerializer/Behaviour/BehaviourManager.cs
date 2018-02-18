@@ -20,23 +20,7 @@ namespace UMS.Behaviour
         {
             _loadedBehaviours = new List<BehaviourBase>();
 
-            AssemblyManager.OnLoadType += type =>
-            {
-                foreach (PropertyInfo property in type.GetProperties())
-                {
-                    Analyze(property);
-                }
-
-                foreach (FieldInfo field in type.GetFields())
-                {
-                    Analyze(field);
-                }
-
-                foreach (MethodInfo method in type.GetMethods())
-                {
-                    Analyze(method);
-                }
-            };
+            AssemblyManager.OnLoadType += Analyze;
 
             AssemblyManager.OnFinishedReflection += () =>
             {
@@ -47,6 +31,34 @@ namespace UMS.Behaviour
         public static IEnumerable<BehaviourBase> GetBehaviours<T>() where T : BehaviourBase
         {
             return _loadedBehaviours.Where(x => (typeof(T).IsAssignableFrom(x.GetType())));
+        }
+        private static void Analyze(Type type)
+        {
+            foreach (Attribute attribute in type.GetCustomAttributes(false))
+            {
+                if (!(attribute is BehaviourBase))
+                    continue;
+
+                if(attribute is IBehaviourClassLoader loader)
+                {
+                    loader.Load(type);
+                }
+
+                AddBehaviour(attribute as BehaviourBase);
+            }
+
+            foreach (PropertyInfo property in type.GetProperties())
+            {
+                Analyze(property);
+            }
+            foreach (FieldInfo field in type.GetFields())
+            {
+                Analyze(field);
+            }
+            foreach (MethodInfo method in type.GetMethods())
+            {
+                Analyze(method);
+            }
         }
         private static void Analyze<T>(T targetObj) where T : MemberInfo
         {
@@ -59,15 +71,19 @@ namespace UMS.Behaviour
         {
             if (!(attribute is BehaviourBase))
                 return;
-
-            if (attribute is IBehaviourLoader<T> loader)
+            
+            if (attribute is IBehaviourLoader<T>)
             {
-                loader.Load(targetObj);
+                (attribute as IBehaviourLoader<T>).Load(targetObj);
+            }
+            if(attribute is IBehaviourLoader)
+            {
+                (attribute as IBehaviourLoader).Load();
             }
 
             AddBehaviour(attribute as BehaviourBase, targetObj);
         }
-        private static void AddBehaviour<T>(BehaviourBase behaviour, T targetObject) where T : MemberInfo
+        private static void AddBehaviour(BehaviourBase behaviour)
         {
             if (behaviour == null)
                 return;
@@ -76,6 +92,13 @@ namespace UMS.Behaviour
 
             if (OnBehaviourLoaded != null && behaviour != null)
                 OnBehaviourLoaded.Invoke(behaviour);
+        }
+        private static void AddBehaviour<T>(BehaviourBase behaviour, T targetObject) where T : MemberInfo
+        {
+            if (behaviour == null)
+                return;
+
+            AddBehaviour(behaviour);
 
             if (OnBehaviourLoadedWithContext != null && behaviour != null)
                 OnBehaviourLoadedWithContext.Invoke(behaviour, targetObject);

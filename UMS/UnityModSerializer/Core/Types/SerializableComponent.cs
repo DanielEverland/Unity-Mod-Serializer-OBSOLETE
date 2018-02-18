@@ -51,7 +51,7 @@ namespace UMS.Core.Types
                     {
                         object fieldValue = field.GetValue(comp);
 
-                        if (fieldValue != null)
+                        if (!Utility.IsNull(fieldValue))
                         {
                             Add(field, fieldValue);
                         }
@@ -79,7 +79,7 @@ namespace UMS.Core.Types
                     {
                         object propertyValue = property.GetValue(comp, null);
 
-                        if (propertyValue != null)
+                        if (!Utility.IsNull(propertyValue))
                         {
                             Add(property, propertyValue);
                         }
@@ -124,10 +124,10 @@ namespace UMS.Core.Types
         }
         private void Add(MemberInfo info, object value)
         {
-            if (value == null)
+            if (Utility.IsNull(value))
                 throw new NullReferenceException();
 
-            Debugging.Verbose("Adding member " + Utility.GetObjectMemberName(info) + " with value " + value);
+            Debugging.Verbose("Adding member " + Utility.GetObjectMemberName(info) + " with value " + value + " IsNull: " + (value == null));
                  
             _members.Add(new SerializableMember(info, value));
         }

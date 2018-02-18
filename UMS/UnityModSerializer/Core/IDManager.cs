@@ -90,8 +90,6 @@ namespace UMS.Core
         {
             if (CustomGeneratorExists(obj.GetType()))
             {
-                Debugging.Verbose("Using custom ID generator for " + obj.GetType());
-
                 return GetCustomID(obj);
             }
             else

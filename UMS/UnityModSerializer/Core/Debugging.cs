@@ -7,6 +7,7 @@ namespace UMS.Core
     public static class Debugging
     {
         public const TraceLevel DEFAULT_TRACE_LEVEL = TraceLevel.Warning;
+        public const bool DEBUG_JSON_INTERNAL = true;
 
         private static EG_TraceLogger Logger
         {
@@ -44,10 +45,20 @@ namespace UMS.Core
 
         public class EG_TraceLogger : ITraceWriter
         {
+            public EG_TraceLogger(bool isJsonInternal = false)
+            {
+                _isJsonInternal = isJsonInternal;
+            }
+
             public TraceLevel LevelFilter => DEFAULT_TRACE_LEVEL;
+
+            private readonly bool _isJsonInternal;
             
             public void Trace(TraceLevel level, string message, Exception ex)
             {
+                if (_isJsonInternal && !DEBUG_JSON_INTERNAL)
+                    return;
+
                 Action<string> logger = GetLogger(level);
 
                 logger(message);

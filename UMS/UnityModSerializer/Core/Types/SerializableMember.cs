@@ -17,7 +17,7 @@ namespace UMS.Core.Types
         {
             if (value == null)
                 return;
-            
+                        
             _value = new MemberObject();
             _memberName = info.Name;
 

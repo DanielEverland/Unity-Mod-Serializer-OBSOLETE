@@ -1,10 +1,30 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
+using System.Collections.Generic;
 using UMS.Serialization;
 
 namespace UMS.Core
 {
     public static class Extensions
     {
+        public static string CollectionToString<T>(this IEnumerable<T> collection)
+        {
+            string toReturn = "";
+
+            if (collection == null)
+                return toReturn;
+
+            int length = collection.Count();
+
+            for (int i = 0; i < length; i++)
+            {
+                toReturn += collection.ElementAt(i).ToString();
+
+                if (i < length - 1)
+                    toReturn += ", ";
+            }
+
+            return toReturn;
+        }
         public static T GetAndRemove<T>(this IList<T> collection, int index)
         {
             T obj = collection[index];

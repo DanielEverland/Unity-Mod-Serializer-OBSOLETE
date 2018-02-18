@@ -1,10 +1,18 @@
-﻿namespace UMS.Core.Types
+﻿using System;
+
+namespace UMS.Core.Types
 {
     public class Reference : Serializable<object, Reference>
     {
         public Reference() { }
         private Reference(object obj)
         {
+            if (obj == null)
+            {
+                UnityEngine.Debug.LogWarning("Obj is null");
+                throw new NullReferenceException();
+            }
+
             ID = ObjectManager.Add(obj);
         }
 
