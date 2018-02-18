@@ -43,7 +43,7 @@ namespace UMS.Core
         {
             return GetObjectMemberName(info.DeclaringType.Name, info.Name);
         }
-        public static string GetObjectMemberName(string objName, string memberName)
+        private static string GetObjectMemberName(string objName, string memberName)
         {
             return string.Format("{0}.{1}", objName, memberName);
         }

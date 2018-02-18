@@ -328,7 +328,7 @@ namespace UMS.Core
 
                 public override string ToString()
                 {
-                    return string.Format("{0} - {1}|{2}", Utility.GetObjectMemberName(_member.DeclaringType.Name, _member.Name), _a, _b);
+                    return string.Format("{0} - {1}|{2}", Utility.GetObjectMemberName(_member), _a, _b);
                 }
             }
         }

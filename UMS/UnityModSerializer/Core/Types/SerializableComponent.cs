@@ -91,7 +91,7 @@ namespace UMS.Core.Types
                 }
                 catch (NotSupportedException)
                 {
-                    throw new NotSupportedException(Utility.GetObjectMemberName(property.DeclaringType.Name, property.Name) + " is not supported. Please block");
+                    throw new NotSupportedException(Utility.GetObjectMemberName(property) + " is not supported. Please block");
                 }
                 catch (Exception)
                 {
@@ -118,7 +118,7 @@ namespace UMS.Core.Types
         }
         private bool IsValid(MemberInfo info)
         {
-            string objectMemberValue = Utility.GetObjectMemberName(info.DeclaringType.Name, info.Name);
+            string objectMemberValue = Utility.GetObjectMemberName(info);
 
             return !BlockedTypes.IsBlocked(objectMemberValue);
         }
