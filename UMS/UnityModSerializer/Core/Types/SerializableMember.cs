@@ -15,8 +15,8 @@ namespace UMS.Core.Types
         private SerializableMember() { }
         public SerializableMember(MemberInfo info, object value)
         {
-            if (value == null)
-                return;
+            if (Utility.IsNull(value))
+                throw new NullReferenceException();
                         
             _value = new MemberObject();
             _memberName = info.Name;
