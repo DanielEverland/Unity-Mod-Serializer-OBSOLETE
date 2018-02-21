@@ -32,6 +32,9 @@ namespace UMS.Core
                 _data.Add(id, null);
 
                 _data[id] = CustomSerializers.SerializeObject(obj);
+
+                if (!(_data[id] is IModEntry))
+                    throw new ArgumentException("Tried to add " + _data[id].GetType() + " as a reference type, but it does not implement IModEntry");
             }
 
             return id;
