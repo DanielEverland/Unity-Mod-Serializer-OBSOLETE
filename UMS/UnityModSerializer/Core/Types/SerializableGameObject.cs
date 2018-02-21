@@ -89,7 +89,7 @@ namespace UMS.Core.Types
         }
         private Component GetComponent(Type type, GameObject obj)
         {
-            if (type == typeof(Transform))
+            if (typeof(Transform).IsAssignableFrom(type))
             {
                 return obj.GetComponent<Transform>();
             }
