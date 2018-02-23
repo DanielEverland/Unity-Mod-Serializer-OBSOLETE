@@ -77,6 +77,7 @@
     <Compile Include="Core\ObjectManager.cs" />
     <Compile Include="Core\Priority.cs" />
     <Compile Include="Core\RectTransformConverter.cs" />
+    <Compile Include="Core\StaticObjects.cs" />
     <Compile Include="Core\Types\SerializableComponentBase.cs" />
     <Compile Include="Core\Types\SerializableFont.cs" />
     <Compile Include="Core\Types\SerializableMember.cs" />

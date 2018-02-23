@@ -57,12 +57,17 @@ namespace UMS.Core
                     zip.AddEntry(file.Key, file.Value);
                 }
 
+                foreach (KeyValuePair<string, byte[]> file in Serializer.ExtraFiles)
+                {
+                    zip.AddEntry(file.Key, file.Value);
+                }
+
                 zip.Save(path);
             }
         }
-        public static Dictionary<string, string> Deserialize(string path)
+        public static Dictionary<string, byte[]> Deserialize(string path)
         {
-            Dictionary<string, string> files = new Dictionary<string, string>();
+            Dictionary<string, byte[]> files = new Dictionary<string, byte[]>();
 
             using (ZipFile zip = ZipFile.Read(path))
             {
@@ -71,11 +76,8 @@ namespace UMS.Core
                     using (MemoryStream stream = new MemoryStream())
                     {
                         entry.Extract(stream);
-
-                        stream.Position = 0;
-                        StreamReader sr = new StreamReader(stream);
-
-                        files.Add(entry.FileName, sr.ReadToEnd());
+                        
+                        files.Add(entry.FileName, stream.ToArray());
                     }
                 }
             }
@@ -83,7 +85,7 @@ namespace UMS.Core
             if (!files.ContainsKey(CONFIG_NAME))
                 throw new System.NullReferenceException("No config file in " + path);
 
-            ConfigFile = JsonSerializer.ToObject<Config>(files[CONFIG_NAME]);
+            ConfigFile = JsonSerializer.ToObject<Config>(Utility.ToString(files[CONFIG_NAME]));
             files.Remove(CONFIG_NAME);
 
             return files;

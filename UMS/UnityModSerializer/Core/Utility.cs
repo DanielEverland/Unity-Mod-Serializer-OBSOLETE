@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -16,7 +17,44 @@ namespace UMS.Core
         public const string MENU_SERIALIZATION = "Serialization";
 
         private static Regex EndNumberParanthesis = new Regex(@"\(\d+\)$");
+
+        private static readonly HashSet<TextureFormat> _supportedWritableFormats = new HashSet<TextureFormat>()
+        {
+            TextureFormat.RGBA32,
+            TextureFormat.ARGB32,
+            TextureFormat.RGB24,
+            TextureFormat.RGBAFloat,
+            TextureFormat.RGBAHalf,
+        };
         
+        public static bool IsReadable(Texture2D texture)
+        {
+            if (!_supportedWritableFormats.Contains(texture.format))
+                return false;
+
+            try
+            {
+                texture.ReadPixels(new Rect(0, 0, 1, 1), 0, 0);
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+        public static string ToString(byte[] array)
+        {
+            using (MemoryStream stream = new MemoryStream())
+            {
+                stream.Write(array, 0, array.Length);
+
+                stream.Position = 0;
+                StreamReader reader = new StreamReader(stream);
+
+                return reader.ReadToEnd();
+            }
+        }
         public static string GetGameObjectFolderName(GameObject gameObject)
         {
             string toReturn = gameObject.name;

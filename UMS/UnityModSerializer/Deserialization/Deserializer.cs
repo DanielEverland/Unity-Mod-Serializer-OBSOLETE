@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using UMS.Behaviour;
@@ -12,7 +13,9 @@ namespace UMS.Deserialization
 {
     public static class Deserializer
     {
-        private static Dictionary<string, string> _serializedData;
+        public static IDictionary<string, byte[]> SerializedData { get { return _serializedData; } }
+
+        private static Dictionary<string, byte[]> _serializedData;
         private static Dictionary<int, ObjectEntry> _objectReferences;
 
         private static Dictionary<int, List<ActionInstance>> _serializedObjectQueue;
@@ -132,28 +135,31 @@ namespace UMS.Deserialization
             {
                 action(_objectReferences[id].DeserializedObject);
             }
-        }
+        }        
         private static void ExecuteDeserialization()
         {
             _objectReferences = new Dictionary<int, ObjectEntry>();
             _serializedData = Mod.Deserialize(@"C:/Users/Daniel/Desktop/New Mod.mod");
 
-            foreach (KeyValuePair<string, string> file in _serializedData)
+            foreach (KeyValuePair<string, byte[]> file in _serializedData)
             {
                 int id = -1;
 
-                try
+                if(Mod.ConfigFile.data.Any(x => x.localPath == file.Key))
                 {
-                    id = Mod.ConfigFile.data.Find(x => x.localPath == file.Key).id;
-                }
-                catch (System.Exception)
-                {
-                    Debug.LogError("Config file didn't contain " + file.Key);
-                    throw;
-                }
+                    try
+                    {
+                        id = Mod.ConfigFile.data.Find(x => x.localPath == file.Key).id;
+                    }
+                    catch (System.Exception)
+                    {
+                        Debug.LogError("Config file didn't contain " + file.Key);
+                        throw;
+                    }
 
-                if (!_objectReferences.ContainsKey(id))
-                    _objectReferences.Add(id, new ObjectEntry(file.Value, id));
+                    if (!_objectReferences.ContainsKey(id))
+                        _objectReferences.Add(id, new ObjectEntry(Utility.ToString(file.Value), id));
+                }                
             }
 
             foreach (KeyValuePair<int, ObjectEntry> keyValuePair in _objectReferences)

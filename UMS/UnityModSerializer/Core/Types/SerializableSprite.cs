@@ -16,7 +16,6 @@ namespace UMS.Core.Types
         public SerializableSprite(Sprite sprite) : base(sprite)
         {
             _texture = Reference.Create(sprite.texture);
-            _rect = sprite.rect;
             _pivot = sprite.pivot;
             _pixelsPerUnit = sprite.pixelsPerUnit;
             _border = sprite.border;
@@ -24,8 +23,6 @@ namespace UMS.Core.Types
 
         [JsonProperty]
         private Reference _texture;
-        [JsonProperty]
-        private SerializableRect _rect;
         [JsonProperty]
         private Vector2 _pivot;
         [JsonProperty]
@@ -42,7 +39,9 @@ namespace UMS.Core.Types
         }
         private Sprite CreateSprite(SerializableSprite serialized, Texture2D texture)
         {
-            Sprite sprite = Sprite.Create(texture, serialized._rect, serialized._pivot, serialized._pixelsPerUnit, 0, SpriteMeshType.Tight, serialized._border);
+            Rect rect = new Rect(0, 0, texture.width, texture.height);
+
+            Sprite sprite = Sprite.Create(texture, rect, serialized._pivot, serialized._pixelsPerUnit, 0, SpriteMeshType.Tight, serialized._border);
             
             serialized.Deserialize(sprite);
 

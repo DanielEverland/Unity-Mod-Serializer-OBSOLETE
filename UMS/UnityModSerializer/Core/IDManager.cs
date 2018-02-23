@@ -222,8 +222,6 @@ namespace UMS.Core
         {
             public CustomIDGeneratorManager()
             {
-                _generators = new Dictionary<Type, CustomIDGenerator>();
-
                 if (BehaviourManager.HasInitialized)
                 {
                     GetGenerators();
@@ -248,9 +246,19 @@ namespace UMS.Core
             {
                 BehaviourManager.OnFinishedInitializing -= GetGenerators;
 
+                _generators = new Dictionary<Type, CustomIDGenerator>();
+
                 foreach (CustomIDGenerator generator in BehaviourManager.GetBehaviours<CustomIDGenerator>())
                 {
-                    _generators.Add(generator.Type, generator);
+                    if (_generators.ContainsKey(generator.Type))
+                    {
+                        if (_generators[generator.Type].Priority < generator.Priority)
+                            _generators[generator.Type] = generator;
+                    }
+                    else
+                    {
+                        _generators.Add(generator.Type, generator);
+                    }                    
                 }
             }
         }
