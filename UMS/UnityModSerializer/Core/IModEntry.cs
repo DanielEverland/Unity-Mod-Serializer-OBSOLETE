@@ -4,5 +4,6 @@
     {
         string Extension { get; }
         string FileName { get; }
+        string FolderName { get; }
     }
 }

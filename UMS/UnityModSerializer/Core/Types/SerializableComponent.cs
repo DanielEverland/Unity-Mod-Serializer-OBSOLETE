@@ -23,7 +23,7 @@ namespace UMS.Core.Types
         
         [JsonProperty]
         private List<SerializableMember> _members;
-
+        
         private void AddMembers(Component comp)
         {
             SerializeProperties(comp);

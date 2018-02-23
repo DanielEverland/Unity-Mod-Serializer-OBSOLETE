@@ -19,6 +19,7 @@ namespace UMS.Core.Types
 
         public abstract string Extension { get; }
         public virtual string FileName { get { return Name; } }
+        public virtual string FolderName { get { return "Static Objects"; } }
 
         public string Name { get { return _name; } }
         public HideFlags HideFlags { get { return _hideFlags; } }

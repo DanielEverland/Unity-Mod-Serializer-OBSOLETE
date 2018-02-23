@@ -24,8 +24,10 @@ namespace UMS.Core
             {
                 if (keyValuePair.Value is IModEntry entry)
                 {
+                    string preferredName = string.Format("{0}/{1}", entry.FolderName, entry.FileName);
+
                     string json = JsonSerializer.ToJson(keyValuePair.Value);
-                    string name = Utility.GetValidName(entry.FileName, entry.Extension, usedNames);
+                    string name = Utility.GetValidName(preferredName, entry.Extension, usedNames);
                     string extension = Utility.SanitizeExtension(entry.Extension);
 
                     AddToConfig(keyValuePair.Key, name);

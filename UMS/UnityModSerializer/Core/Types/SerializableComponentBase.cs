@@ -15,11 +15,13 @@ namespace UMS.Core.Types
         public SerializableComponentBase(TNonSerializable component) : base(component)
         {
             _componentType = component.GetType();
-            _fileName = string.Format("{0} - {1}", component.gameObject.name, component.GetType().Name);
+            _fileName = component.GetType().Name;
+            _folderName = Utility.GetGameObjectFolderName(component.gameObject);
         }
 
         public override string Extension { get { return "component"; } }
         public override string FileName { get { return _fileName; } }
+        public override string FolderName { get { return _folderName; } }
 
         public Type ComponentType { get { return _componentType; } }
 
@@ -28,6 +30,8 @@ namespace UMS.Core.Types
 
         [JsonIgnore]
         private string _fileName;
+        [JsonIgnore]
+        private string _folderName;
 
         public void Deserialize(Component component)
         {

@@ -17,6 +17,8 @@ namespace UMS.Core.Types
             _layer = obj.layer;
             _isStatic = obj.isStatic;
             _tag = obj.tag;
+            _folderName = Utility.GetGameObjectFolderName(obj);
+            _fileName = string.Format(@"""{0}""", obj.name);
 
             _components = new List<Reference>();
             foreach (Component comp in obj.GetComponents<Component>())
@@ -39,6 +41,8 @@ namespace UMS.Core.Types
         }
 
         public override string Extension => "gameObject";
+        public override string FolderName => _folderName;
+        public override string FileName => _fileName;
 
         public IList<Reference> Components { get { return _components; } }
         public IList<Reference> Children { get { return _children; } }
@@ -55,6 +59,11 @@ namespace UMS.Core.Types
         private List<Reference> _components;
         [JsonProperty]
         private List<Reference> _children;
+
+        [JsonIgnore]
+        private string _folderName;
+        [JsonIgnore]
+        private string _fileName;
 
         public override GameObject Deserialize(SerializableGameObject serialized)
         {

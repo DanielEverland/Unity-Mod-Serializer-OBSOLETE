@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using UMS.Serialization;
+using UnityEngine;
 
 namespace UMS.Core
 {
@@ -15,7 +16,22 @@ namespace UMS.Core
         public const string MENU_SERIALIZATION = "Serialization";
 
         private static Regex EndNumberParanthesis = new Regex(@"\(\d+\)$");
+        
+        public static string GetGameObjectFolderName(GameObject gameObject)
+        {
+            string toReturn = gameObject.name;
 
+            Transform currentParent = gameObject.transform.parent;
+
+            while (currentParent != null)
+            {
+                toReturn = currentParent.gameObject.name + "/" + toReturn;
+
+                currentParent = currentParent.parent;
+            }
+
+            return toReturn;
+        }
         public static bool IsNull(object obj)
         {
             if (obj == null)
