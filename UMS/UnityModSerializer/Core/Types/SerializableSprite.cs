@@ -42,8 +42,8 @@ namespace UMS.Core.Types
         }
         private Sprite CreateSprite(SerializableSprite serialized, Texture2D texture)
         {
-            Sprite sprite = Sprite.Create(texture, serialized._rect, serialized._pivot);
-
+            Sprite sprite = Sprite.Create(texture, serialized._rect, serialized._pivot, serialized._pixelsPerUnit, 0, SpriteMeshType.Tight, serialized._border);
+            
             serialized.Deserialize(sprite);
 
             return sprite;
