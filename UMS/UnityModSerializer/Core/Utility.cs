@@ -100,9 +100,11 @@ namespace UMS.Core
         {
             return IDManager.GetID(obj);
         }
-        public static string GetValidName(string preferredName, HashSet<string> blackList)
+        public static string GetValidName(string preferredName, string extension, HashSet<string> blackList)
         {
-            if (blackList.Contains(preferredName))
+            string fullName = string.Format("{0}.{1}", preferredName, extension);
+
+            if (blackList.Contains(fullName))
             {
                 if (EndNumberParanthesis.IsMatch(preferredName))
                 {
@@ -121,15 +123,15 @@ namespace UMS.Core
                         }
                     }
 
-                    return GetValidName(strippedString + "(" + (index + 1) + ")", blackList);
+                    return GetValidName(strippedString + "(" + (index + 1) + ")", extension, blackList);
                 }
                 else
                 {
-                    return GetValidName(preferredName + " (1)", blackList);
+                    return GetValidName(preferredName + " (1)", extension, blackList);
                 }
             }
 
-            return preferredName;
+            return fullName;
         }
     }
 }

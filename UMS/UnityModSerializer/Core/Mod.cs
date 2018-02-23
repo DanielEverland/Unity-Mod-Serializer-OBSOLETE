@@ -25,15 +25,14 @@ namespace UMS.Core
                 if (keyValuePair.Value is IModEntry entry)
                 {
                     string json = JsonSerializer.ToJson(keyValuePair.Value);
-                    string name = Utility.GetValidName(entry.FileName, usedNames);
+                    string name = Utility.GetValidName(entry.FileName, entry.Extension, usedNames);
                     string extension = Utility.SanitizeExtension(entry.Extension);
-                    string selectedName = string.Format("{0}.{1}", name, extension);
 
-                    AddToConfig(keyValuePair.Key, selectedName);
+                    AddToConfig(keyValuePair.Key, name);
 
                     usedNames.Add(name);
 
-                    filesToWrite.Add(selectedName, json);
+                    filesToWrite.Add(name, json);
                 }
                 else
                 {
