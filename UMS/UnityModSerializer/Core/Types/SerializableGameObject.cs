@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using UMS.Deserialization;
 using UnityEngine;
@@ -65,17 +66,7 @@ namespace UMS.Core.Types
             gameObject.isStatic = serialized._isStatic;
             gameObject.tag = serialized._tag;
 
-            foreach (Reference reference in serialized.Components)
-            {
-                if (!Deserializer.ContainsObject(reference.ID))
-                    continue;
-
-                Deserializer.GetSerializedObject<SerializableComponent>(reference.ID, serializableComponent =>
-                {
-                    Component component = GetComponent(serializableComponent.ComponentType, gameObject);
-                    serializableComponent.Deserialize(component);
-                });
-            }
+            ComponentCacheDeserializer componentCacheDeserializer = new ComponentCacheDeserializer(serialized, gameObject);
 
             foreach (Reference child in serialized.Children)
             {
@@ -87,7 +78,7 @@ namespace UMS.Core.Types
 
             return gameObject;
         }
-        private Component GetComponent(Type type, GameObject obj)
+        public Component GetComponent(Type type, GameObject obj)
         {
             if (typeof(Transform).IsAssignableFrom(type))
             {
