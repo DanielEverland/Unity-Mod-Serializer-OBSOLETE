@@ -17,15 +17,21 @@ namespace UMS.Serialization
         [MemberBlocker()]
         public static readonly HashSet<string> Members = new HashSet<string>()
         {
+            //Core
             "MeshFilter.mesh",
             "Renderer.material",
             "Renderer.materials",
-            "Canvas.rootCanvas",
-            "Graphic.canvas",
             "Transform.root",
             "Component.rigidbody",
+
+            //UI
+            "Canvas.rootCanvas",
+            "Graphic.canvas",
             "Graphic.material",
             "Image.material",
+            "ScrollRect.normalizedPosition",
+            "ScrollRect.horizontalNormalizedPosition",
+            "ScrollRect.verticalNormalizedPosition",
         };
         #endregion Definitions
 
