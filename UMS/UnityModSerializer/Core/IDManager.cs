@@ -246,6 +246,8 @@ namespace UMS.Core
             }
             private void GetGenerators()
             {
+                BehaviourManager.OnFinishedInitializing -= GetGenerators;
+
                 foreach (CustomIDGenerator generator in BehaviourManager.GetBehaviours<CustomIDGenerator>())
                 {
                     _generators.Add(generator.Type, generator);
