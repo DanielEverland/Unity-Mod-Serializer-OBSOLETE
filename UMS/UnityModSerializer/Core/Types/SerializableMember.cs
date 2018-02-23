@@ -28,7 +28,7 @@ namespace UMS.Core.Types
             else
             {
                 AssignAsSingular(value);
-            }
+            }         
         }
 
         public string MemberName { get { return _memberName; } }
@@ -49,6 +49,19 @@ namespace UMS.Core.Types
         [JsonProperty]
         private MemberObject _value;
 
+        public bool IsJSONEmpty()
+        {
+            string json = Serialization.JsonSerializer.ToJson(_value.Object);
+
+            string[] lines = json.Split('\n');
+
+            if(lines.Length == 3)
+            {
+                return json.StartsWith("{") && json.EndsWith("}") && json.Contains("$type");
+            }
+
+            return false;
+        }
         private void AssignAsSingular(object value)
         {
             Value = GetSerializableObject(value);

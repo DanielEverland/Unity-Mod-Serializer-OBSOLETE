@@ -84,7 +84,10 @@ namespace UMS.Core.Types
         }
         private void Add(object obj, MemberInfo info)
         {
-            _members.Add(new SerializableMember(info, obj));
+            SerializableMember member = new SerializableMember(info, obj);
+
+            if (!member.IsJSONEmpty())
+                _members.Add(member);
         }
 
         public override SerializableTemporaryUnityObject Serialize(UnityEngine.Object obj)

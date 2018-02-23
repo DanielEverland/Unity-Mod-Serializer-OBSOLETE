@@ -116,10 +116,13 @@ namespace UMS.Core.Types
         {
             if (Utility.IsNull(value))
                 throw new NullReferenceException();
-
+            
             Debugging.Verbose("Adding member " + Utility.GetObjectMemberName(info) + " with value " + value + " IsNull: " + (value == null));
-                 
-            _members.Add(new SerializableMember(info, value));
+
+            SerializableMember member = new SerializableMember(info, value);
+
+            if(!member.IsJSONEmpty())
+                _members.Add(member);
         }
         public override void OnDeserialize(Component target)
         {
