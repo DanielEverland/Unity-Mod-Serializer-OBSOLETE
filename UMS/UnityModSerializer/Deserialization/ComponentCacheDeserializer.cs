@@ -15,7 +15,7 @@ namespace UMS.Deserialization
         private ComponentCacheDeserializer() { }
         public ComponentCacheDeserializer(SerializableGameObject serialized, GameObject targetObject)
         {
-            _components = new List<SerializableComponent>();
+            _components = new List<ISerializableComponentBase>();
             _targetObject = targetObject;
             _serializedGameObject = serialized;
             
@@ -26,7 +26,7 @@ namespace UMS.Deserialization
 
                 _targetComponentCount++;
 
-                Deserializer.GetSerializedObject<SerializableComponent>(reference.ID, serializableComponent =>
+                Deserializer.GetSerializedObject<ISerializableComponentBase>(reference.ID, serializableComponent =>
                 {
                     ReceiveComponent(serializableComponent);
                 });
@@ -35,7 +35,7 @@ namespace UMS.Deserialization
             _finishedInitializing = true;
         }
 
-        private static Func<SerializableComponent, int> orderByDependencies = comp =>
+        private static Func<ISerializableComponentBase, int> orderByDependencies = comp =>
         {
             return comp.ComponentType.GetCustomAttributes(true).Where(x => x is RequireComponent).Count();
         };
@@ -43,11 +43,11 @@ namespace UMS.Deserialization
         private readonly GameObject _targetObject;
         private readonly SerializableGameObject _serializedGameObject;
         
-        private List<SerializableComponent> _components;
+        private List<ISerializableComponentBase> _components;
         private bool _finishedInitializing;
         private int _targetComponentCount;
 
-        private void ReceiveComponent(SerializableComponent component)
+        private void ReceiveComponent(ISerializableComponentBase component)
         {
             _components.Add(component);
 
@@ -59,7 +59,7 @@ namespace UMS.Deserialization
             if (_components.Count != _targetComponentCount || !_finishedInitializing)
                 throw new ArgumentException();
 
-            foreach (SerializableComponent serializableComponent in _components.OrderBy(x => orderByDependencies(x)))
+            foreach (ISerializableComponentBase serializableComponent in _components.OrderBy(x => orderByDependencies(x)))
             {
                 Component component = _serializedGameObject.GetComponent(serializableComponent.ComponentType, _targetObject);
                 serializableComponent.Deserialize(component);

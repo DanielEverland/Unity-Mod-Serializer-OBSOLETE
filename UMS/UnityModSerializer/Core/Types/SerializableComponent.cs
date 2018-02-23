@@ -3,36 +3,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UMS.Deserialization;
 using UMS.Serialization;
 using UnityEngine;
 
 namespace UMS.Core.Types
 {
-    public class SerializableComponent : SerializableObject<Component, SerializableComponent>, IDeserializer<Component>
+    public class SerializableComponent : SerializableComponentBase<Component, SerializableComponent>
     {
         public SerializableComponent() { }
         public SerializableComponent(Component obj) : base(obj)
         {
-            _type = obj.GetType();
-            _fileName = string.Format("{0} - {1}", obj.gameObject.name, obj.GetType().Name);
             _members = new List<SerializableMember>();
 
             AddMembers(obj);
         }
-
-        public override string Extension { get { return "component"; } }
-        public override string FileName { get { return _fileName; } }
-
-        public Type ComponentType { get { return _type; } }
+        
         public IList<SerializableMember> Members { get { return _members; } }
-
-        [JsonProperty]
-        private Type _type;
+        
         [JsonProperty]
         private List<SerializableMember> _members;
-
-        [JsonIgnore]
-        private string _fileName;
 
         private void AddMembers(Component comp)
         {
@@ -131,12 +121,12 @@ namespace UMS.Core.Types
                  
             _members.Add(new SerializableMember(info, value));
         }
-        public void Deserialize(Component target)
+        public override void OnDeserialize(Component target)
         {
             if (target == null)
                 throw new System.NullReferenceException("Given component is null!");
             
-            base.Deserialize(target);
+            Deserialize(target as UnityEngine.Object);
 
             foreach (SerializableMember member in _members)
             {

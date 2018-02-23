@@ -76,6 +76,8 @@
     <Compile Include="Core\Mod.cs" />
     <Compile Include="Core\ObjectManager.cs" />
     <Compile Include="Core\Priority.cs" />
+    <Compile Include="Core\RectTransformConverter.cs" />
+    <Compile Include="Core\Types\SerializableComponentBase.cs" />
     <Compile Include="Core\Types\SerializableFont.cs" />
     <Compile Include="Core\Types\SerializableMember.cs" />
     <Compile Include="Core\Types\Reference.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="Core\Types\SerializableMesh.cs" />
     <Compile Include="Core\Types\SerializableObject.cs" />
     <Compile Include="Core\Types\SerializableRect.cs" />
+    <Compile Include="Core\Types\SerializableRectTransform.cs" />
     <Compile Include="Core\Types\SerializableShader.cs" />
     <Compile Include="Core\Types\SerializableSprite.cs" />
     <Compile Include="Core\Types\SerializableTemporaryUnityObject.cs" />

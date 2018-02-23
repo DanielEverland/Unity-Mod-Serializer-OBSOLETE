@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using UMS.Serialization;
 
 namespace UMS.Core
 {
@@ -58,10 +59,21 @@ namespace UMS.Core
         {
             return !member.GetCustomAttributes(false).Any(x => x.GetType() == typeof(ObsoleteAttribute));
         }
-        public static T GetMostInherited<T>(IEnumerable<T> source)
+        public static IModSerializer GetMostInherited(IEnumerable<IModSerializer> source)
         {
             int max = source.Max(x => GetInheritanceCount(x.GetType()));
-            return source.First(x => GetInheritanceCount(x.GetType()) == max);
+            IEnumerable<IModSerializer> mostInherited = source.Where(x => GetInheritanceCount(x.GetType()) == max);
+            
+            if(mostInherited.Count() > 1)
+            {
+                int nonSerializedTypeInheritance = mostInherited.Max(x => GetInheritanceCount(x.NonSerializableType));
+
+                return mostInherited.First(x => GetInheritanceCount(x.NonSerializableType) == nonSerializedTypeInheritance);
+            }
+            else
+            {
+                return mostInherited.ElementAt(0);
+            }
         }
         public static Type GetMostInherited(IEnumerable<Type> source)
         {

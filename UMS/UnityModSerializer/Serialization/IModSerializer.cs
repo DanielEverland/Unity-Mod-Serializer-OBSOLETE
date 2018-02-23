@@ -11,7 +11,7 @@ namespace UMS.Serialization
         Type SerializedType { get; }
     }
     public interface ICustomSerializer { }
-    public interface ICustomDeserializer { }
+   
     public interface IModSerializer<TObject, TSerializable> : IModSerializer
     {
         TSerializable Serialize(TObject obj);
@@ -21,6 +21,14 @@ namespace UMS.Serialization
     {
         TSerializable Serialize(TObject obj);
     }
+    public interface ISerializer<TObject> : ICustomSerializer
+    {
+        void Serialize(TObject obj);
+    }
+}
+namespace UMS.Deserialization
+{
+    public interface ICustomDeserializer { }
     public interface IDeserializer<TObject, TSerializable> : ICustomDeserializer
     {
         TObject Deserialize(TSerializable serializable);
@@ -28,9 +36,5 @@ namespace UMS.Serialization
     public interface IDeserializer<TSerializable> : ICustomDeserializer
     {
         void Deserialize(TSerializable serializable);
-    }
-    public interface ISerializer<TObject> : ICustomSerializer
-    {
-        void Serialize(TObject obj);
     }
 }

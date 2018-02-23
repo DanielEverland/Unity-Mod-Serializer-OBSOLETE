@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UMS.Deserialization;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace UMS.Core.Types
 {
@@ -80,9 +81,19 @@ namespace UMS.Core.Types
         }
         public Component GetComponent(Type type, GameObject obj)
         {
-            if (typeof(Transform).IsAssignableFrom(type))
+            if (type == typeof(Transform))
             {
                 return obj.GetComponent<Transform>();
+            }
+            else if(type == typeof(RectTransform))
+            {
+                if(obj.GetComponent<RectTransform>() == null)
+                {
+                    Component comp = obj.AddComponent<RectTransformConverter>();
+                    GameObject.DestroyImmediate(comp);
+                }
+
+                return obj.GetComponent<RectTransform>();
             }
             else
             {
