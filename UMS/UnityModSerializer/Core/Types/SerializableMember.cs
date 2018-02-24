@@ -109,6 +109,18 @@ namespace UMS.Core.Types
 
             if (ValueIsReference(member, target))
                 return;
+            
+            if (Value is IModSerializer serializer)
+            {
+                CustomSerializers.DeserializeObject(serializer, x =>
+                {
+                    Value = x;
+
+                    Deserialize(target);
+                });
+
+                return;
+            }
 
             try
             {
