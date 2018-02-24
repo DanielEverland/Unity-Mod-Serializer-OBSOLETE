@@ -17,31 +17,37 @@ namespace UMS.Core
         public const string MENU_SERIALIZATION = "Serialization";
 
         private static Regex EndNumberParanthesis = new Regex(@"\(\d+\)$");
-
-        private static readonly HashSet<TextureFormat> _supportedWritableFormats = new HashSet<TextureFormat>()
-        {
-            TextureFormat.RGBA32,
-            TextureFormat.ARGB32,
-            TextureFormat.RGB24,
-            TextureFormat.RGBAFloat,
-            TextureFormat.RGBAHalf,
-        };
         
-        public static bool IsReadable(Texture2D texture)
+        public static byte[] EncodeToPNG(Texture2D texture)
         {
-            if (!_supportedWritableFormats.Contains(texture.format))
-                return false;
+            // Create a temporary RenderTexture of the same size as the texture
+            RenderTexture temporaryTexture = RenderTexture.GetTemporary(
+                                texture.width,
+                                texture.height,
+                                0,
+                                RenderTextureFormat.Default,
+                                RenderTextureReadWrite.Linear);
+            
+            Graphics.Blit(texture, temporaryTexture);
 
-            try
-            {
-                texture.ReadPixels(new Rect(0, 0, 1, 1), 0, 0);
+            // Backup the currently set RenderTexture
+            RenderTexture previous = RenderTexture.active;
 
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            
+            RenderTexture.active = temporaryTexture;
+            
+            Texture2D toReturn = new Texture2D(texture.width, texture.height);
+            
+            toReturn.ReadPixels(new Rect(0, 0, temporaryTexture.width, temporaryTexture.height), 0, 0);
+            toReturn.Apply();
+
+
+            // Reset the active RenderTexture
+            RenderTexture.active = previous;
+            // Release the temporary RenderTexture
+            RenderTexture.ReleaseTemporary(temporaryTexture);
+
+            return toReturn.EncodeToPNG();
         }
         public static string ToString(byte[] array)
         {

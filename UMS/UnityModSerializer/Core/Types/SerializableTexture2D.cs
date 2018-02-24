@@ -15,29 +15,21 @@ namespace UMS.Core.Types
         /// Creates a serializable texture
         /// </summary>
         /// <param name="texture">Source</param>
-        /// <param name="createTextureInstance">Determines whether we use raw data or an instance of the image file</param>
-        public SerializableTexture2D(Texture2D texture, bool createTextureInstance = true) : base(texture)
+        public SerializableTexture2D(Texture2D texture) : base(texture)
         {
-            if (createTextureInstance && Utility.IsReadable(texture))
-            {
-                _imageFilePath = "Textures/" + texture.name + ".png";
+            _imageFilePath = "Textures/" + texture.name + ".png";
 
-                byte[] textureData = texture.EncodeToPNG();
+            byte[] textureData = Utility.EncodeToPNG(texture);
 
-                _imageFilePath = StaticObjects.AddObject(_imageFilePath, textureData);
-            }
-            else
-            {
-                _rawData = texture.GetRawTextureData();
-            }
-            
+            _imageFilePath = StaticObjects.AddObject(_imageFilePath, textureData);
+
+
+
             _alphaIsTransparency = texture.alphaIsTransparency;
             _format = (int)texture.format;
             _mipMapCount = texture.mipmapCount;
         }
         
-        [JsonProperty]
-        private byte[] _rawData;
         [JsonProperty]
         private bool _alphaIsTransparency;
         [JsonProperty]
@@ -64,17 +56,9 @@ namespace UMS.Core.Types
 
             texture.alphaIsTransparency = serializable._alphaIsTransparency;
 
-            if(serializable._imageFilePath != null)
-            {
-                byte[] data = StaticObjects.GetObject(serializable._imageFilePath);
+            byte[] data = StaticObjects.GetObject(serializable._imageFilePath);
 
-                texture.LoadImage(data, false);
-            }
-            else
-            {
-                texture.LoadRawTextureData(serializable._rawData);
-            }            
-
+            texture.LoadImage(data, false);
             texture.Apply();
 
             return texture;
