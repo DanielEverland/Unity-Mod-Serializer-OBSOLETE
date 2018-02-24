@@ -8,13 +8,14 @@ namespace UMS.Core.Types
                                                                                             IModEntry where TNonSerializable : UnityEngine.Object
     {
         public SerializableObject() { }
-        public SerializableObject(UnityEngine.Object obj) : base((TNonSerializable)obj)
+        public SerializableObject(UnityEngine.Object obj)
         {
             if (obj == null)
                 throw new NullReferenceException("Object cannot be null");
 
             _name = obj.name;
             _hideFlags = obj.hideFlags;
+            _id = ObjectManager.Add(obj);
         }
 
         public abstract string Extension { get; }
@@ -23,12 +24,15 @@ namespace UMS.Core.Types
 
         public string Name { get { return _name; } }
         public HideFlags HideFlags { get { return _hideFlags; } }
-
+        public int ID { get { return _id; } protected set { _id = value; } }
+                        
         [JsonProperty]
         private string _name;
         [JsonProperty]
         private HideFlags _hideFlags;
-        
+        [JsonProperty]
+        private int _id;
+
         protected void Deserialize(UnityEngine.Object obj)
         {
             obj.name = Name;

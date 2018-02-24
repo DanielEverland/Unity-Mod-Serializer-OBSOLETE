@@ -24,7 +24,7 @@ namespace UMS.Serialization
         }
         private static void Analyze(Type type)
         {
-            if (typeof(IModEntry).IsAssignableFrom(type) && typeof(IModSerializer).IsAssignableFrom(type) && !type.IsAbstract)
+            if (typeof(IModSerializer).IsAssignableFrom(type) && !type.IsAbstract)
             {
                 IModSerializer serializer = Activator.CreateInstance(type) as IModSerializer;
 

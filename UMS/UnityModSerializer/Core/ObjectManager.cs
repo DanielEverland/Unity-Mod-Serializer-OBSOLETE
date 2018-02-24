@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UMS.Serialization;
+using UMS.Core.Types;
 
 namespace UMS.Core
 {
@@ -19,8 +20,8 @@ namespace UMS.Core
             if (obj == null)
                 throw new NullReferenceException("Object cannot be null");
 
-            if (obj is IModSerializer serialized)
-                return serialized.ID;
+            if (obj is Reference reference)
+                return reference.ID;
 
             int id = Utility.GetID(obj);
 

@@ -84,7 +84,14 @@ namespace UMS.Core.Types
 
             if (CustomSerializers.CanSerialize(obj.GetType()))
             {
-                return Reference.Create(obj);
+                if(obj is UnityEngine.Object)
+                {
+                    return Reference.Create(obj);
+                }
+                else
+                {
+                    return CustomSerializers.SerializeObject(obj);
+                }                
             }
 
             return obj;

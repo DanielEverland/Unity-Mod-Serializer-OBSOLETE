@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace UMS.Core.Types
 {
@@ -15,6 +16,11 @@ namespace UMS.Core.Types
 
             ID = ObjectManager.Add(obj);
         }
+
+        public int ID { get { return _id; } private set { _id = value; } }
+
+        [JsonProperty]
+        private int _id;
 
         public override Reference Serialize(object obj)
         {
