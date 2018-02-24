@@ -13,8 +13,6 @@ namespace UMS.Core.Types
         public SerializableColorBlock() { }
         public SerializableColorBlock(ColorBlock obj)
         {
-            Debug.Log(obj);
-
             _normalColor = obj.normalColor;
             _highlightedColor = obj.highlightedColor;
             _pressedColor = obj.pressedColor;
