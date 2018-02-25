@@ -130,7 +130,7 @@ namespace UMS.Core.Types
                 throw new System.NullReferenceException("Given component is null!");
             
             Deserialize(target as UnityEngine.Object);
-
+            
             foreach (SerializableMember member in _members)
             {
                 member.Deserialize(target);

@@ -46,6 +46,13 @@ namespace UMS.Deserialization
 
             CoreManager.Initialize();
         }
+        /// <summary>
+        /// Used for objects that deserialize using ICustomDeserializer
+        /// </summary>
+        public static void AssignDeserializedObject(int ID, object obj)
+        {
+            _objectReferences[ID].AssignDeserializedObject(obj);
+        }
         private static void BehaviourLoaded(BehaviourBase behaviour, MemberInfo info)
         {
             if (behaviour is CustomConstructor constructor && info is MethodInfo method)
@@ -126,7 +133,7 @@ namespace UMS.Deserialization
             {
                 throw new NullReferenceException("ID " + id + " wasn't recognized by the config file");
             }
-
+            
             if (_objectReferences[id].DeserializedObject == null)
             {
                 Subscribe(id, new ActionInstance(action, type), _deserializedObjectQueue);
@@ -165,7 +172,7 @@ namespace UMS.Deserialization
             foreach (KeyValuePair<int, ObjectEntry> keyValuePair in _objectReferences)
             {
                 keyValuePair.Value.Deserialize();
-
+                
                 ExecuteID(keyValuePair.Key);
             }
         }
@@ -206,7 +213,7 @@ namespace UMS.Deserialization
                     Serialization.CustomSerializers.DeserializeObject(SerializedObject, AssignDeserializedObject);
                 }
             }
-            private void AssignDeserializedObject(object obj)
+            public void AssignDeserializedObject(object obj)
             {
                 DeserializedObject = obj;
 

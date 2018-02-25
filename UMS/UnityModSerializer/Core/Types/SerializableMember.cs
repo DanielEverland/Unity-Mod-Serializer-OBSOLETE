@@ -103,10 +103,10 @@ namespace UMS.Core.Types
 
             Type declaredType = target.GetType();
             MemberInfo member = Utility.GetMember(declaredType, _memberName);
-
+            
             if (member == null || Value == null)
                 return;
-
+            
             if (ValueIsReference(member, target))
                 return;
             
@@ -121,7 +121,7 @@ namespace UMS.Core.Types
 
                 return;
             }
-
+            
             try
             {
                 if (member is PropertyInfo property)

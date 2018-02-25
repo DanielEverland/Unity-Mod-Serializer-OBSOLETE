@@ -36,6 +36,8 @@ namespace UMS.Core.Types
         public void Deserialize(Component component)
         {
             OnDeserialize((TNonSerializable)component);
+
+            Deserializer.AssignDeserializedObject(ID, component);
         }
         public abstract void OnDeserialize(TNonSerializable component);
     }
