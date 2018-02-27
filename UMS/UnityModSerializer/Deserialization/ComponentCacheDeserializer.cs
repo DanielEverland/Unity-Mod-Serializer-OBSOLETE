@@ -59,7 +59,7 @@ namespace UMS.Deserialization
         private void ExecuteDeserialization()
         {
             if (_components.Count != _targetComponentCount || !_finishedInitializing)
-                throw new ArgumentException();
+                return;
 
             foreach (ISerializableComponentBase serializableComponent in _components.OrderBy(x => orderByDependencies(x)))
             {
