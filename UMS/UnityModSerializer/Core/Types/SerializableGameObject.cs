@@ -19,6 +19,7 @@ namespace UMS.Core.Types
             _tag = obj.tag;
             _folderName = Utility.GetGameObjectFolderName(obj);
             _fileName = string.Format(@"""{0}""", obj.name);
+            _isRectTransform = obj.GetComponent<RectTransform>() != null;
 
             _components = new List<Reference>();
             foreach (Component comp in obj.GetComponents<Component>())
@@ -59,6 +60,8 @@ namespace UMS.Core.Types
         private List<Reference> _components;
         [JsonProperty]
         private List<Reference> _children;
+        [JsonProperty]
+        private bool _isRectTransform;
 
         [JsonIgnore]
         private string _folderName;
@@ -68,6 +71,9 @@ namespace UMS.Core.Types
         public override GameObject Deserialize(SerializableGameObject serialized)
         {
             GameObject gameObject = new GameObject(serialized.Name);
+
+            if (serialized._isRectTransform)
+                ConvertToRectTransform(gameObject);
 
             serialized.Deserialize(gameObject);
 
@@ -96,12 +102,6 @@ namespace UMS.Core.Types
             }
             else if(type == typeof(RectTransform))
             {
-                if(obj.GetComponent<RectTransform>() == null)
-                {
-                    Component comp = obj.AddComponent<RectTransformConverter>();
-                    GameObject.DestroyImmediate(comp);
-                }
-
                 return obj.GetComponent<RectTransform>();
             }
             else
@@ -112,6 +112,14 @@ namespace UMS.Core.Types
         public override SerializableGameObject Serialize(GameObject obj)
         {
             return new SerializableGameObject(obj);
+        }
+        private static void ConvertToRectTransform(GameObject obj)
+        {
+            if(obj.GetComponent<RectTransform>() == null)
+            {
+                Component comp = obj.AddComponent<RectTransformConverter>();
+                UnityEngine.Object.DestroyImmediate(comp);
+            }
         }
     }
 }
