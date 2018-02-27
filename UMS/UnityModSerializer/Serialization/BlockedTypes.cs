@@ -29,9 +29,6 @@ namespace UMS.Serialization
             "Graphic.canvas",
             "Graphic.material",
             "Image.material",
-            "ScrollRect.normalizedPosition",
-            "ScrollRect.horizontalNormalizedPosition",
-            "ScrollRect.verticalNormalizedPosition",
         };
         #endregion Definitions
 

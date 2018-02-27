@@ -29,8 +29,50 @@ namespace UMS.Deserialization
             Initialize();
             ExecuteDeserialization();
 
+            CheckForCachedActions();
             CoreManager.FinishedSerialization();
             Debug.Log("Finished deserializing");
+        }
+        private static void CheckForCachedActions()
+        {
+            foreach (KeyValuePair<int, List<ActionInstance>> queueObject in _deserializedObjectQueue.Union(_serializedObjectQueue))
+            {
+                if (_objectReferences.ContainsKey(queueObject.Key))
+                {
+                    ObjectEntry entry = _objectReferences[queueObject.Key];
+
+                    if (_serializedObjectQueue.ContainsKey(queueObject.Key))
+                    {
+                        if(entry.SerializedObject != null)
+                        {
+                            Debugging.Info("Executing serialized object queue for object " + entry.ID);
+
+                            ExecuteActions(_serializedObjectQueue[entry.ID], entry.SerializedObject);
+                        }
+                        else
+                        {
+                            Debugging.Warning("Serialized object for " + entry.ID + " has not been added");
+                        }
+                    }
+                    if (_deserializedObjectQueue.ContainsKey(queueObject.Key))
+                    {
+                        if (entry.DeserializedObject != null)
+                        {
+                            Debugging.Info("Executing deserialized object queue for object " + entry.ID);
+
+                            ExecuteActions(_deserializedObjectQueue[entry.ID], entry.DeserializedObject);
+                        }
+                        else
+                        {
+                            Debugging.Warning("Deserialized object for " + entry.ID + " has not been added");
+                        }
+                    }
+                }
+                else
+                {
+                    Debugging.Warning("ID " + queueObject.Key + " has not been deserialized. Objects waiting for execution: " + queueObject.Value);
+                }
+            }
         }
         public static IList<JsonConverter> GetConverters()
         {
@@ -71,10 +113,18 @@ namespace UMS.Deserialization
             ObjectEntry entry = _objectReferences[id];
 
             if (_serializedObjectQueue.ContainsKey(id))
+            {
                 ExecuteActions(_serializedObjectQueue[id], entry.SerializedObject);
 
+                _serializedObjectQueue.Remove(id);
+            }
+
             if (_deserializedObjectQueue.ContainsKey(id) && entry.DeserializedObject != null)
+            {
                 ExecuteActions(_deserializedObjectQueue[id], entry.DeserializedObject);
+
+                _deserializedObjectQueue.Remove(id);
+            }
         }
         private static void ExecuteActions(IList<ActionInstance> actions, object obj)
         {

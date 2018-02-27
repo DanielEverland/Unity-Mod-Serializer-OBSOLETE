@@ -46,7 +46,7 @@ namespace UMS.Serialization
             _serializeSettings.NullValueHandling = NullValueHandling.Ignore;
             _serializeSettings.TypeNameHandling = TypeNameHandling.All;
             _serializeSettings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
-            _serializeSettings.TraceWriter = new Debugging.EG_TraceLogger();
+            _serializeSettings.TraceWriter = new Debugging.EG_TraceLogger(true);
             _serializeSettings.ContractResolver = new OnlyFieldsContractResolver();
         }
         ///------------------------------DESERIALIZE SETTINGS------------------------------
@@ -57,7 +57,7 @@ namespace UMS.Serialization
             _deserializeSettings.NullValueHandling = NullValueHandling.Ignore;
             _deserializeSettings.TypeNameHandling = TypeNameHandling.All;
             _deserializeSettings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
-            _deserializeSettings.TraceWriter = new Debugging.EG_TraceLogger();
+            _deserializeSettings.TraceWriter = new Debugging.EG_TraceLogger(true);
             _deserializeSettings.ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor;
             _deserializeSettings.Converters = GetDeserializationConverters();
         }

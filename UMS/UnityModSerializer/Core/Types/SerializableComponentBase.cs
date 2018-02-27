@@ -35,6 +35,8 @@ namespace UMS.Core.Types
 
         public void Deserialize(Component component)
         {
+            Deserialize(component as UnityEngine.Object);
+
             OnDeserialize((TNonSerializable)component);
 
             Deserializer.AssignDeserializedObject(ID, component);
@@ -44,5 +46,6 @@ namespace UMS.Core.Types
     public interface ISerializableComponentBase : IDeserializer<Component>
     {
         Type ComponentType { get; }    
+        int ID { get; }
     }
 }

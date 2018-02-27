@@ -67,6 +67,7 @@
     <Compile Include="Behaviour\TypeValidityComparer.cs" />
     <Compile Include="Core\AssemblyManager.cs" />
     <Compile Include="Core\CloneManager.cs" />
+    <Compile Include="Core\ComponentMemberCollection.cs" />
     <Compile Include="Core\Config.cs" />
     <Compile Include="Core\CoreManager.cs" />
     <Compile Include="Core\Debugging.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="Core\Types\SerializableObject.cs" />
     <Compile Include="Core\Types\SerializableRect.cs" />
     <Compile Include="Core\Types\SerializableRectTransform.cs" />
+    <Compile Include="Core\Types\SerializableScrollRect.cs" />
     <Compile Include="Core\Types\SerializableShader.cs" />
     <Compile Include="Core\Types\SerializableSprite.cs" />
     <Compile Include="Core\Types\SerializableTemporaryUnityObject.cs" />

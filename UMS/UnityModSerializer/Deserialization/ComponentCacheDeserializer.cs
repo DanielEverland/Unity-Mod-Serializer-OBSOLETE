@@ -33,6 +33,8 @@ namespace UMS.Deserialization
             }
 
             _finishedInitializing = true;
+
+            ExecuteDeserialization();
         }
 
         private static Func<ISerializableComponentBase, int> orderByDependencies = comp =>
@@ -63,7 +65,11 @@ namespace UMS.Deserialization
             {
                 Component component = _serializedGameObject.GetComponent(serializableComponent.ComponentType, _targetObject);
                 serializableComponent.Deserialize(component);
+
+                Deserializer.AssignDeserializedObject(serializableComponent.ID, component);
             }
+
+            _components.Clear();
         }
     }
 }
