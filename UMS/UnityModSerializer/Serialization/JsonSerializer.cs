@@ -190,6 +190,24 @@ namespace UMS.Serialization
     }
     public class OnlyFieldsContractResolver : DefaultContractResolver
     {
+        /// <summary>
+        /// Defines attributes that allow private fields to be serialized
+        /// </summary>
+        private static HashSet<Type> PrivateFieldOverrideAttributes = new HashSet<Type>()
+        {
+            typeof(UnityEngine.SerializeField),
+            typeof(JsonPropertyAttribute),
+        };
+
+        /// <summary>
+        /// Defines attributes that forces a field not to be serialized
+        /// </summary>
+        private static HashSet<Type> FieldSerializationBlockerAttributes = new HashSet<Type>()
+        {
+            typeof(JsonIgnoreAttribute),
+            typeof(NonSerializedAttribute)
+        };
+
         protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
         {
             List<JsonProperty> properties = new List<JsonProperty>();
@@ -197,13 +215,43 @@ namespace UMS.Serialization
 
             while (toCheck != null && toCheck != typeof(object))
             {
-                properties.AddRange(toCheck.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
-                .Select(x => base.CreateProperty(x, memberSerialization)));
+                properties.AddRange(GetFields(toCheck).Select(x => base.CreateProperty(x, memberSerialization)));
 
                 toCheck = toCheck.BaseType;
             }
 
+            properties.ForEach(x =>
+            {
+                x.Writable = true;
+                x.Readable = true;
+            });
+
             return properties;
+        }
+        protected static IEnumerable<FieldInfo> GetFields(Type type)
+        {
+            return type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly).Where(x => IsSerializable(x));
+        }
+        protected static bool IsSerializable(FieldInfo field)
+        {
+            if (IsBlocked(field))
+                return false;
+
+            if (!field.IsPublic)
+            {
+                if (!ContainsPrivateSerializerField(field))
+                    return false;
+            }
+
+            return true;
+        }
+        protected static bool ContainsPrivateSerializerField(FieldInfo field)
+        {
+            return field.GetCustomAttributes(false).Any(x => PrivateFieldOverrideAttributes.Contains(x.GetType()));
+        }
+        protected static bool IsBlocked(FieldInfo field)
+        {
+            return field.GetCustomAttributes(false).Any(x => FieldSerializationBlockerAttributes.Contains(x.GetType()));
         }
     }
 }
