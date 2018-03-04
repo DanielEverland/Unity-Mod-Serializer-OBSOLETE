@@ -1,6 +1,7 @@
 ﻿using UMS.Core.Types;
 using UMS.Behaviour;
 using UMS.Serialization;
+using UMS.Deserialization;
 using Newtonsoft.Json;
 
 namespace UMS.Core
@@ -19,11 +20,7 @@ namespace UMS.Core
 
         public static void Initialize()
         {
-            ReferenceHandler.OnCreateReference = x =>
-            {
-                return Reference.Create(x);
-            };
-
+            HookUpJSONReferenceHandler();
             OnSerializationStarted?.Invoke();
 
             AssemblyManager.Initialize();
@@ -39,6 +36,30 @@ namespace UMS.Core
         public static void FinishedSerialization()
         {
             OnSerializationCompleted?.Invoke();
+        }
+        private static void HookUpJSONReferenceHandler()
+        {
+            ReferenceHandler.OnCreateReference = x =>
+            {
+                return Reference.Create(x);
+            };
+
+            ReferenceHandler.IsTypeReference = x =>
+            {
+                return x == typeof(Reference);
+            };
+
+            ReferenceHandler.AssignObjectValue = (value, type, callback) =>
+            {
+                Reference reference = (Reference)value;
+
+                Deserializer.GetDeserializedObject(reference.ID, type, x =>
+                {
+                    UnityEngine.Debug.Log(x.GetType());
+
+                    callback(x);
+                });
+            };
         }
     }
 }
