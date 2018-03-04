@@ -123,7 +123,11 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /y "$(TargetDir)/$(TargetName).dll" "D:\SerializerTest\Assets\Plugins\Mod Serializer/$(TargetName).dll"
+copy /y "$(TargetDir)/$(TargetName).pdb" "D:\SerializerTest\Assets\Plugins\Mod Serializer/$(TargetName).pdb"
+
 copy /y "$(TargetDir)/Newtonsoft.Json.dll" "D:\SerializerTest\Assets\Plugins\Mod Serializer/Newtonsoft.Json.dll"
+copy /y "$(TargetDir)/Newtonsoft.Json.pdb" "D:\SerializerTest\Assets\Plugins\Mod Serializer/Newtonsoft.Json.pdb"
+
 copy /y "$(TargetDir)/DotNetZip.dll" "D:\SerializerTest\Assets\Plugins\Mod Serializer/DotNetZip.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>
