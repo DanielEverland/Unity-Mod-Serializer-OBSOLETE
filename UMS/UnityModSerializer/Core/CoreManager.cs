@@ -1,5 +1,7 @@
-﻿using UMS.Behaviour;
+﻿using UMS.Core.Types;
+using UMS.Behaviour;
 using UMS.Serialization;
+using Newtonsoft.Json;
 
 namespace UMS.Core
 {
@@ -17,6 +19,11 @@ namespace UMS.Core
 
         public static void Initialize()
         {
+            ReferenceHandler.OnCreateReference = x =>
+            {
+                return Reference.Create(x);
+            };
+
             OnSerializationStarted?.Invoke();
 
             AssemblyManager.Initialize();
