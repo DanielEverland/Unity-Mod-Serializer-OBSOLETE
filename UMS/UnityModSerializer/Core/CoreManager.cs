@@ -55,8 +55,6 @@ namespace UMS.Core
 
                 Deserializer.GetDeserializedObject(reference.ID, type, x =>
                 {
-                    UnityEngine.Debug.Log(x.GetType());
-
                     callback(x);
                 });
             };
