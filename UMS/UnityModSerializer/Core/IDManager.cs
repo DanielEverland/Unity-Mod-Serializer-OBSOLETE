@@ -232,7 +232,7 @@ namespace UMS.Core
                 }
             }
 
-            private Dictionary<Type, CustomIDGenerator> _generators;
+            private Dictionary<Type, CustomIDGeneratorAttribute> _generators;
 
             public bool ContainsGenerator(Type type)
             {
@@ -246,9 +246,9 @@ namespace UMS.Core
             {
                 BehaviourManager.OnFinishedInitializing -= GetGenerators;
 
-                _generators = new Dictionary<Type, CustomIDGenerator>();
+                _generators = new Dictionary<Type, CustomIDGeneratorAttribute>();
 
-                foreach (CustomIDGenerator generator in BehaviourManager.GetBehaviours<CustomIDGenerator>())
+                foreach (CustomIDGeneratorAttribute generator in BehaviourManager.GetBehaviours<CustomIDGeneratorAttribute>())
                 {
                     if (_generators.ContainsKey(generator.Type))
                     {
