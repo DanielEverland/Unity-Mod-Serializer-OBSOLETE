@@ -90,7 +90,7 @@ namespace UMS.Core.Types
                 {
                     instance.transform.SetParent(gameObject.transform);
 
-                    HierarchyManager.ExecuteTransform(instance);
+                    HierarchyManager.ExecuteTransform(instance.transform);
                 });
             }
 
