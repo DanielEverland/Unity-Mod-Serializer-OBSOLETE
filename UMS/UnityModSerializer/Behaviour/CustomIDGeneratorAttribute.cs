@@ -31,5 +31,19 @@ namespace UMS.Behaviour
 
             return (int)_method.Invoke(null, new object[1] { obj });
         }
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+
+            unchecked
+            {
+                hash += _type.GetHashCode() * 7;
+                hash += _method.GetHashCode() * 11;
+                hash += typeof(CustomIDGeneratorAttribute).GetHashCode() * 13;
+            }
+
+            return hash;
+        }
     }
 }

@@ -30,5 +30,18 @@ namespace UMS.Behaviour
                 return (IEnumerable<Type>)type.GetValue(null);
             };
         }
+
+        public override int GetHashCode()
+        {
+            int id = 17;
+
+            unchecked
+            {
+                id += TypeFunction.GetHashCode() * 11;
+                id += typeof(TypeBlocker).GetHashCode() * 7;
+            }
+
+            return id;
+        }
     }
 }

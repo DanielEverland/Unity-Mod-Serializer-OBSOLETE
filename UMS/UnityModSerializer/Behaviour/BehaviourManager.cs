@@ -10,15 +10,16 @@ namespace UMS.Behaviour
     {
         public static event Action<BehaviourBase, MemberInfo> OnBehaviourLoadedWithContext;
         public static event Action<BehaviourBase> OnBehaviourLoaded;
+        public static event Action<BehaviourBase> OnBehaviourAdded;
         public static event Action OnFinishedInitializing;
 
         public static bool HasInitialized { get; private set; }
 
-        private static List<BehaviourBase> _loadedBehaviours;
+        private static Dictionary<int, BehaviourBase> _loadedBehaviours;
 
         public static void Initialize()
         {
-            _loadedBehaviours = new List<BehaviourBase>();
+            _loadedBehaviours = new Dictionary<int, BehaviourBase>();
 
             AssemblyManager.OnLoadType += Analyze;
 
@@ -30,7 +31,7 @@ namespace UMS.Behaviour
         }
         public static IEnumerable<BehaviourBase> GetBehaviours<T>() where T : BehaviourBase
         {
-            return _loadedBehaviours.Where(x => (typeof(T).IsAssignableFrom(x.GetType())));
+            return _loadedBehaviours.Values.Where(x => (typeof(T).IsAssignableFrom(x.GetType())));
         }
         private static void Analyze(Type type)
         {
@@ -83,16 +84,6 @@ namespace UMS.Behaviour
 
             AddBehaviour(attribute as BehaviourBase, targetObj);
         }
-        private static void AddBehaviour(BehaviourBase behaviour)
-        {
-            if (behaviour == null)
-                return;
-
-            _loadedBehaviours.Add(behaviour);
-
-            if (OnBehaviourLoaded != null && behaviour != null)
-                OnBehaviourLoaded.Invoke(behaviour);
-        }
         private static void AddBehaviour<T>(BehaviourBase behaviour, T targetObject) where T : MemberInfo
         {
             if (behaviour == null)
@@ -101,24 +92,53 @@ namespace UMS.Behaviour
             AddBehaviour(behaviour);
 
             if (OnBehaviourLoadedWithContext != null && behaviour != null)
-                OnBehaviourLoadedWithContext.Invoke(behaviour, targetObject);
+                OnBehaviourLoadedWithContext(behaviour, targetObject);
         }
-        private static void AddBehaviour<TKey, TValue>(Dictionary<TKey, TValue> dictionary, TKey key, TValue behaviour) where TValue : BehaviourBase
+        private static void AddBehaviour(BehaviourBase behaviour)
+        {
+            if (behaviour == null)
+                return;
+            
+            bool added = AddBehaviour(_loadedBehaviours, behaviour.GetHashCode(), behaviour);
+            
+            if (OnBehaviourLoaded != null && behaviour != null)
+                OnBehaviourLoaded(behaviour);
+
+            if (added && behaviour != null && OnBehaviourAdded != null)
+                OnBehaviourAdded(behaviour);
+        }
+
+        /// <summary>
+        /// Adds a behaviour to a dictionary using a key. If there's any collision it will use the behaviour with the highest priority, or the one that was added first.
+        /// </summary>
+        /// <typeparam name="TKey">The type of key to add</typeparam>
+        /// <typeparam name="TValue">The type of behaviour to add</typeparam>
+        /// <param name="dictionary">The dictionary to add the behaviour to using <paramref name="key"/></param>
+        /// <param name="key">The key to use as an index. Two colliding behaviours must share the same key</param>
+        /// <param name="behaviour">The behaviour to add</param>
+        /// <returns></returns>
+        public static bool AddBehaviour<TKey, TValue>(Dictionary<TKey, TValue> dictionary, TKey key, TValue behaviour) where TValue : BehaviourBase
         {
             if (key == null || behaviour == null)
-                return;
+                return false;
 
             int priority = behaviour.Priority;
 
             if (dictionary.ContainsKey(key))
             {
                 if (dictionary[key].Priority < priority)
+                {
                     dictionary[key] = behaviour;
+                }                    
             }
             else
             {
                 dictionary.Add(key, behaviour);
+
+                return true;
             }
+
+            return false;
         }
     }
 }

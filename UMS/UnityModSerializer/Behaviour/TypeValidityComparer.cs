@@ -57,5 +57,18 @@ namespace UMS.Behaviour
             if (_comparerMethod == null)
                 throw new NullReferenceException("Couldn't find a valid IValidityComparer<" + _type + "> for type " + type);
         }
+        public override int GetHashCode()
+        {
+            int id = 13;
+
+            unchecked
+            {
+                id += _type.GetHashCode() * 11;
+                id += _obj.GetHashCode() * 17;
+                id += typeof(TypeValidityComparer).GetHashCode() * 7;
+            }
+
+            return id;
+        }
     }
 }
