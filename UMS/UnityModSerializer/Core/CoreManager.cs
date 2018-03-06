@@ -20,6 +20,8 @@ namespace UMS.Core
 
         public static void Initialize()
         {
+            HierarchyManager.Initialize();
+
             HookUpJSONReferenceHandler();
             OnSerializationStarted?.Invoke();
 

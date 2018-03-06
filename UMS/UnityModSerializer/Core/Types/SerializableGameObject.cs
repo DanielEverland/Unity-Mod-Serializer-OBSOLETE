@@ -89,6 +89,8 @@ namespace UMS.Core.Types
                 Deserializer.GetDeserializedObject<GameObject>(child.ID, instance =>
                 {
                     instance.transform.SetParent(gameObject.transform);
+
+                    HierarchyManager.ExecuteTransform(instance);
                 });
             }
 

@@ -41,13 +41,16 @@ namespace UMS.Core.Types
 
         public override void OnDeserialize(RectTransform rectTransform)
         {
-            rectTransform.pivot = _pivot;
-            rectTransform.anchorMin = _anchorMin;
-            rectTransform.anchorMax = _anchorMax;
-            rectTransform.anchoredPosition3D = _anchoredPosition3D;
-            rectTransform.offsetMin = _offsetMin;
-            rectTransform.offsetMax = _offsetMax;
-            rectTransform.sizeDelta = _sizeDelta;
+            HierarchyManager.Subscribe(rectTransform, transform =>
+            {
+                transform.pivot = _pivot;
+                transform.anchorMin = _anchorMin;
+                transform.anchorMax = _anchorMax;
+                transform.anchoredPosition3D = _anchoredPosition3D;
+                transform.offsetMin = _offsetMin;
+                transform.offsetMax = _offsetMax;
+                transform.sizeDelta = _sizeDelta;
+            });            
         }
         public override SerializableRectTransform Serialize(RectTransform obj)
         {
