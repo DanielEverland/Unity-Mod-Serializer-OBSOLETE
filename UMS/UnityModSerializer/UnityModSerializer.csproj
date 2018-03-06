@@ -93,6 +93,7 @@
     <Compile Include="Core\Types\SerializableObject.cs" />
     <Compile Include="Core\Types\SerializableRect.cs" />
     <Compile Include="Core\Types\SerializableRectTransform.cs" />
+    <Compile Include="Core\Types\SerializableScriptableObject.cs" />
     <Compile Include="Core\Types\SerializableScrollRect.cs" />
     <Compile Include="Core\Types\SerializableShader.cs" />
     <Compile Include="Core\Types\SerializableSprite.cs" />
