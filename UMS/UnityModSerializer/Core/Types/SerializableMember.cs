@@ -100,11 +100,11 @@ namespace UMS.Core.Types
         {
             if (target == null)
                 throw new NullReferenceException("Given target for " + this + " is null!");
-
+            
             Type declaredType = target.GetType();
             MemberInfo member = Utility.GetMember(declaredType, _memberName);
             
-            if (member == null || Value == null)
+            if (IsNull(member, Value))
                 return;
             
             if (ValueIsReference(member, target))
@@ -138,6 +138,22 @@ namespace UMS.Core.Types
                 Debug.Log("Data dump: " + _memberName + ", " + Value + ", " + target);
                 throw;
             }
+        }
+        private bool IsNull(MemberInfo info, object value)
+        {
+            if(info == null)
+            {
+                Debugging.Warning("MemberInfo is null on " + _memberName);
+                return true;
+            }
+
+            if(value == null)
+            {
+                Debugging.Warning("Value is null on " + _memberName);
+                return true;
+            }
+
+            return false;
         }
         private bool ValueIsReference(MemberInfo member, object target)
         {
