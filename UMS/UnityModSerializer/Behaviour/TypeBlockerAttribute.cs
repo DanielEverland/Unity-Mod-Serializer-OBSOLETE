@@ -5,7 +5,7 @@ using System.Reflection;
 namespace UMS.Behaviour
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
-    public class TypeBlocker : BehaviourBase, IBehaviourLoader<PropertyInfo>, IBehaviourLoader<MethodInfo>, IBehaviourLoader<FieldInfo>
+    public class TypeBlockerAttribute : BehaviourBase, IBehaviourMemberLoader<PropertyInfo>, IBehaviourMemberLoader<MethodInfo>, IBehaviourMemberLoader<FieldInfo>
     {
         public Func<IEnumerable<Type>> TypeFunction;
 
@@ -38,7 +38,7 @@ namespace UMS.Behaviour
             unchecked
             {
                 id += TypeFunction.GetHashCode() * 11;
-                id += typeof(TypeBlocker).GetHashCode() * 7;
+                id += typeof(TypeBlockerAttribute).GetHashCode() * 7;
             }
 
             return id;

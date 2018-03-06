@@ -7,7 +7,7 @@ using System.Text;
 namespace UMS.Behaviour
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public class CustomIDGeneratorAttribute : BehaviourBase, IBehaviourLoader<MethodInfo>
+    public class CustomIDGeneratorAttribute : BehaviourBase, IBehaviourMemberLoader<MethodInfo>
     {
         private CustomIDGeneratorAttribute() { }
         public CustomIDGeneratorAttribute(Type type, int priority = (int)Core.Priority.Medium) : base(priority)

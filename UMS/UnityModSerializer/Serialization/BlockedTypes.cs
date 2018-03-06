@@ -39,7 +39,7 @@ namespace UMS.Serialization
         }
         private static void OnBehaviourLoaded(BehaviourBase behaviour)
         {
-            if (behaviour is TypeBlocker typeBlocker)
+            if (behaviour is TypeBlockerAttribute typeBlocker)
             {
                 foreach (Type type in typeBlocker.TypeFunction())
                 {
@@ -47,7 +47,7 @@ namespace UMS.Serialization
                         _blockedTypes.Add(type);
                 }
             }
-            else if (behaviour is MemberBlocker memberBlocker)
+            else if (behaviour is MemberBlockerAttribute memberBlocker)
             {
                 foreach (string member in memberBlocker.MemberFunction())
                 {

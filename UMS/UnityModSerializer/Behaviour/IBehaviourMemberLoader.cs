@@ -2,11 +2,11 @@
 
 namespace UMS.Behaviour
 {
-    public interface IBehaviourLoader
+    public interface IBehaviourMemberLoader
     {
         void Load();
     }
-    public interface IBehaviourLoader<T> where T : MemberInfo
+    public interface IBehaviourMemberLoader<T> where T : MemberInfo
     {
         void Load(T type);
     }

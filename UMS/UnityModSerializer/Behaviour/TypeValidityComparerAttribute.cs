@@ -10,10 +10,10 @@ namespace UMS.Behaviour
     /// Used to define whether an object can be serialized. Useful for Unity edge cases where a null check doesn't suffice
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
-    public class TypeValidityComparer : BehaviourBase, IBehaviourClassLoader
+    public class TypeValidityComparerAttribute : BehaviourBase, IBehaviourClassLoader
     {
-        private TypeValidityComparer() { }
-        public TypeValidityComparer(Type type, int priority = (int)Core.Priority.Medium) : base(priority)
+        private TypeValidityComparerAttribute() { }
+        public TypeValidityComparerAttribute(Type type, int priority = (int)Core.Priority.Medium) : base(priority)
         {
             _type = type;
         }
@@ -65,7 +65,7 @@ namespace UMS.Behaviour
             {
                 id += _type.GetHashCode() * 11;
                 id += _obj.GetHashCode() * 17;
-                id += typeof(TypeValidityComparer).GetHashCode() * 7;
+                id += typeof(TypeValidityComparerAttribute).GetHashCode() * 7;
             }
 
             return id;

@@ -61,10 +61,10 @@
     <Compile Include="Behaviour\BehaviourManager.cs" />
     <Compile Include="Behaviour\CustomIDGeneratorAttribute.cs" />
     <Compile Include="Behaviour\IBehaviourClassLoader.cs" />
-    <Compile Include="Behaviour\IBehaviourLoader.cs" />
+    <Compile Include="Behaviour\IBehaviourMemberLoader.cs" />
     <Compile Include="Behaviour\IValidityComparer.cs" />
-    <Compile Include="Behaviour\MemberBlocker.cs" />
-    <Compile Include="Behaviour\TypeValidityComparer.cs" />
+    <Compile Include="Behaviour\MemberBlockerAttribute.cs" />
+    <Compile Include="Behaviour\TypeValidityComparerAttribute.cs" />
     <Compile Include="Core\AssemblyManager.cs" />
     <Compile Include="Core\CloneManager.cs" />
     <Compile Include="Core\ComponentMemberCollection.cs" />
@@ -114,7 +114,7 @@
     <Compile Include="Serialization\IModSerializer.cs" />
     <Compile Include="Serialization\JsonSerializer.cs" />
     <Compile Include="Serialization\Serializer.cs" />
-    <Compile Include="Behaviour\TypeBlocker.cs" />
+    <Compile Include="Behaviour\TypeBlockerAttribute.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

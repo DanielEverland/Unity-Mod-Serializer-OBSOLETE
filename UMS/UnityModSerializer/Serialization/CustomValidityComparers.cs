@@ -43,13 +43,13 @@ namespace UMS.Serialization
                 }
             }
 
-            private Dictionary<Type, TypeValidityComparer> _typeValidityComparers;
+            private Dictionary<Type, TypeValidityComparerAttribute> _typeValidityComparers;
 
             private void Load()
             {
-                _typeValidityComparers = new Dictionary<Type, TypeValidityComparer>();
+                _typeValidityComparers = new Dictionary<Type, TypeValidityComparerAttribute>();
 
-                foreach (TypeValidityComparer comparer in BehaviourManager.GetBehaviours<TypeValidityComparer>())
+                foreach (TypeValidityComparerAttribute comparer in BehaviourManager.GetBehaviours<TypeValidityComparerAttribute>())
                 {
                     _typeValidityComparers.Add(comparer.Type, comparer);
                 }

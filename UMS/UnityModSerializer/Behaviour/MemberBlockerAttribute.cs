@@ -5,7 +5,7 @@ using System.Reflection;
 namespace UMS.Behaviour
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field, AllowMultiple = true, Inherited = true)]
-    public class MemberBlocker : BehaviourBase, IBehaviourLoader<PropertyInfo>, IBehaviourLoader<MethodInfo>, IBehaviourLoader<FieldInfo>
+    public class MemberBlockerAttribute : BehaviourBase, IBehaviourMemberLoader<PropertyInfo>, IBehaviourMemberLoader<MethodInfo>, IBehaviourMemberLoader<FieldInfo>
     {
         public Func<IEnumerable<string>> MemberFunction;
 
@@ -38,7 +38,7 @@ namespace UMS.Behaviour
             unchecked
             {
                 id += MemberFunction.GetHashCode() * 11;
-                id += typeof(MemberBlocker).GetHashCode() * 7;
+                id += typeof(MemberBlockerAttribute).GetHashCode() * 7;
             }
 
             return id;

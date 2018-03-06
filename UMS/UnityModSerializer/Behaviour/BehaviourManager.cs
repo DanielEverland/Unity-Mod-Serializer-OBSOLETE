@@ -73,13 +73,13 @@ namespace UMS.Behaviour
             if (!(attribute is BehaviourBase))
                 return;
             
-            if (attribute is IBehaviourLoader<T>)
+            if (attribute is  IBehaviourMemberLoader<T>)
             {
-                (attribute as IBehaviourLoader<T>).Load(targetObj);
+                (attribute as IBehaviourMemberLoader<T>).Load(targetObj);
             }
-            if(attribute is IBehaviourLoader)
+            if(attribute is IBehaviourMemberLoader)
             {
-                (attribute as IBehaviourLoader).Load();
+                (attribute as IBehaviourMemberLoader).Load();
             }
 
             AddBehaviour(attribute as BehaviourBase, targetObj);
@@ -99,7 +99,7 @@ namespace UMS.Behaviour
             if (behaviour == null)
                 return;
             
-            bool added = AddBehaviour(_loadedBehaviours, behaviour.GetHashCode(), behaviour);
+            bool added = AddBehaviour(behaviour.GetHashCode(), behaviour);
             
             if (OnBehaviourLoaded != null && behaviour != null)
                 OnBehaviourLoaded(behaviour);
@@ -108,32 +108,23 @@ namespace UMS.Behaviour
                 OnBehaviourAdded(behaviour);
         }
 
-        /// <summary>
-        /// Adds a behaviour to a dictionary using a key. If there's any collision it will use the behaviour with the highest priority, or the one that was added first.
-        /// </summary>
-        /// <typeparam name="TKey">The type of key to add</typeparam>
-        /// <typeparam name="TValue">The type of behaviour to add</typeparam>
-        /// <param name="dictionary">The dictionary to add the behaviour to using <paramref name="key"/></param>
-        /// <param name="key">The key to use as an index. Two colliding behaviours must share the same key</param>
-        /// <param name="behaviour">The behaviour to add</param>
-        /// <returns></returns>
-        public static bool AddBehaviour<TKey, TValue>(Dictionary<TKey, TValue> dictionary, TKey key, TValue behaviour) where TValue : BehaviourBase
+        public static bool AddBehaviour(int key, BehaviourBase behaviour)
         {
-            if (key == null || behaviour == null)
+            if (behaviour == null)
                 return false;
 
             int priority = behaviour.Priority;
 
-            if (dictionary.ContainsKey(key))
+            if (_loadedBehaviours.ContainsKey(key))
             {
-                if (dictionary[key].Priority < priority)
+                if (_loadedBehaviours[key].Priority < priority)
                 {
-                    dictionary[key] = behaviour;
+                    _loadedBehaviours[key] = behaviour;
                 }                    
             }
             else
             {
-                dictionary.Add(key, behaviour);
+                _loadedBehaviours.Add(key, behaviour);
 
                 return true;
             }
