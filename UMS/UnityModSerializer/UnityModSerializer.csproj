@@ -59,7 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Behaviour\BehaviourManager.cs" />
-    <Compile Include="Behaviour\CustomIDGenerator.cs" />
+    <Compile Include="Behaviour\CustomIDGeneratorAttribute.cs" />
     <Compile Include="Behaviour\IBehaviourClassLoader.cs" />
     <Compile Include="Behaviour\IBehaviourLoader.cs" />
     <Compile Include="Behaviour\IValidityComparer.cs" />
