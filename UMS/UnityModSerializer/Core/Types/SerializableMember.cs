@@ -36,6 +36,9 @@ namespace UMS.Core.Types
         {
             get
             {
+                if (_value == null)
+                    return null;
+
                 return _value.Object;
             }
             set
@@ -257,7 +260,14 @@ namespace UMS.Core.Types
         }
         public override string ToString()
         {
-            return string.Format("{0}: {1} ({2})", _memberName, Value, Value.GetType());
+            if(Value != null)
+            {
+                return string.Format("{0}: {1} ({2})", _memberName, Value, Value.GetType());
+            }
+            else
+            {
+                return string.Format("{0}: {1}", _memberName, Value);
+            }
         }
         private class ArrayDeserializationHandler
         {
