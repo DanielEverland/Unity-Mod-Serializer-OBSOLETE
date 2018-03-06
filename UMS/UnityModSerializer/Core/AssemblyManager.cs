@@ -97,10 +97,16 @@ namespace UMS.Core
             {
                 if (Path.GetExtension(file) == ".dll")
                 {
-                    Assembly assembly = Assembly.LoadFile(file);
+                    try
+                    {
+                        Assembly assembly = Assembly.LoadFile(file);
 
-                    if (!collection.Contains(assembly))
-                        collection.Add(assembly);
+                        if (!collection.Contains(assembly))
+                            collection.Add(assembly);
+                    }
+                    catch
+                    {
+                    }
                 }
             }
 
