@@ -164,9 +164,9 @@ namespace UMS.Core.Types
             {
                 Array array = (Array)Value;
 
-                if(array.Length > 0)
+                if(array.Length > 0 && array != null)
                 {
-                    Type elementType = array.GetValue(0).GetType();
+                    Type elementType = array.GetType().GetElementType();
 
                     if(elementType == typeof(Reference))
                     {
@@ -244,14 +244,20 @@ namespace UMS.Core.Types
             if (parameters.Length != 1)
                 return false;
 
-            Type parameterType = parameters[0].ParameterType;
-
-            if (parameterType.IsEnum)
+            return ParametersMatch(parameters[0].ParameterType);
+        }
+        private bool ParametersMatch(Type type)
+        {
+            if (type.IsArray)
             {
-                if (!Enum.IsDefined(parameterType, Value))
+                return ParametersMatch(type.GetElementType());
+            }
+            else if (type.IsEnum)
+            {
+                if (!Enum.IsDefined(type, Value))
                     return false;
             }
-            else if(!parameters[0].ParameterType.IsAssignableFrom(Value.GetType()))
+            else if (!type.IsAssignableFrom(Value.GetType()))
             {
                 return false;
             }
