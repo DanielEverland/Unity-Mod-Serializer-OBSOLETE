@@ -29,6 +29,7 @@ namespace UMS.Serialization
             "Graphic.canvas",
             "Graphic.material",
             "Image.material",
+            "Canvas.additionalShaderChannels",
         };
         #endregion Definitions
 
