@@ -18,7 +18,6 @@ namespace UMS.Core.Types
             _mainTextureScale = material.mainTextureScale;
             _mainTextureOffset = material.mainTextureOffset;
             _mainTexture = Reference.Create(material.mainTexture);
-            _color = material.color;
             _enableInstancing = material.enableInstancing;
             _doubleSidedGI = material.doubleSidedGI;
         }
@@ -38,8 +37,6 @@ namespace UMS.Core.Types
         [JsonProperty]
         private Reference _mainTexture;
         [JsonProperty]
-        private Color _color;
-        [JsonProperty]
         private bool _enableInstancing;
         [JsonProperty]
         private bool _doubleSidedGI;
@@ -55,7 +52,6 @@ namespace UMS.Core.Types
             material.renderQueue = serializable._renderQueue;
             material.mainTextureScale = serializable._mainTextureScale;
             material.mainTextureOffset = serializable._mainTextureOffset;
-            material.color = serializable._color;
             material.enableInstancing = serializable._enableInstancing;
             material.doubleSidedGI = serializable._doubleSidedGI;
 
