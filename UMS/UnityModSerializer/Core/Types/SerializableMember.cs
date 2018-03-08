@@ -32,18 +32,40 @@ namespace UMS.Core.Types
         }
 
         public string MemberName { get { return _memberName; } }
+
         public object Value
+        {
+            get
+            {
+                return DeserializedValue;
+            }
+        }
+        private object DeserializedValue
         {
             get
             {
                 if (_value == null)
                     return null;
 
-                return _value.Object;
+                return _value.DeserializedObject;
             }
             set
             {
-                _value.Object = value;
+                _value.DeserializedObject = value;
+            }
+        }
+        private object SerializedValue
+        {
+            get
+            {
+                if (_value == null)
+                    return null;
+
+                return _value.SerializedObject;
+            }
+            set
+            {
+                _value.SerializedObject = value;
             }
         }
 
@@ -54,7 +76,7 @@ namespace UMS.Core.Types
 
         public bool IsJSONEmpty()
         {
-            string json = Serialization.JsonSerializer.ToJson(_value.Object);
+            string json = Serialization.JsonSerializer.ToJson(_value.SerializedObject);
 
             string[] lines = json.Split('\n');
 
@@ -67,7 +89,7 @@ namespace UMS.Core.Types
         }
         private void AssignAsSingular(object value)
         {
-            Value = GetSerializableObject(value);
+            SerializedValue = GetSerializableObject(value);
         }
         private void AssignAsArray(object value)
         {
@@ -78,7 +100,7 @@ namespace UMS.Core.Types
                 objects.Add(GetSerializableObject(item));
             }
 
-            Value = objects.ToArray();
+            SerializedValue = objects.ToArray();
         }
         private object GetSerializableObject(object obj)
         {
@@ -107,17 +129,17 @@ namespace UMS.Core.Types
             Type declaredType = target.GetType();
             MemberInfo member = Utility.GetMember(declaredType, _memberName);
             
-            if (IsNull(member, Value))
+            if (IsNull(member, DeserializedValue))
                 return;
             
             if (ValueIsReference(member, target))
                 return;
             
-            if (Value is IModSerializer serializer)
+            if (DeserializedValue is IModSerializer serializer)
             {
                 CustomSerializers.DeserializeObject(serializer, x =>
                 {
-                    Value = x;
+                    DeserializedValue = x;
 
                     Deserialize(target);
                 });
@@ -138,7 +160,7 @@ namespace UMS.Core.Types
             }
             catch (Exception)
             {
-                Debug.Log("Data dump: " + _memberName + ", " + Value + ", " + target);
+                Debug.Log("Data dump: " + _memberName + ", " + DeserializedValue + ", " + target);
                 throw;
             }
         }
@@ -156,14 +178,27 @@ namespace UMS.Core.Types
                 return true;
             }
 
+            if (value.GetType().IsArray)
+            {
+                Array array = value as Array;
+
+                for (int i = 0; i < array.Length; i++)
+                {
+                    if (array.GetValue(i) != null)
+                        return false;
+                }
+                
+                return true;
+            }
+
             return false;
         }
         private bool ValueIsReference(MemberInfo member, object target)
         {
-            if (Value.GetType().IsArray)
+            if (DeserializedValue.GetType().IsArray)
             {
-                Array array = (Array)Value;
-
+                Array array = (Array)DeserializedValue;
+                
                 if(array.Length > 0 && array != null)
                 {
                     Type elementType = array.GetType().GetElementType();
@@ -172,7 +207,7 @@ namespace UMS.Core.Types
                     {
                         ArrayDeserializationHandler.Create(array, obj =>
                         {
-                            Value = obj;
+                            DeserializedValue = obj;
                             Deserialize(target);
                         });
                         
@@ -180,11 +215,11 @@ namespace UMS.Core.Types
                     }
                 }
             }
-            else if(Value is Reference reference)
+            else if(DeserializedValue is Reference reference)
             {
                 Deserializer.GetDeserializedObject(reference.ID, GetType(member), obj =>
                 {
-                    Value = obj;
+                    DeserializedValue = obj;
                     Deserialize(target);
                 });
 
@@ -211,11 +246,11 @@ namespace UMS.Core.Types
         private void AssignAsField(FieldInfo info, object target)
         {
             Type fieldType = info.FieldType;
-            Type valueType = Value.GetType();
+            Type valueType = DeserializedValue.GetType();
 
             if (fieldType.IsEnum)
             {
-                if(!Enum.IsDefined(fieldType, Value))
+                if(!Enum.IsDefined(fieldType, DeserializedValue))
                     throw new ArgumentException("Type mismatch for field " + info + " - " + this);
             }
             else if(!info.FieldType.IsAssignableFrom(valueType))
@@ -223,7 +258,7 @@ namespace UMS.Core.Types
                 throw new ArgumentException("Type mismatch for field " + info + " - " + this);
             }                
 
-            info.SetValue(target, Value);
+            info.SetValue(target, DeserializedValue);
         }
         private void AssignAsProperty(PropertyInfo info, object target)
         {
@@ -231,11 +266,11 @@ namespace UMS.Core.Types
 
             if (setter == null)
                 throw new ArgumentException("No setter for property " + info + " - " + this);
-
+            
             if (!ParamatersMatch(setter))
-                throw new ArgumentException("Parameters don't match for " + info + " - Value: " + Value + "(" + Value.GetType() + ")");
+                throw new ArgumentException("Parameters don't match for " + info + " - Value: " + DeserializedValue + "(" + DeserializedValue.GetType() + ")");
 
-            info.SetValue(target, Value, null);
+            info.SetValue(target, DeserializedValue, null);
         }
         private bool ParamatersMatch(MethodInfo info)
         {
@@ -254,25 +289,41 @@ namespace UMS.Core.Types
             }
             else if (type.IsEnum)
             {
-                if (!Enum.IsDefined(type, Value))
+                if (!Enum.IsDefined(type, DeserializedValue))
                     return false;
             }
-            else if (!type.IsAssignableFrom(Value.GetType()))
+            else
             {
-                return false;
+                Type deserializedType = DeserializedValue.GetType();
+
+                if (deserializedType.IsArray)
+                {
+                    if(!type.IsAssignableFrom(deserializedType.GetElementType()))
+                    {
+                        return false;
+                    }
+                }
+                else if(!type.IsAssignableFrom(DeserializedValue.GetType()))
+                {
+                    return false;
+                }                
             }
 
             return true;
         }
         public override string ToString()
         {
-            if(Value != null)
+            return string.Format("{0} - SerializedValue: {1} - DeserializedValue: {2}", _memberName, ValueString(SerializedValue), ValueString(DeserializedValue));
+        }
+        private string ValueString(object value)
+        {
+            if (value != null)
             {
-                return string.Format("{0}: {1} ({2})", _memberName, Value, Value.GetType());
+                return string.Format("{0} ({1})", value, value.GetType());
             }
             else
             {
-                return string.Format("{0}: {1}", _memberName, Value);
+                return null;
             }
         }
         private class ArrayDeserializationHandler
@@ -285,7 +336,7 @@ namespace UMS.Core.Types
                 for (int i = 0; i < array.Length; i++)
                 {
                     object obj = array.GetValue(i);
-
+                    
                     if(obj != null && obj is Reference reference)
                     {
                         targetObjectCount++;
@@ -293,6 +344,9 @@ namespace UMS.Core.Types
                         Deserializer.GetDeserializedObject(reference.ID, reference.NonSerializableType, x => AddObject(x));
                     }
                 }
+
+                if (targetObjectCount == 0)
+                    return;
 
                 finishedInitializing = true;
                 CheckIfDone();
@@ -348,29 +402,162 @@ namespace UMS.Core.Types
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
         private class MemberObject
         {
-            public object Object
+            public object DeserializedObject
             {
                 get
                 {
-                    if (_type.IsEnum)
+                    if(_deserializedValue == null)
                     {
-                        return Enum.Parse(_type, _value.ToString());
+                        Deserialize();
                     }
 
-                    return Convert.ChangeType(_value, _type);
+                    return _deserializedValue;
                 }
                 set
                 {
-                    _value = value;
-                    _type = value.GetType();
+                    _deserializedValue = value;
+                }
+            }
+            public object SerializedObject
+            {
+                get
+                {
+                    return _serializedValue;
+                }
+                set
+                {
+                    Assign(value);
                 }
             }
 
+            [JsonIgnore]
+            private object _deserializedValue;
             [JsonProperty]
-            private object _value;
-            [JsonProperty]
-            private Type _type;
-            
+            private object _serializedValue;
+
+            private void Deserialize()
+            {
+                if (_serializedValue.GetType().IsArray)
+                {
+                    Array serializedArray = _serializedValue as Array;
+                    Array deserializedArray = Array.CreateInstance(GetType(serializedArray), serializedArray.Length);
+
+                    for (int i = 0; i < serializedArray.Length; i++)
+                    {
+                        deserializedArray.SetValue(GetValue(serializedArray, i), i);
+                    }
+
+                    _deserializedValue = deserializedArray;
+                }
+                else if(_serializedValue is Value value)
+                {
+                    _deserializedValue = value.Object;
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
+            private object GetValue(Array serializedArray, int index)
+            {
+                if (serializedArray.Length < index)
+                    throw new ArgumentOutOfRangeException();
+
+                Value value = serializedArray.GetValue(index) as Value;
+                
+                if (value == null)
+                    return serializedArray.GetValue(index);
+
+                return value.Object;
+            }
+            private Type GetType(Array array)
+            {
+                Type type = null;
+
+                foreach (object obj in array)
+                {
+                    if (obj == null)
+                        continue;
+
+                    if (type == null)
+                    {
+                        type = obj.GetType();
+                    }                        
+                    else if(type != obj.GetType())
+                    {
+                        return typeof(object);
+                    }
+                }
+
+                return type ?? typeof(object);
+            }
+            private void Assign(object value)
+            {
+                _deserializedValue = value;
+
+                if (value.GetType().IsArray)
+                {
+                    AssignAsArray(value);
+                }
+                else
+                {
+                    AssignAsSingular(value);
+                }
+            }
+            private void AssignAsSingular(object value)
+            {
+                _serializedValue = new Value(value);
+            }
+            private void AssignAsArray(object value)
+            {
+                Array existingArray = value as Array;
+                Array newArray = Array.CreateInstance(typeof(Value), existingArray.Length);
+
+                for (int i = 0; i < existingArray.Length; i++)
+                {
+                    newArray.SetValue(new Value(existingArray.GetValue(i)), i);
+                }
+
+                _serializedValue = existingArray;
+            }
+
+            [Serializable]
+            private class Value
+            {
+                private Value() { }
+                public Value(object value)
+                {
+                    Object = value;
+                }
+
+                public object Object
+                {
+                    get
+                    {
+                        if (_value == null)
+                            return null;
+
+                        if (_type.IsEnum)
+                        {
+                            return Enum.Parse(_type, _value.ToString());
+                        }
+
+                        return Convert.ChangeType(_value, _type);
+                    }
+                    set
+                    {
+                        _value = value;
+
+                        if(value != null)
+                            _type = value.GetType();
+                    }
+                }
+
+                [JsonProperty]
+                private object _value;
+                [JsonProperty]
+                private Type _type;
+            }
         }
     }
 }
