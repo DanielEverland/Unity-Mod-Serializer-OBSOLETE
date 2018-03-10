@@ -11,28 +11,47 @@ namespace UMS.Serialization
 
         private static Dictionary<string, byte[]> extraFiles = new Dictionary<string, byte[]>();
 
-        [MenuItem(itemName: Utility.MENU_ITEM_ROOT + "/Serialize Selection", priority = Utility.MENU_ITEM_PRIORITY)]
-        private static void SerializeSelection()
+        public static void SerializePackage(ModPackage package)
         {
-            if (Selection.objects.Length == 0)
+            if (package == null)
+                throw new System.NullReferenceException();
+
+            SerializePackages(package);
+        }
+
+        [MenuItem(itemName: Utility.MENU_ITEM_ROOT + "/Serialize All", priority = Utility.MENU_ITEM_PRIORITY)]
+        private static void SerializeAll()
+        {
+            List<ModPackage> packages = Utility.GetAllPackages();
+
+            if (packages.Count == 0)
             {
-                Debug.LogWarning("No objects selected");
+                Debug.LogWarning("Found no packages");
                 return;
             }
 
-            Initialize();
+            SerializePackages(packages.ToArray());
+        }
 
-            for (int i = 0; i < Selection.objects.Length; i++)
+        private static void SerializePackages(params ModPackage[] packages)
+        {
+            foreach (ModPackage package in packages)
             {
-                Object toSerialize = CloneManager.GetClone(Selection.objects[i]);
+                Initialize();
 
-                CustomSerializers.SerializeObject(toSerialize);
+                foreach (ModPackage.ObjectEntry entry in package.ObjectEntries)
+                {
+                    AddObject(entry.Object);
+                }
+
+                Complete(package);
             }
+        }
+        private static void AddObject(Object obj)
+        {
+            Object toSerialize = CloneManager.GetClone(obj);
 
-            InitializeSerialization();
-
-            CoreManager.FinishedSerialization();
-            Debug.Log("Finished serializing");
+            CustomSerializers.SerializeObject(toSerialize);
         }
         public static void AddExtraFile(string filePath, byte[] data)
         {
@@ -41,14 +60,21 @@ namespace UMS.Serialization
 
             extraFiles[filePath] = data;
         }
+        private static void Complete(ModPackage package)
+        {
+            InitializeSerialization(package);
+
+            CoreManager.FinishedSerialization();
+            Debug.Log("Serialized " + package.name);
+        }
         private static void Initialize()
         {
             CoreManager.Initialize();
         }
-        private static void InitializeSerialization()
+        private static void InitializeSerialization(ModPackage package)
         {
             Mod.Initialize();
-            Mod.Serialize(@"C:/Users/Daniel/Desktop/New Mod.mod");
+            Mod.Serialize(string.Format(@"{0}/{1}.mod", System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop), package.name));
         }
     }
 }

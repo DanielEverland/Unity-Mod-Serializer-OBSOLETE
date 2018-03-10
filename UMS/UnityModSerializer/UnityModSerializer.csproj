@@ -76,6 +76,7 @@
     <Compile Include="Core\IDManager.cs" />
     <Compile Include="Core\IModEntry.cs" />
     <Compile Include="Core\Mod.cs" />
+    <Compile Include="Core\ModPackage.cs" />
     <Compile Include="Core\ObjectManager.cs" />
     <Compile Include="Core\Priority.cs" />
     <Compile Include="Core\RectTransformConverter.cs" />
@@ -105,6 +106,8 @@
     <Compile Include="Deserialization\CustomConstructor.cs" />
     <Compile Include="Deserialization\Deserializer.cs" />
     <Compile Include="Deserialization\IAsynchronousDeserializer.cs" />
+    <Compile Include="Inspectors\ModPackageEditor.cs" />
+    <Compile Include="Inspectors\ModPackageReorderableList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\BlockedTypes.cs" />
     <Compile Include="Serialization\CustomIDGeneratorCollection.cs" />
