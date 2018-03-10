@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UMS.Deserialization;
 using UMS.Serialization;
@@ -17,7 +17,7 @@ namespace UMS.Core.Types
         {
             if (Utility.IsNull(value))
                 throw new NullReferenceException();
-                        
+
             _value = new MemberObject();
             _memberName = info.Name;
 
@@ -28,7 +28,7 @@ namespace UMS.Core.Types
             else
             {
                 AssignAsSingular(value);
-            }         
+            }
         }
 
         public string MemberName { get { return _memberName; } }
@@ -80,7 +80,7 @@ namespace UMS.Core.Types
 
             string[] lines = json.Split('\n');
 
-            if(lines.Length == 3)
+            if (lines.Length == 3)
             {
                 return json.StartsWith("{") && json.EndsWith("}") && json.Contains("$type");
             }
@@ -109,14 +109,14 @@ namespace UMS.Core.Types
 
             if (CustomSerializers.CanSerialize(obj.GetType()))
             {
-                if(obj is UnityEngine.Object)
+                if (obj is UnityEngine.Object)
                 {
                     return Reference.Create(obj);
                 }
                 else
                 {
                     return CustomSerializers.SerializeObject(obj);
-                }                
+                }
             }
 
             return obj;
@@ -125,16 +125,16 @@ namespace UMS.Core.Types
         {
             if (target == null)
                 throw new NullReferenceException("Given target for " + this + " is null!");
-            
+
             Type declaredType = target.GetType();
             MemberInfo member = Utility.GetMember(declaredType, _memberName);
-            
+
             if (IsNull(member, DeserializedValue))
                 return;
-            
+
             if (ValueIsReference(member, target))
                 return;
-            
+
             if (DeserializedValue is IModSerializer serializer)
             {
                 CustomSerializers.DeserializeObject(serializer, x =>
@@ -146,7 +146,7 @@ namespace UMS.Core.Types
 
                 return;
             }
-            
+
             try
             {
                 if (member is PropertyInfo property)
@@ -166,13 +166,13 @@ namespace UMS.Core.Types
         }
         private bool IsNull(MemberInfo info, object value)
         {
-            if(info == null)
+            if (info == null)
             {
                 Debugging.Warning("MemberInfo is null on " + _memberName);
                 return true;
             }
 
-            if(value == null)
+            if (value == null)
             {
                 Debugging.Warning("Value is null on " + _memberName);
                 return true;
@@ -187,7 +187,7 @@ namespace UMS.Core.Types
                     if (array.GetValue(i) != null)
                         return false;
                 }
-                
+
                 return true;
             }
 
@@ -198,24 +198,24 @@ namespace UMS.Core.Types
             if (DeserializedValue.GetType().IsArray)
             {
                 Array array = (Array)DeserializedValue;
-                
-                if(array.Length > 0 && array != null)
+
+                if (array.Length > 0 && array != null)
                 {
                     Type elementType = array.GetType().GetElementType();
 
-                    if(elementType == typeof(Reference))
+                    if (elementType == typeof(Reference))
                     {
                         ArrayDeserializationHandler.Create(array, obj =>
                         {
                             DeserializedValue = obj;
                             Deserialize(target);
                         });
-                        
+
                         return true;
                     }
                 }
             }
-            else if(DeserializedValue is Reference reference)
+            else if (DeserializedValue is Reference reference)
             {
                 Deserializer.GetDeserializedObject(reference.ID, GetType(member), obj =>
                 {
@@ -250,13 +250,13 @@ namespace UMS.Core.Types
 
             if (fieldType.IsEnum)
             {
-                if(!Enum.IsDefined(fieldType, DeserializedValue))
+                if (!Enum.IsDefined(fieldType, DeserializedValue))
                     throw new ArgumentException("Type mismatch for field " + info + " - " + this);
             }
-            else if(!info.FieldType.IsAssignableFrom(valueType))
+            else if (!info.FieldType.IsAssignableFrom(valueType))
             {
                 throw new ArgumentException("Type mismatch for field " + info + " - " + this);
-            }                
+            }
 
             info.SetValue(target, DeserializedValue);
         }
@@ -266,7 +266,7 @@ namespace UMS.Core.Types
 
             if (setter == null)
                 throw new ArgumentException("No setter for property " + info + " - " + this);
-            
+
             if (!ParamatersMatch(setter))
                 throw new ArgumentException("Parameters don't match for " + info + " - Value: " + DeserializedValue + "(" + DeserializedValue.GetType() + ")");
 
@@ -298,15 +298,15 @@ namespace UMS.Core.Types
 
                 if (deserializedType.IsArray)
                 {
-                    if(!type.IsAssignableFrom(deserializedType.GetElementType()))
+                    if (!type.IsAssignableFrom(deserializedType.GetElementType()))
                     {
                         return false;
                     }
                 }
-                else if(!type.IsAssignableFrom(DeserializedValue.GetType()))
+                else if (!type.IsAssignableFrom(DeserializedValue.GetType()))
                 {
                     return false;
-                }                
+                }
             }
 
             return true;
@@ -332,12 +332,12 @@ namespace UMS.Core.Types
             {
                 this.onDeserialized = onDeserialized;
                 deserializedObjects = new List<object>();
-                
+
                 for (int i = 0; i < array.Length; i++)
                 {
                     object obj = array.GetValue(i);
-                    
-                    if(obj != null && obj is Reference reference)
+
+                    if (obj != null && obj is Reference reference)
                     {
                         targetObjectCount++;
 
@@ -369,7 +369,7 @@ namespace UMS.Core.Types
                 if (!finishedInitializing)
                     return;
 
-                if(deserializedObjects.Count == targetObjectCount)
+                if (deserializedObjects.Count == targetObjectCount)
                 {
                     onDeserialized?.Invoke(CreateArray());
                 }
@@ -406,7 +406,7 @@ namespace UMS.Core.Types
             {
                 get
                 {
-                    if(_deserializedValue == null)
+                    if (_deserializedValue == null)
                     {
                         Deserialize();
                     }
@@ -449,7 +449,7 @@ namespace UMS.Core.Types
 
                     _deserializedValue = deserializedArray;
                 }
-                else if(_serializedValue is Value value)
+                else if (_serializedValue is Value value)
                 {
                     _deserializedValue = value.Object;
                 }
@@ -464,7 +464,7 @@ namespace UMS.Core.Types
                     throw new ArgumentOutOfRangeException();
 
                 Value value = serializedArray.GetValue(index) as Value;
-                
+
                 if (value == null)
                     return serializedArray.GetValue(index);
 
@@ -482,8 +482,8 @@ namespace UMS.Core.Types
                     if (type == null)
                     {
                         type = obj.GetType();
-                    }                        
-                    else if(type != obj.GetType())
+                    }
+                    else if (type != obj.GetType())
                     {
                         return typeof(object);
                     }
@@ -548,7 +548,7 @@ namespace UMS.Core.Types
                     {
                         _value = value;
 
-                        if(value != null)
+                        if (value != null)
                             _type = value.GetType();
                     }
                 }

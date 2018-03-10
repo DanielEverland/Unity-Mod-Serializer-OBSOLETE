@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using UMS.Serialization;
 using UMS.Core.Types;
+using UMS.Serialization;
 
 namespace UMS.Core
 {

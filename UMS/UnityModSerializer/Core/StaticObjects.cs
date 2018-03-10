@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UMS.Deserialization;
 using UMS.Serialization;
 
@@ -28,7 +25,7 @@ namespace UMS.Core
         {
             if (localPath.StartsWith(FolderPath))
                 localPath = localPath.Remove(0, localPath.IndexOf('/') + 1);
-            
+
             if (!Contains(localPath))
                 throw new NullReferenceException();
 

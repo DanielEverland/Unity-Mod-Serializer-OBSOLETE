@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using UnityEngine;
 using UMS.Core.Types;
 using UMS.Serialization;
+using UnityEngine;
 
 namespace UMS.Core
 {
@@ -32,7 +32,7 @@ namespace UMS.Core
 
         [JsonProperty]
         private List<SerializableMember> _members;
-        
+
         public void Deserialize(Component component)
         {
             foreach (SerializableMember member in _members)

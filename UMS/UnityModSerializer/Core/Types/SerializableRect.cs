@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Newtonsoft.Json;
 using UnityEngine;
-using Newtonsoft.Json;
 
 namespace UMS.Core.Types
 {
@@ -44,5 +40,5 @@ namespace UMS.Core.Types
         {
             return serialized.Deserialize(serialized);
         }
-    }    
+    }
 }

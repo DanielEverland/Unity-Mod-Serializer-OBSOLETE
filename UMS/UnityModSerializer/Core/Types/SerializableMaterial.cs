@@ -46,7 +46,7 @@ namespace UMS.Core.Types
             Material material = new Material(Shader.Find("Standard"));
 
             serializable.Deserialize(material);
-            
+
             material.globalIlluminationFlags = (MaterialGlobalIlluminationFlags)serializable._globalIlluminationFlags;
             material.shaderKeywords = serializable._shaderKeywords;
             material.renderQueue = serializable._renderQueue;

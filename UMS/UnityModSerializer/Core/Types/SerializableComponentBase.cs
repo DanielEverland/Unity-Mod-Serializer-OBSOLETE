@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 using UMS.Deserialization;
 using UnityEngine;
 
@@ -45,7 +42,7 @@ namespace UMS.Core.Types
     }
     public interface ISerializableComponentBase : IDeserializer<Component>
     {
-        Type ComponentType { get; }    
+        Type ComponentType { get; }
         int ID { get; }
     }
 }

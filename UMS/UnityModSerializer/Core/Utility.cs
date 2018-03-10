@@ -5,8 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using UMS.Serialization;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace UMS.Core
 {
@@ -18,7 +18,7 @@ namespace UMS.Core
         public const string MENU_SERIALIZATION = "Serialization";
 
         private static Regex EndNumberParanthesis = new Regex(@"\(\d+\)$");
-        
+
         public static List<ModPackage> GetAllPackages()
         {
             return new List<ModPackage>(AssetDatabase.FindAssets("t:ModPackage").Select(x =>
@@ -35,20 +35,18 @@ namespace UMS.Core
                                 0,
                                 RenderTextureFormat.Default,
                                 RenderTextureReadWrite.Linear);
-            
+
             Graphics.Blit(texture, temporaryTexture);
 
             // Backup the currently set RenderTexture
             RenderTexture previous = RenderTexture.active;
 
-            
             RenderTexture.active = temporaryTexture;
-            
+
             Texture2D toReturn = new Texture2D(texture.width, texture.height);
-            
+
             toReturn.ReadPixels(new Rect(0, 0, temporaryTexture.width, temporaryTexture.height), 0, 0);
             toReturn.Apply();
-
 
             // Reset the active RenderTexture
             RenderTexture.active = previous;
@@ -131,8 +129,8 @@ namespace UMS.Core
         {
             int max = source.Max(x => GetInheritanceCount(x.GetType()));
             IEnumerable<IModSerializer> mostInherited = source.Where(x => GetInheritanceCount(x.GetType()) == max);
-            
-            if(mostInherited.Count() > 1)
+
+            if (mostInherited.Count() > 1)
             {
                 int nonSerializedTypeInheritance = mostInherited.Max(x => GetInheritanceCount(x.NonSerializableType));
 

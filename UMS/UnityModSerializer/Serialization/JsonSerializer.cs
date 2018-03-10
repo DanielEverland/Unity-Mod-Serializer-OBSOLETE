@@ -132,7 +132,7 @@ namespace UMS.Serialization
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
         {
-            if(reader.TokenType == JsonToken.Integer)
+            if (reader.TokenType == JsonToken.Integer)
             {
                 string stringValue = reader.Value.ToString();
                 int intValue;
@@ -144,7 +144,7 @@ namespace UMS.Serialization
                 {
                     return intValue;
                 }
-                else if(uint.TryParse(stringValue, out uIntValue))
+                else if (uint.TryParse(stringValue, out uIntValue))
                 {
                     return uIntValue;
                 }
@@ -152,7 +152,7 @@ namespace UMS.Serialization
                 {
                     return longValue;
                 }
-                else if(ulong.TryParse(stringValue, out ulongValue))
+                else if (ulong.TryParse(stringValue, out ulongValue))
                 {
                     return ulongValue;
                 }
@@ -161,10 +161,10 @@ namespace UMS.Serialization
                     UnityEngine.Debug.LogWarning("Couldn't convert " + stringValue + " to integer");
                 }
             }
-            else if(reader.TokenType == JsonToken.Float)
+            else if (reader.TokenType == JsonToken.Float)
             {
                 string stringValue = reader.Value.ToString();
-                
+
                 float floatValue = -1;
                 double doubleValue = -1;
 

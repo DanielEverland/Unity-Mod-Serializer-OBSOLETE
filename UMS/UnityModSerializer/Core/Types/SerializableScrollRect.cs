@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UMS.Serialization;
+﻿using Newtonsoft.Json;
 using UMS.Deserialization;
-using UMS.Core.Types;
 using UnityEngine;
 using UnityEngine.UI;
-using Newtonsoft.Json;
 
 namespace UMS.Core.Types
 {

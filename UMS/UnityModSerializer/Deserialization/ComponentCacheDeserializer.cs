@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using UnityEngine;
 using UMS.Core.Types;
+using UnityEngine;
 
 namespace UMS.Deserialization
 {
@@ -18,7 +17,7 @@ namespace UMS.Deserialization
             _components = new List<ISerializableComponentBase>();
             _targetObject = targetObject;
             _serializedGameObject = serialized;
-            
+
             foreach (Reference reference in serialized.Components)
             {
                 if (!Deserializer.ContainsObject(reference.ID))
@@ -44,7 +43,7 @@ namespace UMS.Deserialization
 
         private readonly GameObject _targetObject;
         private readonly SerializableGameObject _serializedGameObject;
-        
+
         private List<ISerializableComponentBase> _components;
         private bool _finishedInitializing;
         private int _targetComponentCount;

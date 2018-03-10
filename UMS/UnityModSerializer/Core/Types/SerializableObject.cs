@@ -25,7 +25,7 @@ namespace UMS.Core.Types
         public string Name { get { return _name; } }
         public HideFlags HideFlags { get { return _hideFlags; } }
         public int ID { get { return _id; } protected set { _id = value; } }
-                        
+
         [JsonProperty]
         private string _name;
         [JsonProperty]

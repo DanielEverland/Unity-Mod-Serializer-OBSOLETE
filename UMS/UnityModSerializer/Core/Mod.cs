@@ -76,7 +76,7 @@ namespace UMS.Core
                     using (MemoryStream stream = new MemoryStream())
                     {
                         entry.Extract(stream);
-                        
+
                         files.Add(entry.FileName, stream.ToArray());
                     }
                 }

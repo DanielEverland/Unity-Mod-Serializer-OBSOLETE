@@ -40,7 +40,7 @@ namespace UMS.Behaviour
                 if (!(attribute is BehaviourBase))
                     continue;
 
-                if(attribute is IBehaviourClassLoader loader)
+                if (attribute is IBehaviourClassLoader loader)
                 {
                     loader.Load(type);
                 }
@@ -72,12 +72,12 @@ namespace UMS.Behaviour
         {
             if (!(attribute is BehaviourBase))
                 return;
-            
-            if (attribute is  IBehaviourMemberLoader<T>)
+
+            if (attribute is IBehaviourMemberLoader<T>)
             {
                 (attribute as IBehaviourMemberLoader<T>).Load(targetObj);
             }
-            if(attribute is IBehaviourMemberLoader)
+            if (attribute is IBehaviourMemberLoader)
             {
                 (attribute as IBehaviourMemberLoader).Load();
             }
@@ -98,9 +98,9 @@ namespace UMS.Behaviour
         {
             if (behaviour == null)
                 return;
-            
+
             bool added = AddBehaviour(behaviour.GetHashCode(), behaviour);
-            
+
             if (OnBehaviourLoaded != null && behaviour != null)
                 OnBehaviourLoaded(behaviour);
 
@@ -120,7 +120,7 @@ namespace UMS.Behaviour
                 if (_loadedBehaviours[key].Priority < priority)
                 {
                     _loadedBehaviours[key] = behaviour;
-                }                    
+                }
             }
             else
             {

@@ -1,9 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using System.Reflection;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace UMS.Core.Types
@@ -54,7 +53,7 @@ namespace UMS.Core.Types
         private List<SerializableMember> _members;
         [JsonProperty]
         private Type _type;
-        
+
         private void GetAllMembers()
         {
             _members = new List<SerializableMember>();
@@ -119,11 +118,11 @@ namespace UMS.Core.Types
 
         private bool IsValid(MemberInfo info)
         {
-            if(info is PropertyInfo property)
+            if (info is PropertyInfo property)
             {
                 return IsValid(property);
             }
-            else if(info is FieldInfo field)
+            else if (info is FieldInfo field)
             {
                 return IsValid(field);
             }
@@ -203,7 +202,7 @@ namespace UMS.Core.Types
 
                 foreach (ParameterInfo info in parameters)
                 {
-                    if(memberObjects.Any(x => x.GetType() == info.ParameterType))
+                    if (memberObjects.Any(x => x.GetType() == info.ParameterType))
                     {
                         parameterObjects.Add(memberObjects.First(x => x.GetType() == info.ParameterType));
                     }

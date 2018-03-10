@@ -53,7 +53,7 @@ namespace UMS.Core
             public TraceLevel LevelFilter => DEFAULT_TRACE_LEVEL;
 
             private readonly bool _isJsonInternal;
-            
+
             public void Trace(TraceLevel level, string message, Exception ex)
             {
                 if (_isJsonInternal && !DEBUG_JSON_INTERNAL)

@@ -10,7 +10,7 @@ namespace UMS.Serialization
         Type SerializedType { get; }
     }
     public interface ICustomSerializer { }
-   
+
     public interface IModSerializer<TObject, TSerializable> : IModSerializer
     {
         TSerializable Serialize(TObject obj);

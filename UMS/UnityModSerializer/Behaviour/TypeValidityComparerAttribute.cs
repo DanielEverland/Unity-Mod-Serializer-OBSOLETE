@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace UMS.Behaviour
 {
@@ -42,7 +39,7 @@ namespace UMS.Behaviour
                 {
                     Type comparerType = interfaceType.GetGenericArguments()[0];
 
-                    if(comparerType != _type)
+                    if (comparerType != _type)
                     {
                         throw new ArgumentException("Equality comparer type must be " + _type + ". It is " + comparerType);
                     }

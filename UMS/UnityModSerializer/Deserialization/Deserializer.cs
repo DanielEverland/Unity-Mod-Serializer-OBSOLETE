@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UMS.Behaviour;
 using UMS.Core;
@@ -80,7 +80,7 @@ namespace UMS.Deserialization
 
                     if (_serializedObjectQueue.ContainsKey(queueObject.Key))
                     {
-                        if(entry.SerializedObject != null)
+                        if (entry.SerializedObject != null)
                         {
                             Debugging.Info("Executing serialized object queue for object " + entry.ID);
 
@@ -210,7 +210,7 @@ namespace UMS.Deserialization
             {
                 throw new NullReferenceException("ID " + id + " wasn't recognized by the config file");
             }
-            
+
             if (_objectReferences[id].DeserializedObject == null)
             {
                 Subscribe(id, new ActionInstance(action, type), _deserializedObjectQueue);
@@ -219,7 +219,7 @@ namespace UMS.Deserialization
             {
                 action(_objectReferences[id].DeserializedObject);
             }
-        }        
+        }
         private static void ExecuteDeserialization()
         {
             _objectReferences = new Dictionary<int, ObjectEntry>();
@@ -227,23 +227,23 @@ namespace UMS.Deserialization
 
             foreach (KeyValuePair<string, byte[]> file in _serializedData)
             {
-                if(Mod.ConfigFile.data.Any(x => x.localPath == file.Key))
+                if (Mod.ConfigFile.data.Any(x => x.localPath == file.Key))
                 {
                     Config.Data data = Mod.ConfigFile.data.Find(x => x.localPath == file.Key);
-                    
+
                     if (!_objectReferences.ContainsKey(data.id))
                     {
                         ObjectEntry entry = new ObjectEntry(Utility.ToString(file.Value), data);
 
                         _objectReferences.Add(data.id, entry);
-                    }                        
-                }                
+                    }
+                }
             }
 
             foreach (KeyValuePair<int, ObjectEntry> keyValuePair in _objectReferences)
             {
                 keyValuePair.Value.Deserialize();
-                
+
                 ExecuteID(keyValuePair.Key);
             }
         }
@@ -292,7 +292,7 @@ namespace UMS.Deserialization
 
                 ExecuteID(ID);
 
-                if(Key != null)
+                if (Key != null)
                     _keyLookup.Set(Key, this);
             }
             public void Deserialize()

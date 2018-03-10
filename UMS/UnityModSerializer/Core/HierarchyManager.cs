@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace UMS.Core
@@ -18,7 +16,7 @@ namespace UMS.Core
         }
         public static void ExecuteTransform(Transform transform)
         {
-            if(transform is RectTransform rectTransform)
+            if (transform is RectTransform rectTransform)
             {
                 ExecuteTransform(rectTransform);
             }
@@ -32,7 +30,6 @@ namespace UMS.Core
             {
                 ExecuteQueue(transform);
             }
-
         }
         private static void ExecuteQueue(RectTransform transform)
         {

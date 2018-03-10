@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEditor;
-using UnityEditorInternal;
-using UnityEngine;
-using UMS.Core;
+﻿using UMS.Core;
 using UMS.Serialization;
+using UnityEditor;
+using UnityEngine;
 
 namespace UMS.Inspectors
 {
@@ -18,7 +13,7 @@ namespace UMS.Inspectors
         protected ModPackage Target { get { return (ModPackage)target; } }
 
         protected ModPackageReorderableList _objectEntryList;
-        
+
         protected virtual void OnEnable()
         {
             _objectEntryList = CreateList("_objectEntries");
@@ -42,7 +37,7 @@ namespace UMS.Inspectors
             rect.x = (rect.width - SERIALIZE_BUTTON_WIDTH) / 2;
             rect.width = SERIALIZE_BUTTON_WIDTH;
 
-            if(GUI.Button(rect, buttonText))
+            if (GUI.Button(rect, buttonText))
             {
                 Serializer.SerializePackage(Target);
             }

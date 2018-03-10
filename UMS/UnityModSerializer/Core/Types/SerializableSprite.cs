@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 using UMS.Deserialization;
+using UnityEngine;
 
 namespace UMS.Core.Types
 {
     public class SerializableSprite : SerializableObject<Sprite, SerializableSprite>, IAsynchronousDeserializer<SerializableSprite>
     {
         public override string Extension => "sprite";
-        
+
         public SerializableSprite() { }
         public SerializableSprite(Sprite sprite) : base(sprite)
         {
@@ -32,7 +29,7 @@ namespace UMS.Core.Types
         private Vector4 _border;
         [JsonProperty]
         private SerializableRect _spriteRect;
-        
+
         public void AsynchronousDeserialization(Action<object> action, SerializableSprite serialized)
         {
             Deserializer.GetDeserializedObject<Texture2D>(serialized._texture.ID, texture =>
@@ -43,7 +40,7 @@ namespace UMS.Core.Types
         private Sprite CreateSprite(SerializableSprite serialized, Texture2D texture)
         {
             Sprite sprite = Sprite.Create(texture, serialized._spriteRect, serialized._pivot, serialized._pixelsPerUnit, 0, SpriteMeshType.Tight, serialized._border);
-            
+
             serialized.Deserialize(sprite);
 
             return sprite;

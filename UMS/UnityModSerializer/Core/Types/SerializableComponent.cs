@@ -1,10 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using UMS.Deserialization;
-using UMS.Serialization;
 using UnityEngine;
 
 namespace UMS.Core.Types
@@ -19,12 +13,12 @@ namespace UMS.Core.Types
 
         [JsonProperty]
         private ComponentMemberCollection _memberCollection;
-        
+
         public override void OnDeserialize(Component target)
         {
             if (target == null)
                 throw new System.NullReferenceException("Given component is null!");
-            
+
             _memberCollection.Deserialize(target);
         }
         public override SerializableComponent Serialize(Component obj)

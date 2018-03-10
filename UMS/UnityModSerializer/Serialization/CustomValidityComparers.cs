@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UMS.Behaviour;
-using UnityEngine;
 
 namespace UMS.Serialization
 {
@@ -13,7 +10,7 @@ namespace UMS.Serialization
         {
             get
             {
-                if(_container == null)
+                if (_container == null)
                     _container = new ValidityContainer();
 
                 return _container;
@@ -28,7 +25,7 @@ namespace UMS.Serialization
 
             return Container.IsValid(obj);
         }
-        
+
         private class ValidityContainer
         {
             public ValidityContainer()

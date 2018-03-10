@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
+using UMS.Core;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-using UMS.Core;
 
 namespace UMS.Inspectors
 {
@@ -17,7 +14,7 @@ namespace UMS.Inspectors
             Package = package;
             SerializedObject = serializedObject;
             SerializedProperty = serializedProperty;
-            
+
             drawHeaderCallback = DrawHeader;
             drawElementCallback = DrawElement;
         }
@@ -57,7 +54,7 @@ namespace UMS.Inspectors
 
             EditorGUIUtility.labelWidth = TextWidth(objectContent, EditorStyles.label) + 2;
             entry.Object = EditorGUI.ObjectField(objectRect, objectContent, entry.Object, typeof(UnityEngine.Object), false);
-            #endregion
+            #endregion Object & Key
 
             rect.y += EditorGUIUtility.singleLineHeight;
         }

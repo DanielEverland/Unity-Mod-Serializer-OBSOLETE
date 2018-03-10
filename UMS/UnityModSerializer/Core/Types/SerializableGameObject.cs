@@ -1,10 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using UMS.Deserialization;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace UMS.Core.Types
 {
@@ -102,7 +100,7 @@ namespace UMS.Core.Types
             {
                 return obj.GetComponent<Transform>();
             }
-            else if(type == typeof(RectTransform))
+            else if (type == typeof(RectTransform))
             {
                 return obj.GetComponent<RectTransform>();
             }
@@ -117,7 +115,7 @@ namespace UMS.Core.Types
         }
         private static void ConvertToRectTransform(GameObject obj)
         {
-            if(obj.GetComponent<RectTransform>() == null)
+            if (obj.GetComponent<RectTransform>() == null)
             {
                 Component comp = obj.AddComponent<RectTransformConverter>();
                 UnityEngine.Object.DestroyImmediate(comp);

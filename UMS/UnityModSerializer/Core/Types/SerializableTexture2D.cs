@@ -1,8 +1,5 @@
 ﻿using Newtonsoft.Json;
 using UnityEngine;
-using UMS.Serialization;
-using UMS.Deserialization;
-using System.IO;
 
 namespace UMS.Core.Types
 {
@@ -23,13 +20,11 @@ namespace UMS.Core.Types
 
             _imageFilePath = StaticObjects.AddObject(_imageFilePath, textureData);
 
-
-
             _alphaIsTransparency = texture.alphaIsTransparency;
             _format = (int)texture.format;
             _mipMapCount = texture.mipmapCount;
         }
-        
+
         [JsonProperty]
         private bool _alphaIsTransparency;
         [JsonProperty]

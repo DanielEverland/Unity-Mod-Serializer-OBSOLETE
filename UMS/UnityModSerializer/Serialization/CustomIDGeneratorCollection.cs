@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using UnityEditor;
+﻿using UMS.Behaviour;
 using UMS.Core;
-using UMS.Behaviour;
+using UnityEditor;
+using UnityEngine;
 
 namespace UMS.Serialization
 {
@@ -28,13 +24,13 @@ namespace UMS.Serialization
 
                 for (int i = 0; i < propertyCount; i++)
                 {
-                    if(material.HasProperty(i))
+                    if (material.HasProperty(i))
                     {
                         object obj = GetValue(material, i);
 
-                        if(obj != null)
+                        if (obj != null)
                             id += obj.GetHashCode() * 11;
-                    }                        
+                    }
                 }
             }
 

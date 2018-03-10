@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Newtonsoft.Json;
 using UnityEngine;
-using Newtonsoft.Json;
-using UMS.Deserialization;
 
 namespace UMS.Core.Types
 {
@@ -18,7 +13,7 @@ namespace UMS.Core.Types
             _fontNames = font.fontNames;
             _fontSize = font.fontSize;
         }
-        
+
         [JsonProperty]
         private string[] _fontNames;
         [JsonProperty]
@@ -27,7 +22,7 @@ namespace UMS.Core.Types
         public override Font Deserialize(SerializableFont serializable)
         {
             Font font = Font.CreateDynamicFontFromOSFont(serializable._fontNames, serializable._fontSize);
-            
+
             serializable.Deserialize(font);
 
             return font;

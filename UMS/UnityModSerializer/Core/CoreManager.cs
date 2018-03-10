@@ -1,8 +1,8 @@
-﻿using UMS.Core.Types;
+﻿using Newtonsoft.Json;
 using UMS.Behaviour;
-using UMS.Serialization;
+using UMS.Core.Types;
 using UMS.Deserialization;
-using Newtonsoft.Json;
+using UMS.Serialization;
 
 namespace UMS.Core
 {

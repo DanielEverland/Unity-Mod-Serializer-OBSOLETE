@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine.UI;
+﻿using Newtonsoft.Json;
 using UnityEngine;
-using UMS.Deserialization;
-using UMS.Serialization;
-using Newtonsoft.Json;
 
 namespace UMS.Core.Types
 {
@@ -23,7 +16,7 @@ namespace UMS.Core.Types
             _anchorMax = rectTransform.anchorMax;
             _sizeDelta = rectTransform.sizeDelta;
         }
-        
+
         [JsonProperty]
         private Vector2 _pivot;
         [JsonProperty]
@@ -50,7 +43,7 @@ namespace UMS.Core.Types
                 transform.offsetMin = _offsetMin;
                 transform.offsetMax = _offsetMax;
                 transform.sizeDelta = _sizeDelta;
-            });            
+            });
         }
         public override SerializableRectTransform Serialize(RectTransform obj)
         {

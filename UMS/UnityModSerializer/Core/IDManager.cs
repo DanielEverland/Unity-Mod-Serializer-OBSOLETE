@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
-using UMS.Serialization;
 using UMS.Behaviour;
+using UMS.Serialization;
 
 namespace UMS.Core
 {
@@ -20,7 +19,7 @@ namespace UMS.Core
             }
         }
         private static CustomIDGeneratorManager _customIDGeneratorManager;
-                
+
         private static Dictionary<int, int> _objectLookup;
         private static HashSet<int> _blockedIDs;
 
@@ -28,7 +27,7 @@ namespace UMS.Core
         {
             _objectLookup = new Dictionary<int, int>();
             _blockedIDs = new HashSet<int>();
-        }        
+        }
         public static int GetID(object obj)
         {
             if (_blockedIDs.Contains(obj.GetHashCode()))
@@ -106,7 +105,7 @@ namespace UMS.Core
 
                 foreach (PropertyInfo property in obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
                 {
-                    if(GetPropertyHash(property, obj, memberValues, ref buffer))
+                    if (GetPropertyHash(property, obj, memberValues, ref buffer))
                     {
                         i += buffer * 23;
                     }
@@ -258,7 +257,7 @@ namespace UMS.Core
                     else
                     {
                         _generators.Add(generator.Type, generator);
-                    }                    
+                    }
                 }
             }
         }
