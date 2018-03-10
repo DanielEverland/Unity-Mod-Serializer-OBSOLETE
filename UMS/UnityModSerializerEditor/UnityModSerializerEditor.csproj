@@ -45,7 +45,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y "$(TargetDir)/$(TargetName).dll" "D:\SerializerTest\Assets\Plugins/Mod Serializer\Editor\$(TargetName).dll"
-copy /y "$(TargetDir)/$(TargetName).pdb" "D:\SerializerTest\Assets\Plugins/Mod Serializer\Editor\$(TargetName).pdb"</PostBuildEvent>
+    <PostBuildEvent>copy /y "$(TargetDir)/$(TargetName).dll" "D:\SerializerTest\Assets\Plugins/Mod Serializer/Editor\$(TargetName).dll"
+copy /y "$(TargetDir)/$(TargetName).pdb" "D:\SerializerTest\Assets\Plugins/Mod Serializer/Editor\$(TargetName).pdb"</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using UnityEditor;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace UMS.Core
@@ -15,16 +15,19 @@ namespace UMS.Core
         public static IEnumerable<Assembly> LoadedAssemblies { get { return _loadedAssemblies; } }
 
         private static List<Assembly> _loadedAssemblies;
+        private static Regex _blockedAssemblies = new Regex(REGEX);
+
+        private const string REGEX = "^(Unity|System|Boo|pdb|I18N|Mono|nunit|ExCSS|Syntax|mscorlib)";
 
         public static void Initialize()
         {
-            _loadedAssemblies = new List<Assembly>(GetAssemblies());
+            GetAssemblies();
         }
         public static void ExecuteReflection()
         {
             if (OnLoadType == null)
                 throw new NullReferenceException("No reflection analyzers loaded!");
-
+            
             foreach (Assembly assembly in LoadedAssemblies)
             {
                 try
@@ -47,72 +50,16 @@ namespace UMS.Core
 
             OnFinishedReflection?.Invoke();
         }
-        private static IEnumerable<Assembly> GetAssemblies()
+        private static void GetAssemblies()
         {
-            HashSet<Assembly> _toReturn = new HashSet<Assembly>();
+            _loadedAssemblies = new List<Assembly>();
 
-            Assembly unityAssembly = GetUnityAssembly();
-
-            if (unityAssembly != null)
-                _toReturn.Add(unityAssembly);
-
-            Queue<string> toCheck = new Queue<string>();
-            toCheck.Enqueue(Application.dataPath);
-
-            while (toCheck.Count > 0)
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                string current = toCheck.Dequeue();
-
-                if (Path.GetFileNameWithoutExtension(current) == "Plugins")
-                {
-                    GetAssemblies(current, _toReturn);
-                }
-                else
-                {
-                    foreach (string subFolder in Directory.GetDirectories(current))
-                    {
-                        toCheck.Enqueue(subFolder);
-                    }
-                }
-            }
-
-            return _toReturn;
-        }
-        private static Assembly GetUnityAssembly()
-        {
-            string assetPath = Application.dataPath;
-            string projectPath = Directory.GetParent(assetPath).FullName;
-            string fullPath = projectPath + @"\Library\ScriptAssemblies\Assembly-CSharp.dll";
-
-            AssetDatabase.Refresh();
-
-            if (!File.Exists(fullPath))
-                return null;
-
-            return Assembly.LoadFile(fullPath);
-        }
-        private static void GetAssemblies(string path, HashSet<Assembly> collection)
-        {
-            foreach (string file in Directory.GetFiles(path))
-            {
-                if (Path.GetExtension(file) == ".dll")
-                {
-                    try
-                    {
-                        Assembly assembly = Assembly.LoadFile(file);
-
-                        if (!collection.Contains(assembly))
-                            collection.Add(assembly);
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
-
-            foreach (string subDirectory in Directory.GetDirectories(path))
-            {
-                GetAssemblies(subDirectory, collection);
+                if (_blockedAssemblies.IsMatch(assembly.FullName))
+                    continue;
+                    
+                _loadedAssemblies.Add(assembly);
             }
         }
     }
