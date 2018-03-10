@@ -20,7 +20,10 @@ namespace UMS.Core
         public class ObjectEntry
         {
             public UnityEngine.Object Object { get { return _object; } set { _object = value; } }
+            public string Key { get { return _key; } set { _key = value; } }
 
+            [SerializeField]
+            private string _key;
             [SerializeField]
             private UnityEngine.Object _object;
         }

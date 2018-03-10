@@ -41,17 +41,19 @@ namespace UMS.Serialization
 
                 foreach (ModPackage.ObjectEntry entry in package.ObjectEntries)
                 {
-                    AddObject(entry.Object);
+                    AddEntry(entry);
                 }
 
                 Complete(package);
             }
         }
-        private static void AddObject(Object obj)
+        private static void AddEntry(ModPackage.ObjectEntry entry)
         {
-            Object toSerialize = CloneManager.GetClone(obj);
+            Object toSerialize = CloneManager.GetClone(entry.Object);
 
-            CustomSerializers.SerializeObject(toSerialize);
+            ObjectManager.AddKey(toSerialize, entry.Key);
+
+            object serialized = CustomSerializers.SerializeObject(toSerialize);
         }
         public static void AddExtraFile(string filePath, byte[] data)
         {

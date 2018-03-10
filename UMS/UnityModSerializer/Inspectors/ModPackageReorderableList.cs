@@ -26,6 +26,8 @@ namespace UMS.Inspectors
         public SerializedObject SerializedObject { get; protected set; }
         public SerializedProperty SerializedProperty { get; protected set; }
 
+        protected const float SPACING = 5;
+
         public virtual void Draw()
         {
             SerializedObject.Update();
@@ -42,9 +44,26 @@ namespace UMS.Inspectors
         {
             ModPackage.ObjectEntry entry = Package.ObjectEntries.ElementAt(index);
 
-            entry.Object = EditorGUI.ObjectField(GetElementRect(rect), GUIContent.none, entry.Object, typeof(UnityEngine.Object), false);
+            #region Object & Key
+            Rect element = GetElementRect(rect);
+            Rect textRect = new Rect(element.x, element.y, element.width / 2 - SPACING / 2, element.height);
+            Rect objectRect = new Rect(element.x + element.width / 2 + SPACING / 2, element.y, element.width / 2, element.height);
+
+            GUIContent keyContent = new GUIContent("Key", "Used to reference the object during runtime");
+            GUIContent objectContent = new GUIContent("Object");
+
+            EditorGUIUtility.labelWidth = TextWidth(keyContent, EditorStyles.label) + 2;
+            entry.Key = EditorGUI.TextField(textRect, keyContent, entry.Key);
+
+            EditorGUIUtility.labelWidth = TextWidth(objectContent, EditorStyles.label) + 2;
+            entry.Object = EditorGUI.ObjectField(objectRect, objectContent, entry.Object, typeof(UnityEngine.Object), false);
+            #endregion
 
             rect.y += EditorGUIUtility.singleLineHeight;
+        }
+        protected virtual float TextWidth(GUIContent content, GUIStyle style)
+        {
+            return style.CalcSize(content).x;
         }
         protected virtual Rect GetElementRect(Rect source)
         {

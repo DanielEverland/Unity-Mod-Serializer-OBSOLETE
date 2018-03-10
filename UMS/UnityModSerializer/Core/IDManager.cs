@@ -20,7 +20,7 @@ namespace UMS.Core
             }
         }
         private static CustomIDGeneratorManager _customIDGeneratorManager;
-
+                
         private static Dictionary<int, int> _objectLookup;
         private static HashSet<int> _blockedIDs;
 
@@ -28,7 +28,7 @@ namespace UMS.Core
         {
             _objectLookup = new Dictionary<int, int>();
             _blockedIDs = new HashSet<int>();
-        }
+        }        
         public static int GetID(object obj)
         {
             if (_blockedIDs.Contains(obj.GetHashCode()))

@@ -14,14 +14,17 @@ namespace UMS.Deserialization
     public static class Deserializer
     {
         public static IDictionary<string, byte[]> SerializedData { get { return _serializedData; } }
+        public static bool HasDeserialized { get { return _hasFinished; } }
 
         private static Dictionary<string, byte[]> _serializedData;
         private static Dictionary<int, ObjectEntry> _objectReferences;
+        private static Dictionary<string, ObjectEntry> _keyLookup;
 
         private static Dictionary<int, List<ActionInstance>> _serializedObjectQueue;
         private static Dictionary<int, List<ActionInstance>> _deserializedObjectQueue;
 
         private static List<JsonConverter> _converters;
+        private static bool _hasFinished;
 
         [MenuItem(itemName: Utility.MENU_ITEM_ROOT + "/Deserialize", priority = Utility.MENU_ITEM_PRIORITY)]
         private static void Deserialize()
@@ -31,7 +34,41 @@ namespace UMS.Deserialization
 
             CheckForCachedActions();
             CoreManager.FinishedSerialization();
+
+            _hasFinished = true;
             Debug.Log("Finished deserializing");
+        }
+        private static void Initialize()
+        {
+            _keyLookup = new Dictionary<string, ObjectEntry>();
+            _serializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
+            _deserializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
+            _converters = new List<JsonConverter>();
+
+            BehaviourManager.OnBehaviourLoadedWithContext += BehaviourLoaded;
+
+            CoreManager.Initialize();
+        }
+        public static bool KeyExists(string key)
+        {
+            if (!HasDeserialized)
+                throw new InvalidOperationException("Deserialization hasn't finished");
+
+            return _keyLookup.ContainsKey(key);
+        }
+        public static T GetObject<T>(string key)
+        {
+            if (!HasDeserialized)
+                throw new InvalidOperationException("Deserialization hasn't finished");
+
+            return (T)_keyLookup[key].DeserializedObject;
+        }
+        public static object GetObject(string key)
+        {
+            if (!HasDeserialized)
+                throw new InvalidOperationException("Deserialization hasn't finished");
+
+            return _keyLookup[key].DeserializedObject;
         }
         private static void CheckForCachedActions()
         {
@@ -77,16 +114,6 @@ namespace UMS.Deserialization
         public static IList<JsonConverter> GetConverters()
         {
             return _converters;
-        }
-        private static void Initialize()
-        {
-            _serializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
-            _deserializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
-            _converters = new List<JsonConverter>();
-
-            BehaviourManager.OnBehaviourLoadedWithContext += BehaviourLoaded;
-
-            CoreManager.Initialize();
         }
         /// <summary>
         /// Used for objects that deserialize using ICustomDeserializer
@@ -200,22 +227,16 @@ namespace UMS.Deserialization
 
             foreach (KeyValuePair<string, byte[]> file in _serializedData)
             {
-                int id = -1;
-
                 if(Mod.ConfigFile.data.Any(x => x.localPath == file.Key))
                 {
-                    try
+                    Config.Data data = Mod.ConfigFile.data.Find(x => x.localPath == file.Key);
+                    
+                    if (!_objectReferences.ContainsKey(data.id))
                     {
-                        id = Mod.ConfigFile.data.Find(x => x.localPath == file.Key).id;
-                    }
-                    catch (System.Exception)
-                    {
-                        Debug.LogError("Config file didn't contain " + file.Key);
-                        throw;
-                    }
+                        ObjectEntry entry = new ObjectEntry(Utility.ToString(file.Value), data);
 
-                    if (!_objectReferences.ContainsKey(id))
-                        _objectReferences.Add(id, new ObjectEntry(Utility.ToString(file.Value), id));
+                        _objectReferences.Add(data.id, entry);
+                    }                        
                 }                
             }
 
@@ -239,15 +260,17 @@ namespace UMS.Deserialization
         }
         private class ObjectEntry
         {
-            public ObjectEntry(string json, int ID)
+            public ObjectEntry(string json, Config.Data data)
             {
                 JSON = json;
 
-                this.ID = ID;
+                this.ID = data.id;
+                this.Key = data.key;
             }
 
             public string JSON { get; private set; }
 
+            public string Key { get; private set; }
             public object SerializedObject { get; set; }
             public object DeserializedObject { get; set; }
             public int ID { get; set; }
@@ -268,6 +291,9 @@ namespace UMS.Deserialization
                 DeserializedObject = obj;
 
                 ExecuteID(ID);
+
+                if(Key != null)
+                    _keyLookup.Set(Key, this);
             }
             public void Deserialize()
             {

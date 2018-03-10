@@ -6,6 +6,20 @@ namespace UMS.Core
 {
     public static class Extensions
     {
+        /// <summary>
+        /// Sets the value of a key. If a key already exists, it is overridden.
+        /// </summary>
+        public static void Set<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue value)
+        {
+            if (dictionary.ContainsKey(key))
+            {
+                dictionary[key] = value;
+            }
+            else
+            {
+                dictionary.Add(key, value);
+            }
+        }
         public static string CollectionToString<T>(this IEnumerable<T> collection)
         {
             string toReturn = "";

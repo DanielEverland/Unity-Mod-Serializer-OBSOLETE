@@ -44,7 +44,7 @@ namespace UMS.Core
         }
         private static void AddToConfig(int id, string name)
         {
-            ConfigFile.Add(id, name);
+            ConfigFile.Add(id, name, ObjectManager.GetKey(id));
         }
         public static void Serialize(string path)
         {

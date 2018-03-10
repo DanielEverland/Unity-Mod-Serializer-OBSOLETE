@@ -10,10 +10,32 @@ namespace UMS.Core
         public static IDictionary<int, object> Data { get { return _data; } }
 
         private static Dictionary<int, object> _data;
+        private static Dictionary<int, string> _idKeys;
 
         public static void Initialize()
         {
             _data = new Dictionary<int, object>();
+            _idKeys = new Dictionary<int, string>();
+        }
+        public static string GetKey(int ID)
+        {
+            if (_idKeys.ContainsKey(ID))
+            {
+                return _idKeys[ID];
+            }
+
+            return null;
+        }
+        public static void AddKey(object obj, string key)
+        {
+            AddKey(IDManager.GetID(obj), key);
+        }
+        public static void AddKey(int ID, string key)
+        {
+            if (!_idKeys.ContainsKey(ID))
+            {
+                _idKeys.Add(ID, key);
+            }
         }
         public static int Add(object obj)
         {
