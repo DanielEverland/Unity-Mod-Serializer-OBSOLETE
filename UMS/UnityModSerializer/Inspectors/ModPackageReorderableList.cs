@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿#if EDITOR
+using System.Linq;
 using UMS.Core;
 using UnityEditor;
 using UnityEditorInternal;
@@ -68,3 +69,4 @@ namespace UMS.Inspectors
         }
     }
 }
+#endif

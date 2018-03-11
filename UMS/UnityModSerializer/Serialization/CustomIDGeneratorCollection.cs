@@ -1,7 +1,9 @@
 ﻿using UMS.Behaviour;
 using UMS.Core;
-using UnityEditor;
 using UnityEngine;
+#if EDITOR
+using UnityEditor;
+#endif
 
 namespace UMS.Serialization
 {
@@ -18,6 +20,7 @@ namespace UMS.Serialization
 
             int id = 17;
 
+#if EDITOR
             unchecked
             {
                 int propertyCount = ShaderUtil.GetPropertyCount(material.shader);
@@ -33,9 +36,11 @@ namespace UMS.Serialization
                     }
                 }
             }
+#endif
 
             return id;
         }
+#if EDITOR
         private static object GetValue(Material material, int index)
         {
             switch (ShaderUtil.GetPropertyType(material.shader, index))
@@ -50,6 +55,7 @@ namespace UMS.Serialization
                     return null;
             }
         }
+#endif
         [CustomIDGenerator(typeof(Font))]
         public static int GetFontID(Font font)
         {

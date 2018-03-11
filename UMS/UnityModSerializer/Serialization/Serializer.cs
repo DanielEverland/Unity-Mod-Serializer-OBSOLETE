@@ -1,9 +1,10 @@
 ﻿using Ionic.Zip;
 using System.Collections.Generic;
 using UMS.Core;
-using UMS.Types;
-using UnityEditor;
 using UnityEngine;
+#if EDITOR
+using UnityEditor;
+#endif
 
 namespace UMS.Serialization
 {
@@ -79,6 +80,7 @@ namespace UMS.Serialization
             SerializePackages(package);
         }
 
+#if EDITOR
         [MenuItem(itemName: Utility.MENU_ITEM_ROOT + "/Serialize All", priority = Utility.MENU_ITEM_PRIORITY)]
         private static void SerializeAll()
         {
@@ -92,6 +94,7 @@ namespace UMS.Serialization
 
             SerializePackages(packages.ToArray());
         }
+#endif
 
         private static void SerializePackages(params ModPackage[] packages)
         {

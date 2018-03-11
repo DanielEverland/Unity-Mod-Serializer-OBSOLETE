@@ -6,7 +6,9 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UMS.Behaviour;
+#if EDITOR
 using UnityEditor;
+#endif
 
 namespace UMS.Core
 {
@@ -24,6 +26,7 @@ namespace UMS.Core
 
         private static Regex _endNumberParanthesis = new Regex(@"\(\d+\)$");
 
+#if EDITOR
         public static List<ModPackage> GetAllPackages()
         {
             return new List<ModPackage>(AssetDatabase.FindAssets("t:ModPackage").Select(x =>
@@ -31,6 +34,7 @@ namespace UMS.Core
                 return AssetDatabase.LoadAssetAtPath<ModPackage>(AssetDatabase.GUIDToAssetPath(x));
             }));
         }
+#endif
         public static byte[] EncodeToPNG(Texture2D texture)
         {
             // Create a temporary RenderTexture of the same size as the texture

@@ -1,7 +1,8 @@
-﻿using UMS.Core;
+﻿#if EDITOR
+using UMS.Core;
 using UMS.Serialization;
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
 
 namespace UMS.Inspectors
 {
@@ -48,3 +49,4 @@ namespace UMS.Inspectors
         }
     }
 }
+#endif

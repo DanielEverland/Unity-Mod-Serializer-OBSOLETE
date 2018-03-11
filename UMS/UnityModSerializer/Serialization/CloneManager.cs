@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UMS.Core;
+#if EDITOR
+using UnityEditor;
+#endif
 
 namespace UMS.Serialization
 {
@@ -14,7 +16,9 @@ namespace UMS.Serialization
             CoreManager.OnSerializationStarted += () => _isSerializing = true;
             CoreManager.OnSerializationCompleted += () => _isSerializing = false;
 
+#if EDITOR
             EditorApplication.update += ClearClones;
+#endif
         }
 
         public static CloneManager Instance
