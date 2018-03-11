@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using UMS.Deserialization;
+using UMS.Runtime.Deserialization;
 using UnityEngine;
 
 namespace UMS.Runtime.Types

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UMS.Deserialization;
+using UMS.Runtime.Deserialization;
 using UMS.Runtime.Core;
 
 namespace UMS.Serialization

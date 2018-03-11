@@ -8,7 +8,7 @@ using UMS.Runtime.Behaviour;
 using UMS.Runtime.Core;
 using UnityEngine;
 
-namespace UMS.Deserialization
+namespace UMS.Runtime.Deserialization
 {
     public static class Deserializer
     {

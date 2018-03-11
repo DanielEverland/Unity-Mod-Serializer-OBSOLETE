@@ -4,7 +4,7 @@ using System.Linq;
 using UMS.Runtime.Types;
 using UnityEngine;
 
-namespace UMS.Deserialization
+namespace UMS.Runtime.Deserialization
 {
     /// <summary>
     /// Used for deserializing components on a gameobject by ordering them based on dependencies, which are defined on components using the RequireComponent attribute

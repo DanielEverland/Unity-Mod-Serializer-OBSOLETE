@@ -2,7 +2,7 @@
 using System.Reflection;
 using UMS.Runtime.Behaviour;
 
-namespace UMS.Deserialization
+namespace UMS.Runtime.Deserialization
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class CustomConstructor : BehaviourBase

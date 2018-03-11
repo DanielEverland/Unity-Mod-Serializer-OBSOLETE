@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UMS.Deserialization
+namespace UMS.Runtime.Deserialization
 {
     public interface IAsynchronousDeserializer
     {

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using UMS.Runtime.Behaviour;
 using UMS.Runtime.Types;
-using UMS.Deserialization;
+using UMS.Runtime.Deserialization;
 
 namespace UMS.Runtime.Core
 {
