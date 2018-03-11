@@ -5,8 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UMS.Runtime.Behaviour;
-using UMS.Core;
-using UnityEditor;
+using UMS.Runtime.Core;
 using UnityEngine;
 
 namespace UMS.Deserialization

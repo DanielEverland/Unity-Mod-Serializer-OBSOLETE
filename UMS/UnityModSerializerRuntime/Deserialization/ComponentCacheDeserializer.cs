@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UMS.Core.Types;
+using UMS.Runtime.Types;
 using UnityEngine;
 
 namespace UMS.Deserialization
