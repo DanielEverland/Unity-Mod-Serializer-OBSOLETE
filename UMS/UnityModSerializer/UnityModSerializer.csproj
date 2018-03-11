@@ -66,7 +66,6 @@
     <Compile Include="Serialization\CustomSerializers.cs" />
     <Compile Include="Serialization\CustomValidityComparers.cs" />
     <Compile Include="Serialization\Extensions.cs" />
-    <Compile Include="Serialization\IModSerializer.cs" />
     <Compile Include="Serialization\JsonSerializer.cs" />
     <Compile Include="Serialization\Serializer.cs" />
   </ItemGroup>
