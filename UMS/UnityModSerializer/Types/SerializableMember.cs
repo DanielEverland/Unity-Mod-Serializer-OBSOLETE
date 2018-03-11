@@ -330,8 +330,8 @@ namespace UMS.Types
         {
             private ArrayDeserializationHandler(Array array, Action<object> onDeserialized)
             {
-                this.onDeserialized = onDeserialized;
-                deserializedObjects = new List<object>();
+                this._onDeserialized = onDeserialized;
+                _deserializedObjects = new List<object>();
 
                 for (int i = 0; i < array.Length; i++)
                 {
@@ -339,56 +339,56 @@ namespace UMS.Types
 
                     if (obj != null && obj is Reference reference)
                     {
-                        targetObjectCount++;
+                        _targetObjectCount++;
 
                         Deserializer.GetDeserializedObject(reference.ID, reference.NonSerializableType, x => AddObject(x));
                     }
                 }
 
-                if (targetObjectCount == 0)
+                if (_targetObjectCount == 0)
                     return;
 
-                finishedInitializing = true;
+                _finishedInitializing = true;
                 CheckIfDone();
             }
 
-            private Action<object> onDeserialized;
-            private List<object> deserializedObjects;
-            private bool finishedInitializing;
-            private int targetObjectCount;
+            private Action<object> _onDeserialized;
+            private List<object> _deserializedObjects;
+            private bool _finishedInitializing;
+            private int _targetObjectCount;
 
             private void AddObject(object obj)
             {
-                deserializedObjects.Add(obj);
+                _deserializedObjects.Add(obj);
 
                 CheckIfDone();
             }
 
             private void CheckIfDone()
             {
-                if (!finishedInitializing)
+                if (!_finishedInitializing)
                     return;
 
-                if (deserializedObjects.Count == targetObjectCount)
+                if (_deserializedObjects.Count == _targetObjectCount)
                 {
-                    onDeserialized?.Invoke(CreateArray());
+                    _onDeserialized?.Invoke(CreateArray());
                 }
             }
             private Array CreateArray()
             {
-                if (deserializedObjects.Count == 0)
+                if (_deserializedObjects.Count == 0)
                     throw new NullReferenceException();
 
-                Type targetType = deserializedObjects[0].GetType();
+                Type targetType = _deserializedObjects[0].GetType();
 
-                if (deserializedObjects.Any(x => x.GetType() != targetType))
+                if (_deserializedObjects.Any(x => x.GetType() != targetType))
                     throw new InvalidCastException();
 
-                Array array = Array.CreateInstance(targetType, deserializedObjects.Count);
+                Array array = Array.CreateInstance(targetType, _deserializedObjects.Count);
 
-                for (int i = 0; i < deserializedObjects.Count; i++)
+                for (int i = 0; i < _deserializedObjects.Count; i++)
                 {
-                    array.SetValue(deserializedObjects[i], i);
+                    array.SetValue(_deserializedObjects[i], i);
                 }
 
                 return array;

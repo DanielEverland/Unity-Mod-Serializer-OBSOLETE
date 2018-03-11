@@ -22,7 +22,7 @@ namespace UMS.Core
         /// </summary>
         public const string MANIFEST_NAME = "manifest";
 
-        private static Regex EndNumberParanthesis = new Regex(@"\(\d+\)$");
+        private static Regex _endNumberParanthesis = new Regex(@"\(\d+\)$");
 
         public static List<ModPackage> GetAllPackages()
         {
@@ -177,9 +177,9 @@ namespace UMS.Core
 
             if (blackList.Contains(fullName))
             {
-                if (EndNumberParanthesis.IsMatch(preferredName))
+                if (_endNumberParanthesis.IsMatch(preferredName))
                 {
-                    Match match = EndNumberParanthesis.Match(preferredName);
+                    Match match = _endNumberParanthesis.Match(preferredName);
 
                     int index = 0;
                     string strippedString = preferredName.Replace(match.Value, string.Empty);
