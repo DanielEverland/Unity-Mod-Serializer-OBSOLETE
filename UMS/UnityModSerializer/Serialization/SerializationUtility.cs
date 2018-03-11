@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UMS.Runtime.Core;
+using UMS.Core;
 using UnityEditor;
 
 namespace UMS.Serialization

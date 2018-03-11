@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UMS.Runtime.Core;
+using UMS.Core;
 
 namespace UMS.Serialization
 {

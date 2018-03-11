@@ -1,7 +1,7 @@
 ﻿using Ionic.Zip;
 using System.Collections.Generic;
-using UMS.Runtime.Core;
-using UMS.Runtime.Types;
+using UMS.Core;
+using UMS.Types;
 using UnityEditor;
 using UnityEngine;
 

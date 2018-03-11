@@ -1,5 +1,5 @@
-﻿using UMS.Runtime.Behaviour;
-using UMS.Runtime.Core;
+﻿using UMS.Behaviour;
+using UMS.Core;
 using UnityEditor;
 using UnityEngine;
 
