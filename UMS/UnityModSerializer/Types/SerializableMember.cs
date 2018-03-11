@@ -108,7 +108,7 @@ namespace UMS.Types
             if (obj == null)
                 return null;
 
-            if (CustomSerializers.CanSerialize(obj.GetType()))
+            if (Converter.CanSerialize(obj.GetType()))
             {
                 if (obj is UnityEngine.Object)
                 {
@@ -116,7 +116,7 @@ namespace UMS.Types
                 }
                 else
                 {
-                    return CustomSerializers.SerializeObject(obj);
+                    return Converter.SerializeObject(obj);
                 }
             }
 
@@ -138,7 +138,7 @@ namespace UMS.Types
 
             if (DeserializedValue is IModSerializer serializer)
             {
-                CustomSerializers.DeserializeObject(serializer, x =>
+                Converter.DeserializeObject(serializer, x =>
                 {
                     DeserializedValue = x;
 
