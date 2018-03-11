@@ -163,5 +163,17 @@ namespace UMS.Serialization
             CreateManifest();
             Serialize(string.Format(@"{0}/{1}.mod", System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop), package.name));
         }
+        /// <summary>
+        /// Adds a file to the Static Objects folder. Must be called during serialization
+        /// </summary>
+        /// <param name="path">Path relative to Static Objects folder</param>
+        public static string AddStaticObject(string path, byte[] data)
+        {
+            string fullPath = StaticObjects.FolderPath + path;
+
+            AddExtraFile(fullPath, data);
+
+            return fullPath;
+        }
     }
 }

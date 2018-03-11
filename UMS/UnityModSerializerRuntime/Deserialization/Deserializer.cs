@@ -44,6 +44,14 @@ namespace UMS.Runtime.Deserialization
 
             _hasInitialized = true;
         }
+        public static bool ContainsStaticObject(string localPath)
+        {
+            return StaticObjects.Contains(localPath);
+        }
+        public static byte[] GetObject(string localPath)
+        {
+            return StaticObjects.GetObject(localPath);
+        }
         public static void DeserializePackage(string path)
         {
             Initialize();

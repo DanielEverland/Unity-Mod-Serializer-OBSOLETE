@@ -30,18 +30,5 @@ namespace UMS.Runtime.Core
 
             return Deserializer.SerializedData[FolderPath + localPath];
         }
-
-        /// <summary>
-        /// Adds a file to the Static Objects folder. Must be called during serialization
-        /// </summary>
-        /// <param name="path">Path relative to Static Objects folder</param>
-        public static string AddObject(string path, byte[] data)
-        {
-            string fullPath = FolderPath + path;
-
-            Serializer.AddExtraFile(fullPath, data);
-
-            return fullPath;
-        }
     }
 }
