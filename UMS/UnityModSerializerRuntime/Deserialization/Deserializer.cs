@@ -27,6 +27,18 @@ namespace UMS.Runtime.Deserialization
         private static List<JsonConverter> _converters;
         private static bool _hasFinished;
 
+        private static void Initialize()
+        {
+            _keyLookup = new Dictionary<string, ObjectEntry>();
+            _serializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
+            _deserializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
+            _converters = new List<JsonConverter>();
+
+            BehaviourManager.OnBehaviourLoadedWithContext += BehaviourLoaded;
+
+            CoreManager.Initialize();
+        }
+
         [MenuItem(itemName: Utility.MENU_ITEM_ROOT + "/Deserialize", priority = Utility.MENU_ITEM_PRIORITY)]
         private static void Deserialize()
         {
@@ -39,7 +51,6 @@ namespace UMS.Runtime.Deserialization
             _hasFinished = true;
             Debug.Log("Finished deserializing");
         }
- 
         public static Dictionary<string, byte[]> DeserializePackage(string path)
         {
             Dictionary<string, byte[]> files = new Dictionary<string, byte[]>();
@@ -64,18 +75,7 @@ namespace UMS.Runtime.Deserialization
             files.Remove(Utility.MANIFEST_NAME);
 
             return files;
-        }
-        private static void Initialize()
-        {
-            _keyLookup = new Dictionary<string, ObjectEntry>();
-            _serializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
-            _deserializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
-            _converters = new List<JsonConverter>();
-
-            BehaviourManager.OnBehaviourLoadedWithContext += BehaviourLoaded;
-
-            CoreManager.Initialize();
-        }
+        }        
         public static bool KeyExists(string key)
         {
             if (!HasDeserialized)
@@ -308,9 +308,9 @@ namespace UMS.Runtime.Deserialization
             }
             private void CreateDeserializedObject()
             {
-                if (Serialization.CustomSerializers.CanDeserialize(SerializedObject.GetType()))
+                if (Converter.CanDeserialize(SerializedObject.GetType()))
                 {
-                    Serialization.CustomSerializers.DeserializeObject(SerializedObject, AssignDeserializedObject);
+                    Converter.DeserializeObject(SerializedObject, AssignDeserializedObject);
                 }
             }
             public void AssignDeserializedObject(object obj)

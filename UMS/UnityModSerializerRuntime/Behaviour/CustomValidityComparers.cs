@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using UMS.Runtime.Behaviour;
 
-namespace UMS.Serialization
+namespace UMS.Runtime.Behaviour
 {
     public static class CustomValidityComparers
     {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UMS.Runtime.Behaviour;
 
 namespace UMS.Runtime.Core
 {
@@ -93,7 +94,7 @@ namespace UMS.Runtime.Core
             if (obj.ToString() == "null")
                 return true;
 
-            return !Serialization.CustomValidityComparers.IsValid(obj);
+            return !CustomValidityComparers.IsValid(obj);
         }
         public static MemberInfo GetMember(Type type, string name)
         {

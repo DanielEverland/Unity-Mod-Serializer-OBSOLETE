@@ -35,7 +35,7 @@ namespace UMS.Serialization
                 //This is done to prevent infinite loops. Once an object ID has been added, we only want to serialize it once, and use its ID as a reference
                 _data.Add(id, null);
 
-                _data[id] = CustomSerializers.SerializeObject(obj);
+                _data[id] = Converter.SerializeObject(obj);
 
                 if (!(_data[id] is IModEntry))
                     throw new System.ArgumentException("Tried to add " + _data[id].GetType() + " as a reference type, but it does not implement IModEntry");
@@ -138,7 +138,7 @@ namespace UMS.Serialization
 
             KeyManager.Add(toSerialize, entry.Key);
 
-            object serialized = CustomSerializers.SerializeObject(toSerialize);
+            object serialized = Converter.SerializeObject(toSerialize);
         }
         public static void AddExtraFile(string filePath, byte[] data)
         {

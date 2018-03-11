@@ -63,7 +63,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\CloneManager.cs" />
     <Compile Include="Serialization\CustomIDGeneratorCollection.cs" />
-    <Compile Include="Serialization\CustomSerializers.cs" />
     <Compile Include="Serialization\CustomValidityComparers.cs" />
     <Compile Include="Serialization\Extensions.cs" />
     <Compile Include="Serialization\JsonSerializer.cs" />

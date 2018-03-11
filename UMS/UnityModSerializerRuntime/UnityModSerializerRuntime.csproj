@@ -64,6 +64,7 @@
     <Compile Include="Core\AssemblyManager.cs" />
     <Compile Include="Core\ComponentMemberCollection.cs" />
     <Compile Include="Core\Config.cs" />
+    <Compile Include="Core\Converter.cs" />
     <Compile Include="Core\CoreManager.cs" />
     <Compile Include="Core\Debugging.cs" />
     <Compile Include="Core\Extensions.cs" />
