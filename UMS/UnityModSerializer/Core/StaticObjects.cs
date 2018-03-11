@@ -1,5 +1,6 @@
 ﻿using System;
 using UMS.Deserialization;
+using UMS.Serialization;
 
 namespace UMS.Core
 {
@@ -29,6 +30,19 @@ namespace UMS.Core
                 throw new NullReferenceException();
 
             return Deserializer.SerializedData[FolderPath + localPath];
+        }
+
+        /// <summary>
+        /// Adds a file to the Static Objects folder. Must be called during serialization
+        /// </summary>
+        /// <param name="path">Path relative to Static Objects folder</param>
+        public static string Add(string path, byte[] data)
+        {
+            string fullPath = FolderPath + path;
+
+            Serializer.AddExtraFile(fullPath, data);
+
+            return fullPath;
         }
     }
 }
