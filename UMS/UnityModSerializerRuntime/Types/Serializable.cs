@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
+using UMS.Runtime.Core;
 using System;
 
-namespace UMS.Types
+namespace UMS.Runtime.Types
 {
     [Serializable]
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
@@ -9,7 +10,7 @@ namespace UMS.Types
     {
         public Type NonSerializableType => typeof(TFrom);
         public Type SerializedType => typeof(TTo);
-        public virtual int Priority => (int)Core.Priority.Medium;
+        public virtual int Priority => (int)Runtime.Core.Priority.Medium;
 
         public virtual TFrom Deserialize(TTo serializable) { throw new NotImplementedException(GetType().ToString()); }
         public virtual TTo Serialize(TFrom obj) { throw new NotImplementedException(GetType().ToString()); }
