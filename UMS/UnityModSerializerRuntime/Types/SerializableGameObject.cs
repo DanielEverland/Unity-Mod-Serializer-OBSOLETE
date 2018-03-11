@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using UMS.Runtime.Core;
 using UMS.Runtime.Deserialization;
 using UnityEngine;
 
