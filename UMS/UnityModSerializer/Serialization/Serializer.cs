@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using UMS.Core;
+﻿using Ionic.Zip;
+using System.Collections.Generic;
+using UMS.Runtime.Core;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,7 +11,61 @@ namespace UMS.Serialization
         public static IDictionary<string, byte[]> ExtraFiles { get { return extraFiles; } }
 
         private static Dictionary<string, byte[]> extraFiles = new Dictionary<string, byte[]>();
+        private static Dictionary<string, string> filesToWrite;
+        private static HashSet<string> usedNames;
 
+        public static void CreateManifest()
+        {
+            Manifest.Instance = new Manifest();
+
+            filesToWrite = new Dictionary<string, string>();
+            usedNames = new HashSet<string>();
+
+            foreach (KeyValuePair<int, object> keyValuePair in ObjectManager.Data)
+            {
+                if (keyValuePair.Value is IModEntry entry)
+                {
+                    string preferredName = string.Format("{0}/{1}", entry.FolderName, entry.FileName);
+
+                    string json = JsonSerializer.ToJson(keyValuePair.Value);
+                    string name = Utility.GetValidName(preferredName, entry.Extension, usedNames);
+                    string extension = Utility.SanitizeExtension(entry.Extension);
+
+                    AddToManifest(keyValuePair.Key, name);
+
+                    usedNames.Add(name);
+
+                    filesToWrite.Add(name, json);
+                }
+                else
+                {
+                    UnityEngine.Debug.LogWarning("Tried to add " + keyValuePair.Value + " as a reference type, but it doesn't implement IModEntry");
+                }
+            }
+        }
+        private static void AddToManifest(int id, string name)
+        {
+            Manifest.Instance.Add(id, name, ObjectManager.GetKey(id));
+        }
+        public static void Serialize(string path)
+        {
+            filesToWrite.Add(Utility.MANIFEST_NAME, JsonSerializer.ToJson(Manifest.Instance));
+
+            using (ZipFile zip = new ZipFile())
+            {
+                foreach (KeyValuePair<string, string> file in filesToWrite)
+                {
+                    zip.AddEntry(file.Key, file.Value);
+                }
+
+                foreach (KeyValuePair<string, byte[]> file in Serializer.ExtraFiles)
+                {
+                    zip.AddEntry(file.Key, file.Value);
+                }
+
+                zip.Save(path);
+            }
+        }
         public static void SerializePackage(ModPackage package)
         {
             if (package == null)
@@ -75,8 +130,8 @@ namespace UMS.Serialization
         }
         private static void InitializeSerialization(ModPackage package)
         {
-            Mod.Initialize();
-            Mod.Serialize(string.Format(@"{0}/{1}.mod", System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop), package.name));
+            CreateManifest();
+            Serialize(string.Format(@"{0}/{1}.mod", System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop), package.name));
         }
     }
 }

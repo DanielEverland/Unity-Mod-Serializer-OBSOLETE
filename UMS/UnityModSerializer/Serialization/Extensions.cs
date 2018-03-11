@@ -11,13 +11,5 @@ namespace UMS.Serialization
         {
             return JsonSerializer.ToJson(obj);
         }
-        public static T ToObject<T>(this string json)
-        {
-            return JsonSerializer.ToObject<T>(json);
-        }
-        public static object ToObject(this string json)
-        {
-            return JsonSerializer.ToObject<object>(json);
-        }
     }
 }

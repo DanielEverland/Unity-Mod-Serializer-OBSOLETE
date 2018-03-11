@@ -15,6 +15,11 @@ namespace UMS.Runtime.Core
         public const string MENU_ITEM_ROOT = "Modding";
         public const string MENU_SERIALIZATION = "Serialization";
 
+        /// <summary>
+        /// Name used for the manifest file
+        /// </summary>
+        public const string MANIFEST_NAME = "manifest";
+
         private static Regex EndNumberParanthesis = new Regex(@"\(\d+\)$");
 
         public static List<ModPackage> GetAllPackages()

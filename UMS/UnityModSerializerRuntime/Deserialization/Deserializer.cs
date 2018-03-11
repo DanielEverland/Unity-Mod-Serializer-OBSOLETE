@@ -1,7 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using Ionic.Zip;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using UMS.Runtime.Behaviour;
@@ -36,6 +38,31 @@ namespace UMS.Runtime.Deserialization
 
             _hasFinished = true;
             Debug.Log("Finished deserializing");
+        }
+        public static Dictionary<string, byte[]> DeserializePackage(string path)
+        {
+            Dictionary<string, byte[]> files = new Dictionary<string, byte[]>();
+
+            using (ZipFile zip = ZipFile.Read(path))
+            {
+                foreach (ZipEntry entry in zip)
+                {
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        entry.Extract(stream);
+
+                        files.Add(entry.FileName, stream.ToArray());
+                    }
+                }
+            }
+
+            if (!files.ContainsKey(Utility.MANIFEST_NAME))
+                throw new NullReferenceException("No manifest file in " + path);
+
+            Manifest.Instance = JsonDeserializer.ToObject<Manifest>(Utility.ToString(files[Utility.MANIFEST_NAME]));
+            files.Remove(Utility.MANIFEST_NAME);
+
+            return files;
         }
         private static void Initialize()
         {
@@ -222,13 +249,13 @@ namespace UMS.Runtime.Deserialization
         private static void ExecuteDeserialization()
         {
             _objectReferences = new Dictionary<int, ObjectEntry>();
-            _serializedData = Mod.Deserialize(@"C:/Users/Daniel/Desktop/New Mod.mod");
+            _serializedData = DeserializePackage(@"C:/Users/Daniel/Desktop/New Mod.mod");
 
             foreach (KeyValuePair<string, byte[]> file in _serializedData)
             {
-                if (Mod.ConfigFile.data.Any(x => x.localPath == file.Key))
+                if (Manifest.Instance.data.Any(x => x.localPath == file.Key))
                 {
-                    Config.Data data = Mod.ConfigFile.data.Find(x => x.localPath == file.Key);
+                    Manifest.Data data = Manifest.Instance.data.Find(x => x.localPath == file.Key);
 
                     if (!_objectReferences.ContainsKey(data.id))
                     {
@@ -259,7 +286,7 @@ namespace UMS.Runtime.Deserialization
         }
         private class ObjectEntry
         {
-            public ObjectEntry(string json, Config.Data data)
+            public ObjectEntry(string json, Manifest.Data data)
             {
                 JSON = json;
 
@@ -276,7 +303,7 @@ namespace UMS.Runtime.Deserialization
 
             private void CreateSerializedObject()
             {
-                SerializedObject = Serialization.JsonSerializer.ToObject(JSON);
+                SerializedObject = JsonDeserializer.ToObject(JSON);
             }
             private void CreateDeserializedObject()
             {

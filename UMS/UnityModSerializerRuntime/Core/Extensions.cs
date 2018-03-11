@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UMS.Runtime.Deserialization;
 
 namespace UMS.Runtime.Core
 {
@@ -51,6 +52,14 @@ namespace UMS.Runtime.Core
             {
                 UnityEngine.Debug.Log(obj);
             }
+        }
+        public static T ToObject<T>(this string json)
+        {
+            return JsonDeserializer.ToObject<T>(json);
+        }
+        public static object ToObject(this string json)
+        {
+            return JsonDeserializer.ToObject<object>(json);
         }
     }
 }

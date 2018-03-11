@@ -3,8 +3,10 @@
 namespace UMS.Runtime.Core
 {
     [System.Serializable]
-    public class Config
+    public class Manifest
     {
+        public static Manifest Instance { get; set; }
+
         public void Add(int id, string localPath, string key)
         {
             data.Add(new Data(id, localPath, key));
