@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UMS.Runtime.Behaviour;
+using UMS.Runtime.Types;
 
 namespace UMS.Runtime.Core
 {
     public class IDManager
     {
+        public static IDictionary<int, object> Data { get { return _data; } }
+
         private static CustomIDGeneratorManager IDGeneratorManager
         {
             get
@@ -20,12 +23,39 @@ namespace UMS.Runtime.Core
         private static CustomIDGeneratorManager _customIDGeneratorManager;
 
         private static Dictionary<int, int> _objectLookup;
+        private static Dictionary<int, object> _data;
         private static HashSet<int> _blockedIDs;
 
         public static void Initialize()
         {
             _objectLookup = new Dictionary<int, int>();
             _blockedIDs = new HashSet<int>();
+            _data = new Dictionary<int, object>();
+        }
+        public static int AddObject(object obj)
+        {
+            if (obj == null)
+                throw new NullReferenceException("Object cannot be null");
+
+            if (obj is Reference reference)
+                return reference.ID;
+
+            int id = Utility.GetID(obj);
+
+            if (!_data.ContainsKey(id))
+            {
+                //The two lines cannot be merged!
+                //We add the ID before the value because SerializeObject might call constructors that checks whether an ID exists
+                //This is done to prevent infinite loops. Once an object ID has been added, we only want to serialize it once, and use its ID as a reference
+                _data.Add(id, null);
+
+                _data[id] = Converter.SerializeObject(obj);
+
+                if (!(_data[id] is IModEntry))
+                    throw new ArgumentException("Tried to add " + _data[id].GetType() + " as a reference type, but it does not implement IModEntry");
+            }
+
+            return id;
         }
         public static int GetID(object obj)
         {

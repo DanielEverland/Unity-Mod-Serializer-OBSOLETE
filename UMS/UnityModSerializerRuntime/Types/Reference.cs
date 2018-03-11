@@ -1,5 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using Newtonsoft.Json;
+using UMS.Runtime.Core;
 
 namespace UMS.Runtime.Types
 {
@@ -14,7 +15,7 @@ namespace UMS.Runtime.Types
                 throw new NullReferenceException();
             }
 
-            ID = ObjectManager.Add(obj);
+            ID = IDManager.AddObject(obj);
         }
 
         public int ID { get { return _id; } private set { _id = value; } }

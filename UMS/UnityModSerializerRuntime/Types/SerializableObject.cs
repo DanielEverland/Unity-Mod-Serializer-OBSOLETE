@@ -16,7 +16,7 @@ namespace UMS.Runtime.Types
 
             _name = obj.name;
             _hideFlags = obj.hideFlags;
-            _id = ObjectManager.Add(obj);
+            _id = IDManager.AddObject(obj);
         }
 
         public abstract string Extension { get; }

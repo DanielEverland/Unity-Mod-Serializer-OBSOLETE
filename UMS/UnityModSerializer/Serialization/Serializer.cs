@@ -10,48 +10,23 @@ namespace UMS.Serialization
     public static class Serializer
     {
         public static IDictionary<string, byte[]> ExtraFiles { get { return _extraFiles; } }
-        public static IDictionary<int, object> Data { get { return _data; } }
-
-
+                
         private static Dictionary<string, byte[]> _extraFiles = new Dictionary<string, byte[]>();
-        private static Dictionary<string, string> _filesToWrite;
-        private static Dictionary<int, object> _data;
+        private static Dictionary<string, string> _filesToWrite;        
         private static HashSet<string> _usedNames;
 
         public static int AddObject(object obj)
         {
-            if (obj == null)
-                throw new System.NullReferenceException("Object cannot be null");
-
-            if (obj is Reference reference)
-                return reference.ID;
-
-            int id = Utility.GetID(obj);
-
-            if (!_data.ContainsKey(id))
-            {
-                //The two lines cannot be merged!
-                //We add the ID before the value because SerializeObject might call constructors that checks whether an ID exists
-                //This is done to prevent infinite loops. Once an object ID has been added, we only want to serialize it once, and use its ID as a reference
-                _data.Add(id, null);
-
-                _data[id] = Converter.SerializeObject(obj);
-
-                if (!(_data[id] is IModEntry))
-                    throw new System.ArgumentException("Tried to add " + _data[id].GetType() + " as a reference type, but it does not implement IModEntry");
-            }
-
-            return id;
+            return IDManager.AddObject(obj);
         }
         public static void CreateManifest()
         {
             Manifest.Instance = new Manifest();
 
             _filesToWrite = new Dictionary<string, string>();
-            _data = new Dictionary<int, object>();
             _usedNames = new HashSet<string>();
 
-            foreach (KeyValuePair<int, object> keyValuePair in Data)
+            foreach (KeyValuePair<int, object> keyValuePair in IDManager.Data)
             {
                 if (keyValuePair.Value is IModEntry entry)
                 {
