@@ -10,8 +10,10 @@ namespace UMS.Core
     {
         public IEnumerable<ObjectEntry> ObjectEntries { get { return _objectEntries; } }
 
+#pragma warning disable
         [SerializeField]
         private List<ObjectEntry> _objectEntries;
+#pragma warning restore
 
         [Serializable]
         public class ObjectEntry

@@ -24,7 +24,7 @@ namespace UMS.Deserialization
         private static Dictionary<int, List<ActionInstance>> _serializedObjectQueue;
         private static Dictionary<int, List<ActionInstance>> _deserializedObjectQueue;
 
-        private static List<Newtonsoft.Json.JsonConverter> _converters;
+        private static List<JsonConverter> _converters;
         private static bool _hasFinished;
         private static bool _hasInitialized;
 
@@ -34,9 +34,11 @@ namespace UMS.Deserialization
                 return;
 
             _keyLookup = new Dictionary<string, ObjectEntry>();
+            _serializedData = new Dictionary<string, byte[]>();
+            _objectReferences = new Dictionary<int, ObjectEntry>();
             _serializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
             _deserializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
-            _converters = new List<Newtonsoft.Json.JsonConverter>();
+            _converters = new List<JsonConverter>();
 
             BehaviourManager.OnBehaviourLoadedWithContext += BehaviourLoaded;
 
