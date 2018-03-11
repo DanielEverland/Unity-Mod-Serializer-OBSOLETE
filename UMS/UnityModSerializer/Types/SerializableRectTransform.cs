@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using UMS.Core;
 using UnityEngine;
 
 namespace UMS.Types
