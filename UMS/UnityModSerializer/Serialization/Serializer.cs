@@ -107,7 +107,7 @@ namespace UMS.Serialization
         [MenuItem(itemName: Utility.MENU_ITEM_ROOT + "/Serialize All", priority = Utility.MENU_ITEM_PRIORITY)]
         private static void SerializeAll()
         {
-            List<ModPackage> packages = Utility.GetAllPackages();
+            List<ModPackage> packages = SerializationUtility.GetAllPackages();
 
             if (packages.Count == 0)
             {

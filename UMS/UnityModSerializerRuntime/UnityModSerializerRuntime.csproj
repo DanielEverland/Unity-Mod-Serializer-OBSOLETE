@@ -55,6 +55,7 @@
     <Compile Include="Behaviour\BehaviourManager.cs" />
     <Compile Include="Behaviour\BlockedTypes.cs" />
     <Compile Include="Behaviour\CustomIDGeneratorAttribute.cs" />
+    <Compile Include="Behaviour\CustomValidityComparers.cs" />
     <Compile Include="Behaviour\IBehaviourClassLoader.cs" />
     <Compile Include="Behaviour\IBehaviourMemberLoader.cs" />
     <Compile Include="Behaviour\IValidityComparer.cs" />

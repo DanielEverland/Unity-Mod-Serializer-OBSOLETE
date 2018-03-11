@@ -22,14 +22,7 @@ namespace UMS.Runtime.Core
         public const string MANIFEST_NAME = "manifest";
 
         private static Regex EndNumberParanthesis = new Regex(@"\(\d+\)$");
-
-        public static List<ModPackage> GetAllPackages()
-        {
-            return new List<ModPackage>(AssetDatabase.FindAssets("t:ModPackage").Select(x =>
-            {
-                return AssetDatabase.LoadAssetAtPath<ModPackage>(AssetDatabase.GUIDToAssetPath(x));
-            }));
-        }
+                
         public static byte[] EncodeToPNG(Texture2D texture)
         {
             // Create a temporary RenderTexture of the same size as the texture
