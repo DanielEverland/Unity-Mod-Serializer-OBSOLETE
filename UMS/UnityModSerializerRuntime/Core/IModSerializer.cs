@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UMS.Serialization
+namespace UMS.Runtime.Core
 {
     public interface IModSerializer
     {
