@@ -186,8 +186,7 @@ namespace UMS.Core
 
                     foreach (Capture capture in match.Captures)
                     {
-                        int value = 0;
-                        if (int.TryParse(capture.Value.Trim(')', '('), out value))
+                        if (int.TryParse(capture.Value.Trim(')', '('), out int value))
                         {
                             index = value;
                             break;
