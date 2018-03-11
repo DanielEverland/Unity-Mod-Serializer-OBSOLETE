@@ -15,12 +15,13 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Client|AnyCPU' ">
     <AssemblyName>UMS_Runtime</AssemblyName>
-    <DebugType>none</DebugType>
+    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\Client\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Editor|AnyCPU'">
     <AssemblyName>UMS_Editor</AssemblyName>
@@ -30,6 +31,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
@@ -127,8 +130,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y "$(TargetDir)/$(TargetName).dll" "D:\SerializerTest\Assets\Plugins\Mod Serializer/$(TargetName).dll"
-copy /y "$(TargetDir)/$(TargetName).pdb" "D:\SerializerTest\Assets\Plugins\Mod Serializer/$(TargetName).pdb"
+    <PostBuildEvent>copy /y "$(ProjectDir)bin\Client\$(TargetName).dll" "D:\SerializerTest\Assets\Plugins\Mod Serializer\$(TargetName).dll"
+copy /y "$(ProjectDir)bin\Client\$(TargetName).pdb" "D:\SerializerTest\Assets\Plugins\Mod Serializer\$(TargetName).pdb"
+
+copy /y "$(ProjectDir)bin\Editor\$(TargetName).dll" "D:\SerializerTest\Assets\Plugins\Mod Serializer/Editor\$(TargetName).dll"
+copy /y "$(ProjectDir)bin\Editor\$(TargetName).pdb" "D:\SerializerTest\Assets\Plugins\Mod Serializer/Editor\$(TargetName).pdb"
 
 copy /y "$(TargetDir)/Newtonsoft.Json.dll" "D:\SerializerTest\Assets\Plugins\Mod Serializer/Newtonsoft.Json.dll"
 copy /y "$(TargetDir)/Newtonsoft.Json.pdb" "D:\SerializerTest\Assets\Plugins\Mod Serializer/Newtonsoft.Json.pdb"
