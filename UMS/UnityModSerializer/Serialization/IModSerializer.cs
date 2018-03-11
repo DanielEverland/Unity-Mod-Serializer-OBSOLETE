@@ -25,15 +25,3 @@ namespace UMS.Serialization
         void Serialize(TObject obj);
     }
 }
-namespace UMS.Deserialization
-{
-    public interface ICustomDeserializer { }
-    public interface IDeserializer<TObject, TSerializable> : ICustomDeserializer
-    {
-        TObject Deserialize(TSerializable serializable);
-    }
-    public interface IDeserializer<TSerializable> : ICustomDeserializer
-    {
-        void Deserialize(TSerializable serializable);
-    }
-}
