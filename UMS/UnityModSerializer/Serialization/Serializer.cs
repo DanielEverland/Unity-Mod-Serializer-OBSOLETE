@@ -32,7 +32,7 @@ namespace UMS.Serialization
                 {
                     string preferredName = string.Format("{0}/{1}", entry.FolderName, entry.FileName);
 
-                    string json = JsonSerializer.ToJson(keyValuePair.Value);
+                    string json = Json.ToJson(keyValuePair.Value);
                     string name = Utility.GetValidName(preferredName, entry.Extension, _usedNames);
                     string extension = Utility.SanitizeExtension(entry.Extension);
 
@@ -54,7 +54,7 @@ namespace UMS.Serialization
         }
         public static void Serialize(string path)
         {
-            _filesToWrite.Add(Utility.MANIFEST_NAME, JsonSerializer.ToJson(Manifest.Instance));
+            _filesToWrite.Add(Utility.MANIFEST_NAME, Json.ToJson(Manifest.Instance));
 
             using (ZipFile zip = new ZipFile())
             {

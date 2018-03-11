@@ -24,7 +24,7 @@ namespace UMS.Runtime.Deserialization
         private static Dictionary<int, List<ActionInstance>> _serializedObjectQueue;
         private static Dictionary<int, List<ActionInstance>> _deserializedObjectQueue;
 
-        private static List<JsonConverter> _converters;
+        private static List<Newtonsoft.Json.JsonConverter> _converters;
         private static bool _hasFinished;
         private static bool _hasInitialized;
 
@@ -36,7 +36,7 @@ namespace UMS.Runtime.Deserialization
             _keyLookup = new Dictionary<string, ObjectEntry>();
             _serializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
             _deserializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
-            _converters = new List<JsonConverter>();
+            _converters = new List<Newtonsoft.Json.JsonConverter>();
 
             BehaviourManager.OnBehaviourLoadedWithContext += BehaviourLoaded;
 
@@ -74,7 +74,7 @@ namespace UMS.Runtime.Deserialization
             if (!files.ContainsKey(Utility.MANIFEST_NAME))
                 throw new NullReferenceException("No manifest file in " + path);
 
-            Manifest.Instance = JsonDeserializer.ToObject<Manifest>(Utility.ToString(files[Utility.MANIFEST_NAME]));
+            Manifest.Instance = Json.ToObject<Manifest>(Utility.ToString(files[Utility.MANIFEST_NAME]));
             files.Remove(Utility.MANIFEST_NAME);
 
             foreach (KeyValuePair<string, byte[]> file in _serializedData)
@@ -166,7 +166,7 @@ namespace UMS.Runtime.Deserialization
                 }
             }
         }
-        public static IList<JsonConverter> GetConverters()
+        public static IList<Newtonsoft.Json.JsonConverter> GetConverters()
         {
             return _converters;
         }
@@ -305,7 +305,7 @@ namespace UMS.Runtime.Deserialization
 
             private void CreateSerializedObject()
             {
-                SerializedObject = JsonDeserializer.ToObject(JSON);
+                SerializedObject = Json.ToObject(JSON);
             }
             private void CreateDeserializedObject()
             {
@@ -329,7 +329,7 @@ namespace UMS.Runtime.Deserialization
                 CreateDeserializedObject();
             }
         }
-        private class CustomConstructorConverter : JsonConverter
+        private class CustomConstructorConverter : Newtonsoft.Json.JsonConverter
         {
             private CustomConstructorConverter() { }
             public CustomConstructorConverter(CustomConstructor customConstructor)

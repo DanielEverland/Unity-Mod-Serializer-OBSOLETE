@@ -55,11 +55,11 @@ namespace UMS.Runtime.Core
         }
         public static T ToObject<T>(this string json)
         {
-            return JsonDeserializer.ToObject<T>(json);
+            return Json.ToObject<T>(json);
         }
         public static object ToObject(this string json)
         {
-            return JsonDeserializer.ToObject<object>(json);
+            return Json.ToObject<object>(json);
         }
     }
 }

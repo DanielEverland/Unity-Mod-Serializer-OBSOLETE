@@ -77,7 +77,7 @@ namespace UMS.Runtime.Types
 
         public bool IsJSONEmpty()
         {
-            string json = Serialization.JsonSerializer.ToJson(_value.SerializedObject);
+            string json = Json.ToJson(_value.SerializedObject);
 
             string[] lines = json.Split('\n');
 

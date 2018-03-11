@@ -64,7 +64,6 @@
     <Compile Include="Serialization\CloneManager.cs" />
     <Compile Include="Serialization\CustomIDGeneratorCollection.cs" />
     <Compile Include="Serialization\Extensions.cs" />
-    <Compile Include="Serialization\JsonSerializer.cs" />
     <Compile Include="Serialization\SerializationUtility.cs" />
     <Compile Include="Serialization\Serializer.cs" />
   </ItemGroup>
