@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using UMS.Core;
 using UnityEngine;
 
 namespace UMS.Types
@@ -18,7 +19,7 @@ namespace UMS.Types
 
             byte[] textureData = Utility.EncodeToPNG(texture);
 
-            _imageFilePath = StaticObjects.AddObject(_imageFilePath, textureData);
+            _imageFilePath = StaticObjects.Add(_imageFilePath, textureData);
 
             _alphaIsTransparency = texture.alphaIsTransparency;
             _format = (int)texture.format;
