@@ -26,9 +26,13 @@ namespace UMS.Runtime.Deserialization
 
         private static List<JsonConverter> _converters;
         private static bool _hasFinished;
+        private static bool _hasInitialized;
 
         private static void Initialize()
         {
+            if (_hasInitialized)
+                return;
+
             _keyLookup = new Dictionary<string, ObjectEntry>();
             _serializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
             _deserializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
@@ -37,22 +41,13 @@ namespace UMS.Runtime.Deserialization
             BehaviourManager.OnBehaviourLoadedWithContext += BehaviourLoaded;
 
             CoreManager.Initialize();
-        }
 
-        [MenuItem(itemName: Utility.MENU_ITEM_ROOT + "/Deserialize", priority = Utility.MENU_ITEM_PRIORITY)]
-        private static void Deserialize()
+            _hasInitialized = true;
+        }
+        public static void DeserializePackage(string path)
         {
             Initialize();
-            ExecuteDeserialization();
 
-            CheckForCachedActions();
-            CoreManager.FinishedSerialization();
-
-            _hasFinished = true;
-            Debug.Log("Finished deserializing");
-        }
-        public static Dictionary<string, byte[]> DeserializePackage(string path)
-        {
             Dictionary<string, byte[]> files = new Dictionary<string, byte[]>();
 
             using (ZipFile zip = ZipFile.Read(path))
@@ -74,7 +69,32 @@ namespace UMS.Runtime.Deserialization
             Manifest.Instance = JsonDeserializer.ToObject<Manifest>(Utility.ToString(files[Utility.MANIFEST_NAME]));
             files.Remove(Utility.MANIFEST_NAME);
 
-            return files;
+            foreach (KeyValuePair<string, byte[]> file in _serializedData)
+            {
+                if (Manifest.Instance.data.Any(x => x.localPath == file.Key))
+                {
+                    Manifest.Data data = Manifest.Instance.data.Find(x => x.localPath == file.Key);
+
+                    if (!_objectReferences.ContainsKey(data.id))
+                    {
+                        ObjectEntry entry = new ObjectEntry(Utility.ToString(file.Value), data);
+
+                        _objectReferences.Add(data.id, entry);
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<int, ObjectEntry> keyValuePair in _objectReferences)
+            {
+                keyValuePair.Value.Deserialize();
+
+                ExecuteID(keyValuePair.Key);
+            }
+
+            CheckForCachedActions();
+            CoreManager.FinishedSerialization();
+
+            _hasFinished = true;
         }        
         public static bool KeyExists(string key)
         {
@@ -245,33 +265,6 @@ namespace UMS.Runtime.Deserialization
             else
             {
                 action(_objectReferences[id].DeserializedObject);
-            }
-        }
-        private static void ExecuteDeserialization()
-        {
-            _objectReferences = new Dictionary<int, ObjectEntry>();
-            _serializedData = DeserializePackage(@"C:/Users/Daniel/Desktop/New Mod.mod");
-
-            foreach (KeyValuePair<string, byte[]> file in _serializedData)
-            {
-                if (Manifest.Instance.data.Any(x => x.localPath == file.Key))
-                {
-                    Manifest.Data data = Manifest.Instance.data.Find(x => x.localPath == file.Key);
-
-                    if (!_objectReferences.ContainsKey(data.id))
-                    {
-                        ObjectEntry entry = new ObjectEntry(Utility.ToString(file.Value), data);
-
-                        _objectReferences.Add(data.id, entry);
-                    }
-                }
-            }
-
-            foreach (KeyValuePair<int, ObjectEntry> keyValuePair in _objectReferences)
-            {
-                keyValuePair.Value.Deserialize();
-
-                ExecuteID(keyValuePair.Key);
             }
         }
         private class ActionInstance
