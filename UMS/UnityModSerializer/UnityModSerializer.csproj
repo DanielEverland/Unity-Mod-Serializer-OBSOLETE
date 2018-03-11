@@ -13,16 +13,8 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Client|AnyCPU' ">
+    <AssemblyName>UMS_Runtime</AssemblyName>
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -135,8 +127,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y "$(TargetDir)/$(TargetName).dll" "D:\SerializerTest\Assets\Plugins\Mod Serializer/Editor/$(TargetName).dll"
-copy /y "$(TargetDir)/$(TargetName).pdb" "D:\SerializerTest\Assets\Plugins\Mod Serializer/Editor/$(TargetName).pdb"
+    <PostBuildEvent>copy /y "$(TargetDir)/$(TargetName).dll" "D:\SerializerTest\Assets\Plugins\Mod Serializer/$(TargetName).dll"
+copy /y "$(TargetDir)/$(TargetName).pdb" "D:\SerializerTest\Assets\Plugins\Mod Serializer/$(TargetName).pdb"
 
 copy /y "$(TargetDir)/Newtonsoft.Json.dll" "D:\SerializerTest\Assets\Plugins\Mod Serializer/Newtonsoft.Json.dll"
 copy /y "$(TargetDir)/Newtonsoft.Json.pdb" "D:\SerializerTest\Assets\Plugins\Mod Serializer/Newtonsoft.Json.pdb"
