@@ -71,8 +71,8 @@
     <Compile Include="Core\IDManager.cs" />
     <Compile Include="Core\IModEntry.cs" />
     <Compile Include="Core\IModSerializer.cs" />
+    <Compile Include="Core\KeyManager.cs" />
     <Compile Include="Core\ModPackage.cs" />
-    <Compile Include="Core\ObjectManager.cs" />
     <Compile Include="Core\Priority.cs" />
     <Compile Include="Core\RectTransformConverter.cs" />
     <Compile Include="Core\StaticObjects.cs" />

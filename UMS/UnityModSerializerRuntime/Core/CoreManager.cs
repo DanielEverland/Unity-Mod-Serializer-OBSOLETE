@@ -27,7 +27,6 @@ namespace UMS.Runtime.Core
             AssemblyManager.Initialize();
 
             IDManager.Initialize();
-            ObjectManager.Initialize();
             CustomSerializers.Initialize();
             BlockedTypes.Initialize();
 

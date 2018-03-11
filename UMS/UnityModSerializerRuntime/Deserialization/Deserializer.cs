@@ -39,6 +39,7 @@ namespace UMS.Runtime.Deserialization
             _hasFinished = true;
             Debug.Log("Finished deserializing");
         }
+ 
         public static Dictionary<string, byte[]> DeserializePackage(string path)
         {
             Dictionary<string, byte[]> files = new Dictionary<string, byte[]>();
