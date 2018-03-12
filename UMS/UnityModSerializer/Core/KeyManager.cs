@@ -48,9 +48,9 @@ namespace UMS.Core
         }
         public static void Add(int ID, string key)
         {
-            if (!_idKeys.ContainsKey(ID))
+            if (!Keys.ContainsKey(ID))
             {
-                _idKeys.Add(ID, key);
+                Keys.Add(ID, key);
             }
         }
     }
