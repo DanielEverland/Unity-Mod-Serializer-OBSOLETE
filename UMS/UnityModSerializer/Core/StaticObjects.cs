@@ -31,7 +31,7 @@ namespace UMS.Core
 
             return Deserializer.SerializedData[FolderPath + localPath];
         }
-
+#if EDITOR
         /// <summary>
         /// Adds a file to the Static Objects folder. Must be called during serialization
         /// </summary>
@@ -44,5 +44,6 @@ namespace UMS.Core
 
             return fullPath;
         }
+#endif
     }
 }

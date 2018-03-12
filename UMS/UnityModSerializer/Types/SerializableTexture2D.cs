@@ -15,6 +15,7 @@ namespace UMS.Types
         /// <param name="texture">Source</param>
         public SerializableTexture2D(Texture2D texture) : base(texture)
         {
+#if EDITOR
             _imageFilePath = "Textures/" + texture.name + ".png";
 
             byte[] textureData = Utility.EncodeToPNG(texture);
@@ -24,8 +25,10 @@ namespace UMS.Types
             _alphaIsTransparency = texture.alphaIsTransparency;
             _format = (int)texture.format;
             _mipMapCount = texture.mipmapCount;
+#endif
         }
 
+#pragma warning disable 0649
         [JsonProperty]
         private bool _alphaIsTransparency;
         [JsonProperty]
@@ -34,6 +37,7 @@ namespace UMS.Types
         private int _mipMapCount;
         [JsonProperty]
         private string _imageFilePath;
+#pragma warning restore
 
         public override Texture2D Deserialize()
         {

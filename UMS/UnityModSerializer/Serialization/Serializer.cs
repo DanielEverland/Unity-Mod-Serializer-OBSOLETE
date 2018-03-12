@@ -72,6 +72,7 @@ namespace UMS.Serialization
                 zip.Save(path);
             }
         }
+#if EDITOR
         public static void SerializePackage(ModPackage package)
         {
             if (package == null)
@@ -79,8 +80,6 @@ namespace UMS.Serialization
 
             SerializePackages(package);
         }
-
-#if EDITOR
         [MenuItem(itemName: Utility.MENU_ITEM_ROOT + "/Serialize All", priority = Utility.MENU_ITEM_PRIORITY)]
         private static void SerializeAll()
         {
@@ -94,8 +93,6 @@ namespace UMS.Serialization
 
             SerializePackages(packages.ToArray());
         }
-#endif
-
         private static void SerializePackages(params ModPackage[] packages)
         {
             foreach (ModPackage package in packages)
@@ -117,7 +114,7 @@ namespace UMS.Serialization
             KeyManager.Add(toSerialize, entry.Key);
 
             object serialized = Converter.SerializeObject(toSerialize);
-        }
+        }        
         public static void AddExtraFile(string filePath, byte[] data)
         {
             if (!_extraFiles.ContainsKey(filePath))
@@ -141,5 +138,6 @@ namespace UMS.Serialization
             CreateManifest();
             Serialize(string.Format(@"{0}/{1}.mod", System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop), package.name));
         }
+#endif
     }
 }
