@@ -67,23 +67,23 @@ namespace UMS.Types
         [JsonIgnore]
         private string _fileName;
 
-        public override GameObject Deserialize(SerializableGameObject serialized)
+        public override GameObject Deserialize()
         {
-            GameObject gameObject = new GameObject(serialized.Name);
+            GameObject gameObject = new GameObject(Name);
 
-            if (serialized._isRectTransform)
+            if (_isRectTransform)
                 ConvertToRectTransform(gameObject);
 
-            serialized.Deserialize(gameObject);
+            Deserialize(gameObject);
 
-            gameObject.SetActive(serialized._activeSelf);
-            gameObject.layer = serialized._layer;
-            gameObject.isStatic = serialized._isStatic;
-            gameObject.tag = serialized._tag;
+            gameObject.SetActive(_activeSelf);
+            gameObject.layer = _layer;
+            gameObject.isStatic = _isStatic;
+            gameObject.tag = _tag;
 
-            ComponentCacheDeserializer componentCacheDeserializer = new ComponentCacheDeserializer(serialized, gameObject);
+            ComponentCacheDeserializer componentCacheDeserializer = new ComponentCacheDeserializer(this, gameObject);
 
-            foreach (Reference child in serialized.Children)
+            foreach (Reference child in Children)
             {
                 Deserializer.GetDeserializedObject<GameObject>(child.ID, instance =>
                 {
@@ -110,7 +110,7 @@ namespace UMS.Types
                 return obj.AddComponent(type);
             }
         }
-        public override SerializableGameObject Serialize(GameObject obj)
+        public static SerializableGameObject Serialize(GameObject obj)
         {
             return new SerializableGameObject(obj);
         }

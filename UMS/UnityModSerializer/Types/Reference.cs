@@ -23,7 +23,7 @@ namespace UMS.Types
         [JsonProperty]
         private int _id;
 
-        public override Reference Serialize(object obj)
+        public static Reference Serialize(object obj)
         {
             return new Reference(obj);
         }

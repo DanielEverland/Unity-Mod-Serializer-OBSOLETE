@@ -23,11 +23,11 @@ namespace UMS.Types
         [JsonProperty]
         private float _height;
 
-        public override Rect Deserialize(SerializableRect serializable)
+        public override Rect Deserialize()
         {
-            return new Rect(serializable._x, serializable._y, serializable._width, serializable._height);
+            return new Rect(_x, _y, _width, _height);
         }
-        public override SerializableRect Serialize(Rect obj)
+        public static SerializableRect Serialize(Rect obj)
         {
             return new SerializableRect(obj);
         }
@@ -38,7 +38,7 @@ namespace UMS.Types
         }
         public static implicit operator Rect(SerializableRect serialized)
         {
-            return serialized.Deserialize(serialized);
+            return serialized.Deserialize();
         }
     }
 }

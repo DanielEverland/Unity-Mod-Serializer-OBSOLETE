@@ -41,31 +41,31 @@ namespace UMS.Types
         [JsonProperty]
         private bool _doubleSidedGI;
 
-        public override Material Deserialize(SerializableMaterial serializable)
+        public override Material Deserialize()
         {
             Material material = new Material(Shader.Find("Standard"));
 
-            serializable.Deserialize(material);
+            Deserialize(material);
 
-            material.globalIlluminationFlags = (MaterialGlobalIlluminationFlags)serializable._globalIlluminationFlags;
-            material.shaderKeywords = serializable._shaderKeywords;
-            material.renderQueue = serializable._renderQueue;
-            material.mainTextureScale = serializable._mainTextureScale;
-            material.mainTextureOffset = serializable._mainTextureOffset;
-            material.enableInstancing = serializable._enableInstancing;
-            material.doubleSidedGI = serializable._doubleSidedGI;
+            material.globalIlluminationFlags = (MaterialGlobalIlluminationFlags)_globalIlluminationFlags;
+            material.shaderKeywords = _shaderKeywords;
+            material.renderQueue = _renderQueue;
+            material.mainTextureScale = _mainTextureScale;
+            material.mainTextureOffset = _mainTextureOffset;
+            material.enableInstancing = _enableInstancing;
+            material.doubleSidedGI = _doubleSidedGI;
 
-            if (serializable._shader != null)
+            if (_shader != null)
             {
-                Deserializer.GetDeserializedObject<Shader>(serializable._shader.ID, shader =>
+                Deserializer.GetDeserializedObject<Shader>(_shader.ID, shader =>
                 {
                     material.shader = shader;
                 });
             }
 
-            if (serializable._mainTexture != null)
+            if (_mainTexture != null)
             {
-                Deserializer.GetDeserializedObject<Texture>(serializable._mainTexture.ID, texture =>
+                Deserializer.GetDeserializedObject<Texture>(_mainTexture.ID, texture =>
                 {
                     material.mainTexture = texture;
                 });
@@ -73,7 +73,7 @@ namespace UMS.Types
 
             return material;
         }
-        public override SerializableMaterial Serialize(Material obj)
+        public static SerializableMaterial Serialize(Material obj)
         {
             return new SerializableMaterial(obj);
         }

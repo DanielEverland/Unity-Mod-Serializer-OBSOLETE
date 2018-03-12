@@ -34,7 +34,7 @@ namespace UMS.Types
                 _members.Deserialize(component);
             });
         }
-        public override SerializableScrollRect Serialize(ScrollRect obj)
+        public static SerializableScrollRect Serialize(ScrollRect obj)
         {
             return new SerializableScrollRect(obj);
         }

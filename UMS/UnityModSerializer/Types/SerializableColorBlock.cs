@@ -30,19 +30,19 @@ namespace UMS.Types
         [JsonProperty]
         private float _fadeDuration;
 
-        public override ColorBlock Deserialize(SerializableColorBlock serializable)
+        public override ColorBlock Deserialize()
         {
             return new ColorBlock()
             {
-                normalColor = serializable._normalColor,
-                highlightedColor = serializable._highlightedColor,
-                pressedColor = serializable._pressedColor,
-                disabledColor = serializable._disabledColor,
-                colorMultiplier = serializable._colorMultiplier,
-                fadeDuration = serializable._fadeDuration,
+                normalColor = _normalColor,
+                highlightedColor = _highlightedColor,
+                pressedColor = _pressedColor,
+                disabledColor = _disabledColor,
+                colorMultiplier = _colorMultiplier,
+                fadeDuration = _fadeDuration,
             };
         }
-        public override SerializableColorBlock Serialize(ColorBlock obj)
+        public static SerializableColorBlock Serialize(ColorBlock obj)
         {
             return new SerializableColorBlock(obj);
         }

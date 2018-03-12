@@ -35,31 +35,31 @@ namespace UMS.Types
         [JsonProperty]
         private string _imageFilePath;
 
-        public override Texture2D Deserialize(SerializableTexture2D serializable)
+        public override Texture2D Deserialize()
         {
-            Texture2D texture = new Texture2D(serializable._width, serializable._height, (TextureFormat)serializable._format, serializable._mipMapCount > 1);
+            Texture2D texture = new Texture2D(_width, _height, (TextureFormat)_format, _mipMapCount > 1);
 
-            serializable.Deserialize(texture);
+            Deserialize(texture);
 
-            texture.wrapMode = (TextureWrapMode)serializable._wrapMode;
-            texture.wrapModeW = (TextureWrapMode)serializable._wrapModeW;
-            texture.wrapModeV = (TextureWrapMode)serializable._wrapModeV;
-            texture.wrapModeU = (TextureWrapMode)serializable._wrapModeU;
+            texture.wrapMode = (TextureWrapMode)_wrapMode;
+            texture.wrapModeW = (TextureWrapMode)_wrapModeW;
+            texture.wrapModeV = (TextureWrapMode)_wrapModeV;
+            texture.wrapModeU = (TextureWrapMode)_wrapModeU;
 
-            texture.anisoLevel = serializable._anisoLevel;
-            texture.filterMode = (FilterMode)serializable._filterMode;
-            texture.mipMapBias = serializable._mipMapBias;
+            texture.anisoLevel = _anisoLevel;
+            texture.filterMode = (FilterMode)_filterMode;
+            texture.mipMapBias = _mipMapBias;
 
-            texture.alphaIsTransparency = serializable._alphaIsTransparency;
+            texture.alphaIsTransparency = _alphaIsTransparency;
 
-            byte[] data = StaticObjects.GetObject(serializable._imageFilePath);
+            byte[] data = StaticObjects.GetObject(_imageFilePath);
 
             texture.LoadImage(data, false);
             texture.Apply();
 
             return texture;
         }
-        public override SerializableTexture2D Serialize(Texture2D obj)
+        public static SerializableTexture2D Serialize(Texture2D obj)
         {
             return new SerializableTexture2D(obj);
         }

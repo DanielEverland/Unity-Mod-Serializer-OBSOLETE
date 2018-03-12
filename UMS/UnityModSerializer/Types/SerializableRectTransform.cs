@@ -46,7 +46,7 @@ namespace UMS.Types
                 transform.sizeDelta = _sizeDelta;
             });
         }
-        public override SerializableRectTransform Serialize(RectTransform obj)
+        public static SerializableRectTransform Serialize(RectTransform obj)
         {
             return new SerializableRectTransform(obj);
         }

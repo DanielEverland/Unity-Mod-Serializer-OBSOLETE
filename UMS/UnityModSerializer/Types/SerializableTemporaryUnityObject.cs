@@ -16,12 +16,12 @@ namespace UMS.Types
         public SerializableTemporaryUnityObject() { }
         public SerializableTemporaryUnityObject(UnityEngine.Object obj) : base(obj)
         {
-            this.obj = obj;
+            this._obj = obj;
 
             _type = obj.GetType();
 
             bool validType = false;
-            foreach (Initializer initalizer in initializers)
+            foreach (Initializer initalizer in _initializers)
             {
                 if (initalizer.IsValid(_type))
                 {
@@ -38,7 +38,7 @@ namespace UMS.Types
             Debug.LogWarning("Serializing " + obj.GetType() + " using a temporary serializer");
         }
 
-        private static readonly List<Initializer> initializers = new List<Initializer>()
+        private static readonly List<Initializer> _initializers = new List<Initializer>()
         {
             new EmptyConstructorInitializer(),
             new ConstructorWithArgumentsInitializer(),
@@ -47,7 +47,7 @@ namespace UMS.Types
 
         public override string Extension => "unityObject";
 
-        private UnityEngine.Object obj;
+        private UnityEngine.Object _obj;
 
         [JsonProperty]
         private List<SerializableMember> _members;
@@ -63,21 +63,21 @@ namespace UMS.Types
         }
         private void AssignProperties()
         {
-            foreach (PropertyInfo property in obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
+            foreach (PropertyInfo property in _obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
             {
                 if (IsValid(property))
                 {
-                    Add(property.GetValue(obj, null), property);
+                    Add(property.GetValue(_obj, null), property);
                 }
             }
         }
         private void AssignFields()
         {
-            foreach (FieldInfo field in obj.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
+            foreach (FieldInfo field in _obj.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
             {
                 if (IsValid(field))
                 {
-                    Add(field.GetValue(obj), field);
+                    Add(field.GetValue(_obj), field);
                 }
             }
         }
@@ -89,19 +89,19 @@ namespace UMS.Types
                 _members.Add(member);
         }
 
-        public override SerializableTemporaryUnityObject Serialize(UnityEngine.Object obj)
+        public static SerializableTemporaryUnityObject Serialize(UnityEngine.Object obj)
         {
             return new SerializableTemporaryUnityObject(obj);
         }
-        public override UnityEngine.Object Deserialize(SerializableTemporaryUnityObject serializable)
+        public override UnityEngine.Object Deserialize()
         {
             object obj = null;
 
-            foreach (Initializer initializer in initializers)
+            foreach (Initializer initializer in _initializers)
             {
-                if (initializer.IsValid(serializable._type))
+                if (initializer.IsValid(_type))
                 {
-                    obj = initializer.Initialize(serializable._type, _members);
+                    obj = initializer.Initialize(_type, _members);
                     break;
                 }
             }
@@ -111,7 +111,7 @@ namespace UMS.Types
 
             UnityEngine.Object unityObject = (UnityEngine.Object)obj;
 
-            serializable.Deserialize(unityObject);
+            Deserialize(unityObject);
 
             return unityObject;
         }

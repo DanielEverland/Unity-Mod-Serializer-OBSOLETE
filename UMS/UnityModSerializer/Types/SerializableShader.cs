@@ -11,13 +11,13 @@ namespace UMS.Types
 
         public override string Extension => "shader";
 
-        public override SerializableShader Serialize(Shader obj)
+        public static SerializableShader Serialize(Shader obj)
         {
             return new SerializableShader(obj);
         }
-        public override Shader Deserialize(SerializableShader serializable)
+        public override Shader Deserialize()
         {
-            return Shader.Find(serializable.Name);
+            return Shader.Find(Name);
         }
     }
 }

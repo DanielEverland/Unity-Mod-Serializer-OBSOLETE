@@ -19,15 +19,15 @@ namespace UMS.Types
         [JsonProperty]
         private int _fontSize;
 
-        public override Font Deserialize(SerializableFont serializable)
+        public override Font Deserialize()
         {
-            Font font = Font.CreateDynamicFontFromOSFont(serializable._fontNames, serializable._fontSize);
+            Font font = Font.CreateDynamicFontFromOSFont(_fontNames, _fontSize);
 
-            serializable.Deserialize(font);
+            Deserialize(font);
 
             return font;
         }
-        public override SerializableFont Serialize(Font obj)
+        public static SerializableFont Serialize(Font obj)
         {
             return new SerializableFont(obj);
         }

@@ -20,15 +20,15 @@ namespace UMS.Types
         [JsonProperty]
         private string _jsonString;
 
-        public override ScriptableObject Deserialize(SerializableScriptableObject serializable)
+        public override ScriptableObject Deserialize()
         {
-            ScriptableObject scriptableObject = ScriptableObject.CreateInstance(serializable._type);
+            ScriptableObject scriptableObject = ScriptableObject.CreateInstance(_type);
 
-            JsonUtility.FromJsonOverwrite(serializable._jsonString, scriptableObject);
+            JsonUtility.FromJsonOverwrite(_jsonString, scriptableObject);
 
             return scriptableObject;
         }
-        public override SerializableScriptableObject Serialize(ScriptableObject obj)
+        public static SerializableScriptableObject Serialize(ScriptableObject obj)
         {
             return new SerializableScriptableObject(obj);
         }

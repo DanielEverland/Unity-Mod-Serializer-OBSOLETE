@@ -12,7 +12,6 @@ namespace UMS.Types
         public Type SerializedType => typeof(TTo);
         public virtual int Priority => (int)Core.Priority.Medium;
 
-        public virtual TFrom Deserialize(TTo serializable) { throw new NotImplementedException(GetType().ToString()); }
-        public virtual TTo Serialize(TFrom obj) { throw new NotImplementedException(GetType().ToString()); }
+        public virtual TFrom Deserialize() { throw new NotImplementedException(GetType().ToString()); }
     }
 }

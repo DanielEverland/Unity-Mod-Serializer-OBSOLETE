@@ -45,7 +45,7 @@ namespace UMS.Types
 
             return sprite;
         }
-        public override SerializableSprite Serialize(Sprite obj)
+        public static SerializableSprite Serialize(Sprite obj)
         {
             return new SerializableSprite(obj);
         }

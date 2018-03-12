@@ -9,46 +9,44 @@ namespace UMS.Core
 {
     public static class Converter
     {
-        private static List<IModSerializer> serializers;
+        private static List<IModSerializer> _serializers;
 
         public static void Initialize()
         {
-            serializers = new List<IModSerializer>();
+            _serializers = new List<IModSerializer>();
 
             AssemblyManager.OnLoadType += Analyze;
         }
 
-        private static MethodInfo QueryForSerialization(Func<IModSerializer, bool> predicate, out object instance)
+        private static MethodInfo QueryForSerialization(Func<IModSerializer, bool> predicate)
         {
             Debugging.Info("Processing Serialization Query for " + predicate);
 
-            return Query(predicate, x => { return x.SerializedType; }, x => { return x.NonSerializableType; }, out instance);
+            return Query(predicate, x => { return x.SerializedType; }, x => { return x.NonSerializableType; });
         }
-        private static MethodInfo QueryForDeserialization(Func<IModSerializer, bool> predicate, out object instance)
+        private static MethodInfo QueryForDeserialization(Func<IModSerializer, bool> predicate)
         {
             Debugging.Info("Processing Deserialization Query for " + predicate);
 
-            return Query(predicate, x => { return x.NonSerializableType; }, x => { return x.SerializedType; }, out instance);
+            return Query(predicate, x => { return x.NonSerializableType; }, x => { return x.SerializedType; });
         }
         public static T SerializeObject<T>(object fromObject)
         {
             if (fromObject == null)
                 return default(T);
+            
+            MethodInfo info = QueryForSerialization(x => x.NonSerializableType.IsAssignableFrom(fromObject.GetType()) && x.SerializedType.IsAssignableFrom(typeof(T)));
 
-            object instance;
-            MethodInfo info = QueryForSerialization(x => x.NonSerializableType.IsAssignableFrom(fromObject.GetType()) && x.SerializedType.IsAssignableFrom(typeof(T)), out instance);
-
-            return (T)info.Invoke(instance, new object[1] { fromObject });
+            return (T)info.Invoke(null, new object[1] { fromObject });
         }
         public static object SerializeObject(object fromObject)
         {
             if (fromObject == null)
                 return null;
+            
+            MethodInfo info = QueryForSerialization(x => x.NonSerializableType.IsAssignableFrom(fromObject.GetType()));
 
-            object instance;
-            MethodInfo info = QueryForSerialization(x => x.NonSerializableType.IsAssignableFrom(fromObject.GetType()), out instance);
-
-            return info.Invoke(instance, new object[1] { fromObject });
+            return info.Invoke(null, new object[1] { fromObject });
         }
         public static void DeserializeObject<T>(object serialized, Action<T> callback)
         {
@@ -110,10 +108,9 @@ namespace UMS.Core
             }
             else
             {
-                object instance;
-                MethodInfo info = QueryForDeserialization(predicate, out instance);
+                MethodInfo info = QueryForDeserialization(predicate);
 
-                callback(info.Invoke(instance, new object[1] { serialized }));
+                callback(info.Invoke(serialized, null));
             }
         }
         private static bool Compare(IModSerializer a, IModSerializer b)
@@ -126,19 +123,19 @@ namespace UMS.Core
             {
                 IModSerializer serializer = Activator.CreateInstance(type) as IModSerializer;
 
-                if (serializers.Any(x => Compare(x, serializer)))
+                if (_serializers.Any(x => Compare(x, serializer)))
                 {
-                    IModSerializer other = serializers.Find(x => Compare(x, serializer));
+                    IModSerializer other = _serializers.Find(x => Compare(x, serializer));
 
                     if (other.Priority < serializer.Priority)
                     {
-                        serializers.Remove(other);
-                        serializers.Add(serializer);
+                        _serializers.Remove(other);
+                        _serializers.Add(serializer);
                     }
                 }
                 else
                 {
-                    serializers.Add(serializer);
+                    _serializers.Add(serializer);
                 }
             }
         }
@@ -160,44 +157,33 @@ namespace UMS.Core
 
             return matchCollection.Count == 0;
         }
-        public static MethodInfo GetMethod(Type fromType, Type returnType, params Type[] parameters)
+        public static MethodInfo GetMethod(Type fromType, Type returnType)
         {
-            foreach (MethodInfo method in fromType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            foreach (MethodInfo method in fromType.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
                 if (method.ReturnType != returnType)
                     continue;
 
-                ParameterInfo[] methodParameters = method.GetParameters();
-
-                if (methodParameters.Length != parameters.Length)
-                    continue;
-
-                if (!ParametersMatch(methodParameters, parameters))
-                    continue;
-
-                Debugging.Verbose("Returning method " + method);
-
                 return method;
             }
 
-            throw new NullReferenceException();
+            throw new NotImplementedException(string.Format("FromType: {0} - ReturnType: {1}", fromType, returnType));
         }
-        public static MethodInfo Query(Func<IModSerializer, bool> predicate, Func<IModSerializer, Type> toType, Func<IModSerializer, Type> returnType, out object instance)
+        public static MethodInfo Query(Func<IModSerializer, bool> predicate, Func<IModSerializer, Type> toType, Func<IModSerializer, Type> returnType)
         {
-            if (serializers == null)
+            if (_serializers == null)
                 throw new NullReferenceException("Serializers not initialized");
 
-            List<IModSerializer> validSerializers = new List<IModSerializer>(serializers.Where(predicate));
+            List<IModSerializer> validSerializers = new List<IModSerializer>(_serializers.Where(predicate));
 
             if (validSerializers.Count == 0)
                 throw new NotImplementedException("Couldn't find any valid serializers ");
 
             IModSerializer selectedSerializer = Utility.GetMostInherited(validSerializers);
-            instance = selectedSerializer;
 
             Debugging.Verbose("Found top-most serializer " + selectedSerializer);
 
-            return GetMethod(selectedSerializer.GetType(), toType(selectedSerializer), returnType(selectedSerializer));
+            return GetMethod(selectedSerializer.GetType(), toType(selectedSerializer));
         }
         public static bool TryCallGenericInterface(Action<object> callback, object serialized, object target)
         {
@@ -258,7 +244,7 @@ namespace UMS.Core
             if (type.GetInterfaces().Any(x => x == typeof(ICustomSerializer)))
                 return false;
 
-            return serializers.Any(x => x.NonSerializableType.IsAssignableFrom(type) && !IsPrimitive(x.NonSerializableType));
+            return _serializers.Any(x => x.NonSerializableType.IsAssignableFrom(type) && !IsPrimitive(x.NonSerializableType));
         }
         public static bool IsPrimitive(Type type)
         {

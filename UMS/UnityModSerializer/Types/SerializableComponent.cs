@@ -22,7 +22,7 @@ namespace UMS.Types
 
             _memberCollection.Deserialize(target);
         }
-        public override SerializableComponent Serialize(Component obj)
+        public static SerializableComponent Serialize(Component obj)
         {
             return new SerializableComponent(obj);
         }

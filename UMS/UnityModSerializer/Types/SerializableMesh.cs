@@ -59,31 +59,31 @@ namespace UMS.Types
         [JsonProperty]
         private Color32[] _colors32;
 
-        public override SerializableMesh Serialize(Mesh obj)
+        public static SerializableMesh Serialize(Mesh obj)
         {
             return new SerializableMesh(obj);
         }
-        public override Mesh Deserialize(SerializableMesh serializable)
+        public override Mesh Deserialize()
         {
             Mesh newMesh = new Mesh();
 
-            serializable.Deserialize(newMesh);
+            Deserialize(newMesh);
 
-            newMesh.indexFormat = serializable._indexFormat;
-            newMesh.boneWeights = serializable._boneWeights;
-            newMesh.bindposes = serializable._bindposes;
-            newMesh.subMeshCount = serializable._subMeshCount;
-            newMesh.bounds = serializable._bounds;
-            newMesh.vertices = serializable._vertices;
-            newMesh.normals = serializable._normals;
-            newMesh.tangents = serializable._tangents;
-            newMesh.uv = serializable._uv;
-            newMesh.uv2 = serializable._uv2;
-            newMesh.uv3 = serializable._uv3;
-            newMesh.uv4 = serializable._uv4;
-            newMesh.triangles = serializable._triangles;
-            newMesh.colors = serializable._colors;
-            newMesh.colors32 = serializable._colors32;
+            newMesh.indexFormat = _indexFormat;
+            newMesh.boneWeights = _boneWeights;
+            newMesh.bindposes = _bindposes;
+            newMesh.subMeshCount = _subMeshCount;
+            newMesh.bounds = _bounds;
+            newMesh.vertices = _vertices;
+            newMesh.normals = _normals;
+            newMesh.tangents = _tangents;
+            newMesh.uv = _uv;
+            newMesh.uv2 = _uv2;
+            newMesh.uv3 = _uv3;
+            newMesh.uv4 = _uv4;
+            newMesh.triangles = _triangles;
+            newMesh.colors = _colors;
+            newMesh.colors32 = _colors32;
 
             return newMesh;
         }
