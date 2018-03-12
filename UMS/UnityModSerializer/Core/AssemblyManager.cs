@@ -174,5 +174,18 @@ namespace UMS.Core
         {
             return _blockedAssemblies.Contains(assembly.GetName().Name);
         }
+        public static Type GetType(string typeName)
+        {
+            foreach (Assembly assembly in LoadedAssemblies)
+            {
+                foreach (Type type in assembly.GetTypes())
+                {
+                    if (type.Name == typeName)
+                        return type;
+                }
+            }
+
+            return null;
+        }
     }
 }

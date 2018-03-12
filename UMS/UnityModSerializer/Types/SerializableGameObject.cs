@@ -118,7 +118,7 @@ namespace UMS.Types
         {
             if (obj.GetComponent<RectTransform>() == null)
             {
-                Component comp = obj.AddComponent<RectTransformConverter>();
+                Component comp = obj.AddComponent(AssemblyManager.GetType("RectTransformConverter"));
                 UnityEngine.Object.DestroyImmediate(comp);
             }
         }
