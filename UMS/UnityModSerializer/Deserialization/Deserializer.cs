@@ -29,13 +29,9 @@ namespace UMS.Deserialization
 
         private static List<JsonConverter> _converters;
         private static bool _hasFinished;
-        private static bool _hasInitialized;
 
         private static void Initialize()
         {
-            if (_hasInitialized)
-                return;
-
             _keyLookup = new Dictionary<string, ObjectEntry>();
             _serializedData = new Dictionary<string, byte[]>();
             _objectReferences = new Dictionary<int, ObjectEntry>();
@@ -47,8 +43,6 @@ namespace UMS.Deserialization
             BehaviourManager.OnBehaviourLoadedWithContext += BehaviourLoaded;
 
             CoreManager.Initialize();
-
-            _hasInitialized = true;
         }
 #if EDITOR
         [MenuItem(Utility.MENU_ITEM_ROOT + "/Deserialize Desktop", priority = Utility.MENU_ITEM_PRIORITY)]
