@@ -99,7 +99,7 @@ namespace UMS.Core
         {
             if (serialized is IAsynchronousDeserializer)
             {
-                bool failed = !TryCallGenericInterface(callback, serialized, serialized);
+                bool failed = !TryCallGenericInterface(callback, serialized);
 
                 if (failed)
                 {
@@ -185,7 +185,7 @@ namespace UMS.Core
 
             return GetMethod(selectedSerializer.GetType(), toType(selectedSerializer));
         }
-        public static bool TryCallGenericInterface(Action<object> callback, object serialized, object target)
+        public static bool TryCallGenericInterface(Action<object> callback, object target)
         {
             Type[] interfaces = target.GetType().GetInterfaces();
 
@@ -203,7 +203,6 @@ namespace UMS.Core
                     ParameterInfo[] arguments = function.GetParameters();
 
                     Type firstParameterType = arguments[0].ParameterType;
-                    Type secondParameterType = arguments[1].ParameterType;
 
                     Debugging.Verbose("Arg count: " + arguments.Length);
                     for (int x = 0; x < arguments.Length; x++)
@@ -217,14 +216,8 @@ namespace UMS.Core
                         break;
                     }
 
-                    if (secondParameterType != serialized.GetType())
-                    {
-                        Debug.LogWarning("Serialized type mismatch " + secondParameterType + " - " + serialized.GetType());
-                        break;
-                    }
-
                     Debugging.Info("Successfully calling asynchronous function");
-                    function.Invoke(target, new object[2] { callback, serialized });
+                    function.Invoke(target, new object[1] { callback });
                     return true;
                 }
                 else

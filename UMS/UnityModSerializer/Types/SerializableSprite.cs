@@ -30,18 +30,18 @@ namespace UMS.Types
         [JsonProperty]
         private SerializableRect _spriteRect;
 
-        public void AsynchronousDeserialization(Action<object> action, SerializableSprite serialized)
+        public void AsynchronousDeserialization(Action<object> action)
         {
-            Deserializer.GetDeserializedObject<Texture2D>(serialized._texture.ID, texture =>
+            Deserializer.GetDeserializedObject<Texture2D>(_texture.ID, texture =>
             {
-                action(CreateSprite(serialized, texture));
+                action(CreateSprite(texture));
             });
         }
-        private Sprite CreateSprite(SerializableSprite serialized, Texture2D texture)
+        private Sprite CreateSprite(Texture2D texture)
         {
-            Sprite sprite = Sprite.Create(texture, serialized._spriteRect, serialized._pivot, serialized._pixelsPerUnit, 0, SpriteMeshType.Tight, serialized._border);
+            Sprite sprite = Sprite.Create(texture, _spriteRect, _pivot, _pixelsPerUnit, 0, SpriteMeshType.Tight, _border);
 
-            serialized.Deserialize(sprite);
+            Deserialize(sprite);
 
             return sprite;
         }
