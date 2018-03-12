@@ -40,7 +40,10 @@ namespace UMS.Core
         }
         public static string Get(int id)
         {
-            return Keys[id];
+            if (Contains(id))
+                return Keys[id];
+            else
+                return null;
         }
         public static void Add(object obj, string key)
         {
