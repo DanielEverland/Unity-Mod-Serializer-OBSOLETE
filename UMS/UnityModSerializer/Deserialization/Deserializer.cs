@@ -42,6 +42,7 @@ namespace UMS.Deserialization
             _serializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
             _deserializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
             _converters = new List<JsonConverter>();
+            _hasFinished = false;
 
             BehaviourManager.OnBehaviourLoadedWithContext += BehaviourLoaded;
 
@@ -77,8 +78,6 @@ namespace UMS.Deserialization
         {
             Initialize();
 
-            Dictionary<string, byte[]> files = new Dictionary<string, byte[]>();
-
             using (ZipFile zip = ZipFile.Read(path))
             {
                 foreach (ZipEntry entry in zip)
@@ -87,16 +86,16 @@ namespace UMS.Deserialization
                     {
                         entry.Extract(stream);
 
-                        files.Add(entry.FileName, stream.ToArray());
+                        _serializedData.Add(entry.FileName, stream.ToArray());
                     }
                 }
             }
 
-            if (!files.ContainsKey(Utility.MANIFEST_NAME))
+            if (!_serializedData.ContainsKey(Utility.MANIFEST_NAME))
                 throw new NullReferenceException("No manifest file in " + path);
 
-            Manifest.Instance = Json.ToObject<Manifest>(Utility.ToString(files[Utility.MANIFEST_NAME]));
-            files.Remove(Utility.MANIFEST_NAME);
+            Manifest.Instance = Json.ToObject<Manifest>(Utility.ToString(_serializedData[Utility.MANIFEST_NAME]));
+            _serializedData.Remove(Utility.MANIFEST_NAME);
 
             foreach (KeyValuePair<string, byte[]> file in _serializedData)
             {
@@ -124,6 +123,7 @@ namespace UMS.Deserialization
             CoreManager.FinishedSerialization();
 
             _hasFinished = true;
+            Debug.Log("Deserialized " + Path.GetFileNameWithoutExtension(path));
         }        
         public static bool KeyExists(string key)
         {
