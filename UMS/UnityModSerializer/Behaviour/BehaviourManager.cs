@@ -48,15 +48,15 @@ namespace UMS.Behaviour
                 AddBehaviour(attribute as BehaviourBase);
             }
 
-            foreach (PropertyInfo property in type.GetProperties())
+            foreach (PropertyInfo property in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
             {
                 Analyze(property);
             }
-            foreach (FieldInfo field in type.GetFields())
+            foreach (FieldInfo field in type.GetFields(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
             {
                 Analyze(field);
             }
-            foreach (MethodInfo method in type.GetMethods())
+            foreach (MethodInfo method in type.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
             {
                 Analyze(method);
             }
