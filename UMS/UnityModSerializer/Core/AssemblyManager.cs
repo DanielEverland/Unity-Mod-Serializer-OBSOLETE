@@ -13,6 +13,7 @@ namespace UMS.Core
         public static IEnumerable<Assembly> LoadedAssemblies { get { return _loadedAssemblies; } }
 
         private static List<Assembly> _loadedAssemblies;
+        private static Dictionary<string, Type> _cachedTypes;
 
         #region BlockedAssemblies
         //Obviously not an ideal solution, but I prefer this over getting false positives using RegEx.
@@ -129,6 +130,8 @@ namespace UMS.Core
         
         public static void Initialize()
         {
+            _cachedTypes = new Dictionary<string, Type>();
+
             GetAssemblies();
         }
         public static void ExecuteReflection()
@@ -176,12 +179,19 @@ namespace UMS.Core
         }
         public static Type GetType(string typeName)
         {
+            if (_cachedTypes.ContainsKey(typeName))
+                return _cachedTypes[typeName];
+
             foreach (Assembly assembly in LoadedAssemblies)
             {
                 foreach (Type type in assembly.GetTypes())
                 {
                     if (type.Name == typeName)
+                    {
+                        _cachedTypes.Add(typeName, type);
+
                         return type;
+                    }                        
                 }
             }
 
