@@ -9,6 +9,9 @@ using System.Reflection;
 using UMS.Behaviour;
 using UMS.Core;
 using UnityEngine;
+#if EDITOR
+using UnityEditor;
+#endif
 
 namespace UMS.Deserialization
 {
@@ -46,6 +49,22 @@ namespace UMS.Deserialization
 
             _hasInitialized = true;
         }
+#if EDITOR
+        [MenuItem(Utility.MENU_ITEM_ROOT + "/Deserialize Desktop", priority = Utility.MENU_ITEM_PRIORITY)]
+        private static void DeserializeDesktop()
+        {
+            string[] desktopFiles = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+            IEnumerable<string> modFiles = desktopFiles.Where(x => Path.GetExtension(x) == ".mod");
+
+            if (modFiles.Count() == 0)
+                Debug.LogWarning("No mod files on desktop");
+
+            foreach (string path in modFiles)
+            {
+                DeserializePackage(path);
+            }
+        }
+#endif
         public static bool ContainsStaticObject(string localPath)
         {
             return StaticObjects.Contains(localPath);
