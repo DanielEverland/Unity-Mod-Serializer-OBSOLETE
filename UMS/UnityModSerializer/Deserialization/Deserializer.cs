@@ -152,7 +152,7 @@ namespace UMS.Deserialization
 
             return (T)_keyLookup[key];
         }
-        public static object GetObject(string key)
+        public static UnityEngine.Object GetObject(string key)
         {
             if (!HasDeserialized)
                 throw new InvalidOperationException("Deserialization hasn't finished");
