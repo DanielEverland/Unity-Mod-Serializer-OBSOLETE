@@ -94,6 +94,7 @@
     <Compile Include="Deserialization\ComponentCacheDeserializer.cs" />
     <Compile Include="Deserialization\CustomConstructor.cs" />
     <Compile Include="Deserialization\Deserializer.cs" />
+    <Compile Include="Deserialization\EditorSession.cs" />
     <Compile Include="Deserialization\IAsynchronousDeserializer.cs" />
     <Compile Include="Deserialization\IDeserializer.cs" />
     <Compile Include="Inspectors\ModPackageEditor.cs" />
@@ -130,15 +131,15 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y "$(ProjectDir)bin\Client\$(TargetName).dll" "D:\SerializerTest\Assets\Plugins\Mod Serializer\$(TargetName).dll"
-copy /y "$(ProjectDir)bin\Client\$(TargetName).pdb" "D:\SerializerTest\Assets\Plugins\Mod Serializer\$(TargetName).pdb"
+    <PostBuildEvent>copy /y "$(ProjectDir)bin\Client\$(TargetName).dll" "D:\Dead Air\Assets\Plugins\$(TargetName).dll"
+copy /y "$(ProjectDir)bin\Client\$(TargetName).pdb" "D:\Dead Air\Assets\Plugins\$(TargetName).pdb"
 
-copy /y "$(ProjectDir)bin\Editor\$(TargetName).dll" "D:\SerializerTest\Assets\Plugins\Mod Serializer/Editor\$(TargetName).dll"
-copy /y "$(ProjectDir)bin\Editor\$(TargetName).pdb" "D:\SerializerTest\Assets\Plugins\Mod Serializer/Editor\$(TargetName).pdb"
+copy /y "$(ProjectDir)bin\Editor\$(TargetName).dll" "D:\Dead Air\Assets\Plugins\Editor\$(TargetName).dll"
+copy /y "$(ProjectDir)bin\Editor\$(TargetName).pdb" "D:\Dead Air\Assets\Plugins\Editor\$(TargetName).pdb"
 
-copy /y "$(TargetDir)/Newtonsoft.Json.dll" "D:\SerializerTest\Assets\Plugins\Mod Serializer/Newtonsoft.Json.dll"
-copy /y "$(TargetDir)/Newtonsoft.Json.pdb" "D:\SerializerTest\Assets\Plugins\Mod Serializer/Newtonsoft.Json.pdb"
+copy /y "$(TargetDir)/Newtonsoft.Json.dll" "D:\Dead Air\Assets\Plugins\Newtonsoft.Json.dll"
+copy /y "$(TargetDir)/Newtonsoft.Json.pdb" "D:\Dead Air\Assets\Plugins\Newtonsoft.Json.pdb"
 
-copy /y "$(TargetDir)/DotNetZip.dll" "D:\SerializerTest\Assets\Plugins\Mod Serializer/DotNetZip.dll"</PostBuildEvent>
+copy /y "$(TargetDir)/DotNetZip.dll" "D:\Dead Air\Assets\Plugins\DotNetZip.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

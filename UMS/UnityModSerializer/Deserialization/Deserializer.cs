@@ -17,12 +17,14 @@ namespace UMS.Deserialization
 {
     public static class Deserializer
     {
+        public static event Action OnHasInitialized;
+        public static IDictionary<string, UnityEngine.Object> Objects { get { return _keyLookup; } }
         public static IDictionary<string, byte[]> SerializedData { get { return _serializedData; } }
         public static bool HasDeserialized { get { return _hasFinished; } }
 
         private static Dictionary<string, byte[]> _serializedData;
         private static Dictionary<int, ObjectEntry> _objectReferences;
-        private static Dictionary<string, ObjectEntry> _keyLookup;
+        private static Dictionary<string, UnityEngine.Object> _keyLookup;
 
         private static Dictionary<int, List<ActionInstance>> _serializedObjectQueue;
         private static Dictionary<int, List<ActionInstance>> _deserializedObjectQueue;
@@ -30,9 +32,9 @@ namespace UMS.Deserialization
         private static List<JsonConverter> _converters;
         private static bool _hasFinished;
 
-        private static void Initialize()
+        public static void Initialize()
         {
-            _keyLookup = new Dictionary<string, ObjectEntry>();
+            _keyLookup = new Dictionary<string, UnityEngine.Object>();
             _serializedData = new Dictionary<string, byte[]>();
             _objectReferences = new Dictionary<int, ObjectEntry>();
             _serializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
@@ -43,6 +45,11 @@ namespace UMS.Deserialization
             BehaviourManager.OnBehaviourLoadedWithContext += BehaviourLoaded;
 
             CoreManager.Initialize();
+
+#if EDITOR
+            EditorSession.Load();
+            FinishedInitializing();
+#endif
         }
 #if EDITOR
         [MenuItem(Utility.MENU_ITEM_ROOT + "/Deserialize Desktop", priority = Utility.MENU_ITEM_PRIORITY)]
@@ -116,9 +123,21 @@ namespace UMS.Deserialization
             CheckForCachedActions();
             CoreManager.FinishedSerialization();
 
-            _hasFinished = true;
+            FinishedInitializing();
             Debug.Log("Deserialized " + Path.GetFileNameWithoutExtension(path));
-        }        
+        }
+#if EDITOR
+        /// <summary>
+        /// Used to load object entries from mod packages using the AssetDatabase during edit time
+        /// </summary>
+        public static void AddObject(ModPackage.ObjectEntry obj)
+        {
+            if (_keyLookup.ContainsKey(obj.Key))
+                throw new ArgumentException("Key already exists");
+
+            _keyLookup.Add(obj.Key, obj.Object);
+        }
+#endif
         public static bool KeyExists(string key)
         {
             if (!HasDeserialized)
@@ -126,19 +145,19 @@ namespace UMS.Deserialization
 
             return _keyLookup.ContainsKey(key);
         }
-        public static T GetObject<T>(string key)
+        public static T GetObject<T>(string key) where T : UnityEngine.Object
         {
             if (!HasDeserialized)
                 throw new InvalidOperationException("Deserialization hasn't finished");
 
-            return (T)_keyLookup[key].DeserializedObject;
+            return (T)_keyLookup[key];
         }
         public static object GetObject(string key)
         {
             if (!HasDeserialized)
                 throw new InvalidOperationException("Deserialization hasn't finished");
 
-            return _keyLookup[key].DeserializedObject;
+            return _keyLookup[key];
         }
         private static void CheckForCachedActions()
         {
@@ -290,6 +309,13 @@ namespace UMS.Deserialization
                 action(_objectReferences[id].DeserializedObject);
             }
         }
+        private static void FinishedInitializing()
+        {
+            _hasFinished = true;
+
+            OnHasInitialized?.Invoke();
+        }
+
         private class ActionInstance
         {
             public ActionInstance(Action<object> action, Type expectedType)
@@ -336,7 +362,7 @@ namespace UMS.Deserialization
                 ExecuteID(ID);
 
                 if (Key != null)
-                    _keyLookup.Set(Key, this);
+                    _keyLookup.Set(Key, (UnityEngine.Object)DeserializedObject);
             }
             public void Deserialize()
             {

@@ -18,7 +18,7 @@ namespace UMS.Core
 
         private static Dictionary<int, string> _idKeys;
 
-        public static T GetObject<T>(string key)
+        public static T GetObject<T>(string key) where T : UnityEngine.Object
         {
             return Deserializer.GetObject<T>(key);
         }
