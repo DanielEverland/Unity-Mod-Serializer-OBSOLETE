@@ -17,7 +17,7 @@ namespace UMS.Deserialization
         public static event Action OnHasInitialized;
         public static IDictionary<string, UnityEngine.Object> Objects { get { return _keyLookup; } }
         public static IDictionary<string, byte[]> SerializedData { get { return _serializedData; } }
-        public static bool HasDeserialized { get { return _hasFinished; } }
+        public static bool HasDeserialized { get { return _hasInitialized; } }
 
         private static Dictionary<string, byte[]> _serializedData;
         private static Dictionary<int, ObjectEntry> _objectReferences;
@@ -27,7 +27,7 @@ namespace UMS.Deserialization
         private static Dictionary<int, List<ActionInstance>> _deserializedObjectQueue;
 
         private static List<JsonConverter> _converters;
-        private static bool _hasFinished;
+        private static bool _hasInitialized;
 
         public static void Initialize()
         {
@@ -37,16 +37,11 @@ namespace UMS.Deserialization
             _serializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
             _deserializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
             _converters = new List<JsonConverter>();
-            _hasFinished = false;
 
             BehaviourManager.OnBehaviourLoadedWithContext += BehaviourLoaded;
 
             CoreManager.Initialize();
-
-#if UNITY_EDITOR
-            EditorSession.Load();
             FinishedInitializing();
-#endif
         }
         public static bool ContainsStaticObject(string localPath)
         {
@@ -58,8 +53,6 @@ namespace UMS.Deserialization
         }
         public static void DeserializePackage(string path)
         {
-            Initialize();
-
             using (ZipFile zip = ZipFile.Read(path))
             {
                 foreach (ZipEntry entry in zip)
@@ -103,8 +96,7 @@ namespace UMS.Deserialization
 
             CheckForCachedActions();
             CoreManager.FinishedSerialization();
-
-            FinishedInitializing();
+            
             Debug.Log("Deserialized " + Path.GetFileNameWithoutExtension(path));
         }
         /// <summary>
@@ -290,7 +282,7 @@ namespace UMS.Deserialization
         }
         private static void FinishedInitializing()
         {
-            _hasFinished = true;
+            _hasInitialized = true;
 
             OnHasInitialized?.Invoke();
         }

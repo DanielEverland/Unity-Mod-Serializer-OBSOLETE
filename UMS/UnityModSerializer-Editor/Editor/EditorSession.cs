@@ -15,6 +15,8 @@ namespace UMS.Deserialization
     {
         public static void Load()
         {
+            Deserializer.Initialize();
+
             string[] guids = AssetDatabase.FindAssets("t:ModPackage");
 
             foreach (string id in guids)
