@@ -21,6 +21,8 @@ namespace UMS.Inspectors
         }
         public override void OnInspectorGUI()
         {
+            GUI.changed = false;
+
             EditorGUILayout.Space();
             _objectEntryList.Draw();
             EditorGUILayout.Space();
@@ -28,6 +30,9 @@ namespace UMS.Inspectors
             EditorGUILayout.Space();
             DrawSerializeButton();
             EditorGUILayout.Space();
+
+            if (GUI.changed)
+                EditorUtility.SetDirty(target);
         }
         protected virtual void DrawSerializeButton()
         {
@@ -40,7 +45,7 @@ namespace UMS.Inspectors
 
             if (GUI.Button(rect, buttonText))
             {
-                Serializer.SerializePackage(Target);
+                Serializer.SerializePackage(Target, System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop));
             }
         }
         protected virtual ModPackageReorderableList CreateList(string propertyName)

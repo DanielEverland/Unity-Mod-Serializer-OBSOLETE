@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UMS.Core;
 using UnityEngine;
+using System.IO;
 #if EDITOR
 using UnityEditor;
 #endif
@@ -15,6 +16,7 @@ namespace UMS.Serialization
         private static Dictionary<string, byte[]> _extraFiles = new Dictionary<string, byte[]>();
         private static Dictionary<string, string> _filesToWrite;        
         private static HashSet<string> _usedNames;
+        private static string _currentPath;
 
         public static int AddObject(object obj)
         {
@@ -73,16 +75,20 @@ namespace UMS.Serialization
             }
         }
 #if EDITOR
-        public static void SerializePackage(ModPackage package)
+        public static void SerializePackage(ModPackage package, string pathToFolder)
         {
             if (package == null)
                 throw new System.NullReferenceException();
-
+            
+            _currentPath = pathToFolder;
+            
             SerializePackages(package);
         }
         [MenuItem(itemName: Utility.MENU_ITEM_ROOT + "/Serialize All", priority = Utility.MENU_ITEM_PRIORITY)]
         private static void SerializeAll()
         {
+            _currentPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
+
             List<ModPackage> packages = Utility.GetAllPackages();
 
             if (packages.Count == 0)
@@ -136,7 +142,7 @@ namespace UMS.Serialization
         private static void InitializeSerialization(ModPackage package)
         {
             CreateManifest();
-            Serialize(string.Format(@"{0}/{1}.mod", System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop), package.name));
+            Serialize(string.Format(@"{0}/{1}.mod", _currentPath, package.name));
         }
 #endif
     }

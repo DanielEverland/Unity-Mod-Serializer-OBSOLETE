@@ -74,6 +74,7 @@
     <Compile Include="Behaviour\TypeBlockerAttribute.cs" />
     <Compile Include="Behaviour\TypeValidityComparerAttribute.cs" />
     <Compile Include="Core\AssemblyManager.cs" />
+    <Compile Include="Core\BuildHandler.cs" />
     <Compile Include="Core\ComponentMemberCollection.cs" />
     <Compile Include="Core\Config.cs" />
     <Compile Include="Core\Converter.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="Core\ModPackage.cs" />
     <Compile Include="Core\Priority.cs" />
     <Compile Include="Core\RectTransformConverter.cs" />
+    <Compile Include="Core\Settings.cs" />
     <Compile Include="Core\StaticObjects.cs" />
     <Compile Include="Core\Utility.cs" />
     <Compile Include="Deserialization\ComponentCacheDeserializer.cs" />
