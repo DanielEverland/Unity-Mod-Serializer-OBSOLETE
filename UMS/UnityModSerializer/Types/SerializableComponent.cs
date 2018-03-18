@@ -9,11 +9,11 @@ namespace UMS.Types
         public SerializableComponent() { }
         public SerializableComponent(Component obj) : base(obj)
         {
-            _memberCollection = ComponentMemberCollection.Create(obj);
+            _memberCollection = new MemberCollection<Component>(obj);
         }
 
         [JsonProperty]
-        private ComponentMemberCollection _memberCollection;
+        private MemberCollection<Component> _memberCollection;
 
         public override void OnDeserialize(Component target)
         {

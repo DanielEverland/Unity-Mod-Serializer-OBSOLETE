@@ -362,7 +362,7 @@ namespace UMS.Deserialization
                 if (reader.TokenType == JsonToken.StartObject)
                     JObject.Load(reader);
 
-                return _customConstructor.Method.Invoke(null, null);
+                return _customConstructor.Method.Invoke(null, new object[1] { objectType });
             }
 
             public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

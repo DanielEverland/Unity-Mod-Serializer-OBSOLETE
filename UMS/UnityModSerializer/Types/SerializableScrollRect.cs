@@ -17,13 +17,13 @@ namespace UMS.Types
             if (obj.content != null)
                 _content = Reference.Create(obj.content);
 
-            _members = ComponentMemberCollection.Create(obj);
+            _members = new MemberCollection<ScrollRect>(obj);
         }
 
         [JsonProperty]
         private Reference _content;
         [JsonProperty]
-        private ComponentMemberCollection _members;
+        private MemberCollection<ScrollRect> _members;
 
         public override void OnDeserialize(ScrollRect component)
         {

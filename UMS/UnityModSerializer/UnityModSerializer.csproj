@@ -59,7 +59,6 @@
     <Compile Include="Behaviour\TypeBlockerAttribute.cs" />
     <Compile Include="Behaviour\TypeValidityComparerAttribute.cs" />
     <Compile Include="Core\AssemblyManager.cs" />
-    <Compile Include="Core\ComponentMemberCollection.cs" />
     <Compile Include="Core\Config.cs" />
     <Compile Include="Core\Converter.cs" />
     <Compile Include="Core\CoreManager.cs" />
@@ -71,6 +70,7 @@
     <Compile Include="Core\IModSerializer.cs" />
     <Compile Include="Core\Json.cs" />
     <Compile Include="Core\KeyManager.cs" />
+    <Compile Include="Core\MemberCollection.cs" />
     <Compile Include="Core\Priority.cs" />
     <Compile Include="Core\RectTransformConverter.cs" />
     <Compile Include="Core\StaticObjects.cs" />
@@ -96,6 +96,7 @@
     <Compile Include="Types\SerializableObject.cs" />
     <Compile Include="Types\SerializableRect.cs" />
     <Compile Include="Types\SerializableRectTransform.cs" />
+    <Compile Include="Types\SerializableScriptableObject.cs" />
     <Compile Include="Types\SerializableScrollRect.cs" />
     <Compile Include="Types\SerializableShader.cs" />
     <Compile Include="Types\SerializableSprite.cs" />

@@ -1,31 +1,26 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
 using UMS.Behaviour;
 using UMS.Types;
 using UnityEngine;
 
 namespace UMS.Core
 {
-    public class ComponentMemberCollection
+    public class MemberCollection<T>
     {
-        private ComponentMemberCollection() { }
-        private ComponentMemberCollection(Component component)
+        private MemberCollection() { }
+        public MemberCollection(T obj)
         {
             _members = new List<SerializableMember>();
-            _type = component.GetType();
+            _type = obj.GetType();
 
-            SerializeProperties(component);
-            SerializeFields(component);
+            SerializeProperties(obj);
+            SerializeFields(obj);
         }
-
-        public static ComponentMemberCollection Create<T>(T component) where T : Component
-        {
-            return new ComponentMemberCollection(component);
-        }
-
+        
         private Type _type;
 
         public IList<SerializableMember> Members { get { return _members; } }
@@ -33,14 +28,14 @@ namespace UMS.Core
         [JsonProperty]
         private List<SerializableMember> _members;
 
-        public void Deserialize(Component component)
+        public void Deserialize(T obj)
         {
             foreach (SerializableMember member in _members)
             {
-                member.Deserialize(component);
+                member.Deserialize(obj);
             }
         }
-        private void SerializeFields(Component comp)
+        private void SerializeFields(T obj)
         {
             foreach (FieldInfo field in _type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
@@ -50,7 +45,7 @@ namespace UMS.Core
 
                     if (IsValid(field))
                     {
-                        object fieldValue = field.GetValue(comp);
+                        object fieldValue = field.GetValue(obj);
 
                         if (!Utility.IsNull(fieldValue))
                         {
@@ -68,7 +63,7 @@ namespace UMS.Core
                 }
             }
         }
-        private void SerializeProperties(Component comp)
+        private void SerializeProperties(T obj)
         {
             foreach (PropertyInfo property in _type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
@@ -78,7 +73,7 @@ namespace UMS.Core
 
                     if (IsValid(property))
                     {
-                        object propertyValue = property.GetValue(comp, null);
+                        object propertyValue = property.GetValue(obj, null);
 
                         if (!Utility.IsNull(propertyValue))
                         {
