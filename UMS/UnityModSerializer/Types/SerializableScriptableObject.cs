@@ -28,7 +28,7 @@ namespace UMS.Types
         public override ScriptableObject Deserialize()
         {
             ScriptableObject obj = ScriptableObject.CreateInstance(_type);
-
+            
             _memberCollection.Deserialize(obj);
 
             return obj;
