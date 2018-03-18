@@ -25,8 +25,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Editor|AnyCPU'">
     <AssemblyName>UMS_Editor</AssemblyName>
-    <OutputPath>bin\Editor\</OutputPath>
-    <DefineConstants>TRACE;EDITOR</DefineConstants>
+    <OutputPath>..\..\..\Dead Air\Assets\Plugins\UMS\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -132,15 +132,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y "$(ProjectDir)bin\Client\$(TargetName).dll" "D:\Dead Air\Assets\Plugins\$(TargetName).dll"
-copy /y "$(ProjectDir)bin\Client\$(TargetName).pdb" "D:\Dead Air\Assets\Plugins\$(TargetName).pdb"
-
-copy /y "$(ProjectDir)bin\Editor\$(TargetName).dll" "D:\Dead Air\Assets\Plugins\Editor\$(TargetName).dll"
-copy /y "$(ProjectDir)bin\Editor\$(TargetName).pdb" "D:\Dead Air\Assets\Plugins\Editor\$(TargetName).pdb"
-
-copy /y "$(TargetDir)/Newtonsoft.Json.dll" "D:\Dead Air\Assets\Plugins\Newtonsoft.Json.dll"
-copy /y "$(TargetDir)/Newtonsoft.Json.pdb" "D:\Dead Air\Assets\Plugins\Newtonsoft.Json.pdb"
-
-copy /y "$(TargetDir)/DotNetZip.dll" "D:\Dead Air\Assets\Plugins\DotNetZip.dll"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
