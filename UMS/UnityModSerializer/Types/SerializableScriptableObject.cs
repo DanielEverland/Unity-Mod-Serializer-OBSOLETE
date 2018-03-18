@@ -15,12 +15,11 @@ namespace UMS.Types
         public SerializableScriptableObject(ScriptableObject obj) : base(obj)
         {
             _memberCollection = new MemberCollection<ScriptableObject>(obj);
+            _type = obj.GetType();
         }
 
         public override string Extension => "scriptableObject";
-
-        private UnityEngine.Object _obj;
-        
+                
         [JsonProperty]
         private MemberCollection<ScriptableObject> _memberCollection;
         [JsonProperty]

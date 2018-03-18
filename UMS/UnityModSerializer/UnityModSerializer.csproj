@@ -76,7 +76,7 @@
     <Compile Include="Core\StaticObjects.cs" />
     <Compile Include="Core\Utility.cs" />
     <Compile Include="Deserialization\ComponentCacheDeserializer.cs" />
-    <Compile Include="Deserialization\CustomConstructor.cs" />
+    <Compile Include="Deserialization\CustomConstructorAttribute.cs" />
     <Compile Include="Deserialization\Deserializer.cs" />
     <Compile Include="Deserialization\IAsynchronousDeserializer.cs" />
     <Compile Include="Deserialization\IDeserializer.cs" />
