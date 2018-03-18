@@ -8,12 +8,6 @@ namespace UMS.Core
 {
     public static class AssemblyManager
     {
-        public const string ASSEMBLY_EDITOR_NAME = "UMS_Editor";
-        public const string ASSEMBLY_RUNTIME_NAME = "UMS_Runtime";
-
-        public static Assembly EditorAssembly { get; private set; }
-        public static Assembly RuntimeAssembly { get; private set; }
-
         public static event Action<Type> OnLoadType;
         public static event Action OnFinishedReflection;
 
@@ -184,12 +178,6 @@ namespace UMS.Core
             {
                 if (IsBlocked(assembly))
                     continue;
-
-                if (assembly.GetName().Name == ASSEMBLY_RUNTIME_NAME)
-                    RuntimeAssembly = assembly;
-
-                if (assembly.GetName().Name == ASSEMBLY_EDITOR_NAME)
-                    EditorAssembly = assembly;
                 
                 _loadedAssemblies.Add(assembly);
             }

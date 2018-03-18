@@ -36,9 +36,7 @@ namespace UMS.Core
                 return default(T);
             
             MethodInfo info = QueryForSerialization(x => x.NonSerializableType.IsAssignableFrom(fromObject.GetType()) && x.SerializedType.IsAssignableFrom(typeof(T)));
-
-            info = Utility.ConvertMethodInfo(AssemblyManager.RuntimeAssembly, info);
-
+            
             return (T)info.Invoke(null, new object[1] { fromObject });
         }
         public static object SerializeObject(object fromObject)
@@ -47,9 +45,7 @@ namespace UMS.Core
                 return null;
             
             MethodInfo info = QueryForSerialization(x => x.NonSerializableType.IsAssignableFrom(fromObject.GetType()));
-
-            info = Utility.ConvertMethodInfo(AssemblyManager.RuntimeAssembly, info);
-
+            
             return info.Invoke(null, new object[1] { fromObject });
         }
         public static void DeserializeObject<T>(object serialized, Action<T> callback)
