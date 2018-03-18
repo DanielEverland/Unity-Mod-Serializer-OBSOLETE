@@ -43,7 +43,7 @@ namespace UMS.Types
 
         public override Material Deserialize()
         {
-            Material material = new Material(Shader.Find("Standard"));
+            Material material = new Material(Shader.Find("Diffuse"));
 
             Deserialize(material);
 
