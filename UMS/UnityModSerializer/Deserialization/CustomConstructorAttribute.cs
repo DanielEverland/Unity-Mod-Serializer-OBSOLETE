@@ -5,14 +5,14 @@ using UMS.Behaviour;
 namespace UMS.Deserialization
 {
     [AttributeUsage(AttributeTargets.Method)]
-    public class CustomConstructor : BehaviourBase
+    public class CustomConstructorAttribute : BehaviourBase
     {
-        private CustomConstructor() { }
+        private CustomConstructorAttribute() { }
         /// <summary>
         /// Useful for creating an instance of a class you don't have access to, such as a Unity class, using a custom defined constructor.
         /// </summary>
         /// <param name="targetType">Type to create an instance of. Your method return type must match this</param>
-        public CustomConstructor(Type targetType)
+        public CustomConstructorAttribute(Type targetType)
         {
             TargetType = targetType;
         }

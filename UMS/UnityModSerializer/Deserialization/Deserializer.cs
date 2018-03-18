@@ -184,12 +184,12 @@ namespace UMS.Deserialization
         }
         private static void BehaviourLoaded(BehaviourBase behaviour, MemberInfo info)
         {
-            if (behaviour is CustomConstructor constructor && info is MethodInfo method)
+            if (behaviour is CustomConstructorAttribute constructor && info is MethodInfo method)
             {
                 CustomConstructorLoaded(constructor, method);
             }
         }
-        private static void CustomConstructorLoaded(CustomConstructor customConstructor, MethodInfo info)
+        private static void CustomConstructorLoaded(CustomConstructorAttribute customConstructor, MethodInfo info)
         {
             customConstructor.AssignMethod(info);
 
@@ -344,12 +344,12 @@ namespace UMS.Deserialization
         private class CustomConstructorConverter : Newtonsoft.Json.JsonConverter
         {
             private CustomConstructorConverter() { }
-            public CustomConstructorConverter(CustomConstructor customConstructor)
+            public CustomConstructorConverter(CustomConstructorAttribute customConstructor)
             {
                 _customConstructor = customConstructor;
             }
 
-            private readonly CustomConstructor _customConstructor;
+            private readonly CustomConstructorAttribute _customConstructor;
 
             public override bool CanConvert(Type objectType)
             {
