@@ -244,6 +244,9 @@ namespace UMS.Core
             if (obj == null)
                 return 0;
 
+            if (obj is System.Collections.IEnumerable)
+                return GetArrayID(obj);
+
             return obj.GetHashCode();
         }
         private class CustomIDGeneratorManager
