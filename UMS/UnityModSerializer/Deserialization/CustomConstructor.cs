@@ -30,18 +30,13 @@ namespace UMS.Deserialization
                 throw new ArgumentException(info + " return type must be " + TargetType);
 
             if (!ValidParameters(info))
-                throw new ArgumentException(info + " must have one parameter of type System.Type");
+                throw new ArgumentException(info + " cannot have any parameters");
 
             Method = info;
         }
         private bool ValidParameters(MethodInfo info)
         {
-            ParameterInfo[] parameters = info.GetParameters();
-
-            if (parameters.Length != 1)
-                return false;
-
-            return parameters[0].ParameterType == typeof(Type);
+            return info.GetParameters().Length == 0;
         }
     }
 }

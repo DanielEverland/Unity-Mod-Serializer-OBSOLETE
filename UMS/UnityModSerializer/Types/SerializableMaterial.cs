@@ -78,7 +78,7 @@ namespace UMS.Types
             return new SerializableMaterial(obj);
         }
         [CustomConstructor(typeof(Material))]
-        public static Material CustomConstructor(System.Type type)
+        public static Material CustomConstructor()
         {
             return new Material(Shader.Find("Diffuse"));
         }
