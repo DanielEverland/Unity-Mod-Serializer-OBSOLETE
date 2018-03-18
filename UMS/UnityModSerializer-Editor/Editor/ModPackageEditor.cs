@@ -1,13 +1,12 @@
-﻿#if EDITOR
-using UMS.Core;
+﻿using UMS.Core;
 using UMS.Serialization;
 using UnityEngine;
 using UnityEditor;
 
-namespace UMS.Inspectors
+namespace UMS.Editor
 {
     [CustomEditor(typeof(ModPackage))]
-    public class ModPackageEditor : Editor
+    public class ModPackageEditor : UnityEditor.Editor
     {
         protected const float SERIALIZE_BUTTON_WIDTH = 200;
 
@@ -54,4 +53,3 @@ namespace UMS.Inspectors
         }
     }
 }
-#endif

@@ -1,5 +1,4 @@
-﻿#if EDITOR
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -8,7 +7,7 @@ using UnityEditor;
 using UnityEditor.Callbacks;
 using UMS.Serialization;
 
-namespace UMS.Core
+namespace UMS.Editor
 {
     public static class BuildHandler
     {
@@ -79,4 +78,3 @@ namespace UMS.Core
         }
     }
 }
-#endif

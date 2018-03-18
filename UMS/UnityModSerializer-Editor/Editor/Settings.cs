@@ -1,11 +1,10 @@
-﻿#if EDITOR
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEditor;
 
-namespace UMS.Core
+namespace UMS.Editor
 {
     public class Settings : ScriptableObject
     {
@@ -83,4 +82,3 @@ namespace UMS.Core
         }
     }
 }
-#endif

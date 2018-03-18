@@ -1,19 +1,14 @@
 ﻿using Ionic.Zip;
-using System.Collections.Generic;
 using UMS.Core;
+using UMS.Editor;
 using UnityEngine;
-using System.IO;
-#if EDITOR
+using System.Collections.Generic;
 using UnityEditor;
-#endif
 
 namespace UMS.Serialization
 {
     public static class Serializer
     {
-        public static IDictionary<string, byte[]> ExtraFiles { get { return _extraFiles; } }
-                
-        private static Dictionary<string, byte[]> _extraFiles = new Dictionary<string, byte[]>();
         private static Dictionary<string, string> _filesToWrite;        
         private static HashSet<string> _usedNames;
         private static string _currentPath;
@@ -66,7 +61,7 @@ namespace UMS.Serialization
                     zip.AddEntry(file.Key, file.Value);
                 }
 
-                foreach (KeyValuePair<string, byte[]> file in Serializer.ExtraFiles)
+                foreach (KeyValuePair<string, byte[]> file in StaticObjects.ExtraFiles)
                 {
                     zip.AddEntry(file.Key, file.Value);
                 }
@@ -74,7 +69,6 @@ namespace UMS.Serialization
                 zip.Save(path);
             }
         }
-#if EDITOR
         public static void SerializePackage(ModPackage package, string pathToFolder)
         {
             if (package == null)
@@ -84,12 +78,12 @@ namespace UMS.Serialization
             
             SerializePackages(package);
         }
-        [MenuItem(itemName: Utility.MENU_ITEM_ROOT + "/Serialize All", priority = Utility.MENU_ITEM_PRIORITY)]
+        [MenuItem(itemName: EditorUtilities.MENU_ITEM_ROOT + "/Serialize All", priority = EditorUtilities.MENU_ITEM_PRIORITY)]
         private static void SerializeAll()
         {
             _currentPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
 
-            List<ModPackage> packages = Utility.GetAllPackages();
+            List<ModPackage> packages = EditorUtilities.GetAllPackages();
 
             if (packages.Count == 0)
             {
@@ -120,13 +114,6 @@ namespace UMS.Serialization
             KeyManager.Add(toSerialize, entry.Key);
 
             object serialized = Converter.SerializeObject(toSerialize);
-        }        
-        public static void AddExtraFile(string filePath, byte[] data)
-        {
-            if (!_extraFiles.ContainsKey(filePath))
-                _extraFiles.Add(filePath, null);
-
-            _extraFiles[filePath] = data;
         }
         private static void Complete(ModPackage package)
         {
@@ -144,6 +131,5 @@ namespace UMS.Serialization
             CreateManifest();
             Serialize(string.Format(@"{0}/{1}.mod", _currentPath, package.name));
         }
-#endif
     }
 }

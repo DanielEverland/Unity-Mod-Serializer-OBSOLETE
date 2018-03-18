@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UMS.Deserialization;
 using UMS.Serialization;
 
@@ -7,6 +8,9 @@ namespace UMS.Core
     public class StaticObjects
     {
         public static string FolderPath { get { return "Static Objects/"; } }
+        public static IDictionary<string, byte[]> ExtraFiles { get { return _extraFiles; } }
+
+        private static Dictionary<string, byte[]> _extraFiles = new Dictionary<string, byte[]>();
 
         /// <summary>
         /// Determines whether a file has been loaded
@@ -31,7 +35,6 @@ namespace UMS.Core
 
             return Deserializer.SerializedData[FolderPath + localPath];
         }
-#if EDITOR
         /// <summary>
         /// Adds a file to the Static Objects folder. Must be called during serialization
         /// </summary>
@@ -40,10 +43,9 @@ namespace UMS.Core
         {
             string fullPath = FolderPath + path;
 
-            Serializer.AddExtraFile(fullPath, data);
+            _extraFiles.Add(fullPath, data);
 
             return fullPath;
         }
-#endif
     }
 }

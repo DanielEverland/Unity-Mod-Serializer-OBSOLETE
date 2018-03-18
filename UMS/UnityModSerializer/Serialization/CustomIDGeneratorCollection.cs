@@ -1,9 +1,6 @@
 ﻿using UMS.Behaviour;
 using UMS.Core;
 using UnityEngine;
-#if EDITOR
-using UnityEditor;
-#endif
 
 namespace UMS.Serialization
 {
@@ -19,43 +16,9 @@ namespace UMS.Serialization
                 return material.GetHashCode();
 
             int id = 17;
-
-#if EDITOR
-            unchecked
-            {
-                int propertyCount = ShaderUtil.GetPropertyCount(material.shader);
-
-                for (int i = 0; i < propertyCount; i++)
-                {
-                    if (material.HasProperty(i))
-                    {
-                        object obj = GetValue(material, i);
-
-                        if (obj != null)
-                            id += obj.GetHashCode() * 11;
-                    }
-                }
-            }
-#endif
-
+            
             return id;
         }
-#if EDITOR
-        private static object GetValue(Material material, int index)
-        {
-            switch (ShaderUtil.GetPropertyType(material.shader, index))
-            {
-                case ShaderUtil.ShaderPropertyType.Color:
-                    return material.GetColor(index);
-                case ShaderUtil.ShaderPropertyType.Vector:
-                    return material.GetVector(index);
-                case ShaderUtil.ShaderPropertyType.TexEnv:
-                    return material.GetTexture(index);
-                default:
-                    return null;
-            }
-        }
-#endif
         [CustomIDGenerator(typeof(Font))]
         public static int GetFontID(Font font)
         {

@@ -1,11 +1,10 @@
-﻿#if EDITOR
-using System.Linq;
+﻿using System.Linq;
 using UMS.Core;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace UMS.Inspectors
+namespace UMS.Editor
 {
     public class ModPackageReorderableList : ReorderableList
     {
@@ -69,4 +68,3 @@ namespace UMS.Inspectors
         }
     }
 }
-#endif

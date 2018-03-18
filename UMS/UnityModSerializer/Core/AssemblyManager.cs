@@ -177,9 +177,6 @@ namespace UMS.Core
             _loadedAssemblies = new List<Assembly>();
 
             LoadAssemblies(AppDomain.CurrentDomain.GetAssemblies());
-#if EDITOR
-            LoadAssemblies(GetAssembliesInProject());
-#endif
         }
         private static void LoadAssemblies(IEnumerable<Assembly> collection)
         {
@@ -197,34 +194,6 @@ namespace UMS.Core
                 _loadedAssemblies.Add(assembly);
             }
         }
-#if EDITOR
-        private static IEnumerable<Assembly> GetAssembliesInProject()
-        {
-            LinkedList<Assembly> toReturn = new LinkedList<Assembly>();
-            Queue<string> toCheck = new Queue<string>();
-            toCheck.Enqueue(Application.dataPath);
-
-            while (toCheck.Count > 0)
-            {
-                string currentFolder = toCheck.Dequeue();
-
-                foreach (string file in Directory.GetFiles(currentFolder))
-                {
-                    if(Path.GetExtension(file) == ".dll")
-                    {
-                        toReturn.AddLast(Assembly.LoadFile(file));
-                    }
-                }
-
-                foreach (string subFolder in Directory.GetDirectories(currentFolder))
-                {
-                    toCheck.Enqueue(subFolder);
-                }
-            }
-
-            return toReturn;
-        }
-#endif
         private static bool IsBlocked(Assembly assembly)
         {
             return _blockedAssemblies.Contains(assembly.GetName().Name);

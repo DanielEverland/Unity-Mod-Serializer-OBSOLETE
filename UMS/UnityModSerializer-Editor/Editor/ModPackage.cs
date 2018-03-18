@@ -1,12 +1,11 @@
-﻿#if EDITOR
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UMS.Core
+namespace UMS.Editor
 {
     [Serializable]
-    [CreateAssetMenu(fileName = "ModPackage.asset", menuName = "Modding/Package", order = Utility.MENU_ITEM_PRIORITY)]
+    [CreateAssetMenu(fileName = "ModPackage.asset", menuName = "Modding/Package", order = EditorUtilities.MENU_ITEM_PRIORITY)]
     public class ModPackage : ScriptableObject
     {
         public IEnumerable<ObjectEntry> ObjectEntries { get { return _objectEntries; } }
@@ -29,4 +28,3 @@ namespace UMS.Core
         }
     }
 }
-#endif

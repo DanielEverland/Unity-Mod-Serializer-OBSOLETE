@@ -9,9 +9,6 @@ using System.Reflection;
 using UMS.Behaviour;
 using UMS.Core;
 using UnityEngine;
-#if EDITOR
-using UnityEditor;
-#endif
 
 namespace UMS.Deserialization
 {
@@ -46,27 +43,11 @@ namespace UMS.Deserialization
 
             CoreManager.Initialize();
 
-#if EDITOR
+#if UNITY_EDITOR
             EditorSession.Load();
             FinishedInitializing();
 #endif
         }
-#if EDITOR
-        [MenuItem(Utility.MENU_ITEM_ROOT + "/Deserialize Desktop", priority = Utility.MENU_ITEM_PRIORITY)]
-        private static void DeserializeDesktop()
-        {
-            string[] desktopFiles = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
-            IEnumerable<string> modFiles = desktopFiles.Where(x => Path.GetExtension(x) == ".mod");
-
-            if (modFiles.Count() == 0)
-                Debug.LogWarning("No mod files on desktop");
-
-            foreach (string path in modFiles)
-            {
-                DeserializePackage(path);
-            }
-        }
-#endif
         public static bool ContainsStaticObject(string localPath)
         {
             return StaticObjects.Contains(localPath);
@@ -126,18 +107,16 @@ namespace UMS.Deserialization
             FinishedInitializing();
             Debug.Log("Deserialized " + Path.GetFileNameWithoutExtension(path));
         }
-#if EDITOR
         /// <summary>
         /// Used to load object entries from mod packages using the AssetDatabase during edit time
         /// </summary>
-        public static void AddObject(ModPackage.ObjectEntry obj)
+        public static void AddObject(string key, UnityEngine.Object obj)
         {
-            if (_keyLookup.ContainsKey(obj.Key))
+            if (_keyLookup.ContainsKey(key))
                 throw new ArgumentException("Key already exists");
 
-            _keyLookup.Add(obj.Key, obj.Object);
+            _keyLookup.Add(key, obj);
         }
-#endif
         public static bool KeyExists(string key)
         {
             if (!HasDeserialized)

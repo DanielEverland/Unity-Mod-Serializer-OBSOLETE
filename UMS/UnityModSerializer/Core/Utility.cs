@@ -6,36 +6,18 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UMS.Behaviour;
-#if EDITOR
-using UnityEditor;
-#endif
 
 namespace UMS.Core
 {
     public static class Utility
     {
-        public const int MENU_ITEM_PRIORITY = 100;
-
-        public const string MOD_FOLDER_MARK_NAME = ".mods";
-        public const string MENU_ITEM_ROOT = "Modding";
-        public const string MENU_SERIALIZATION = "Serialization";
-
         /// <summary>
         /// Name used for the manifest file
         /// </summary>
         public const string MANIFEST_NAME = "manifest";
 
         private static Regex _endNumberParanthesis = new Regex(@"\(\d+\)$");
-
-#if EDITOR
-        public static List<ModPackage> GetAllPackages()
-        {
-            return new List<ModPackage>(AssetDatabase.FindAssets("t:ModPackage").Select(x =>
-            {
-                return AssetDatabase.LoadAssetAtPath<ModPackage>(AssetDatabase.GUIDToAssetPath(x));
-            }));
-        }
-#endif
+        
         private static void EnsureManagersAreInitialized(Assembly targetAssembly)
         {
             if (targetAssembly != AssemblyManager.EditorAssembly && targetAssembly != AssemblyManager.RuntimeAssembly)
