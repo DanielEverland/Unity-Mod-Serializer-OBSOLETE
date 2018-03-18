@@ -7,6 +7,8 @@ namespace UMS.Core
 {
     public static class CoreManager
     {
+        public static bool HasInitialized { get; private set; }
+
         /// <summary>
         /// This is called when serialization or deserialization is initiated
         /// </summary>
@@ -19,6 +21,11 @@ namespace UMS.Core
 
         public static void Initialize()
         {
+            if (HasInitialized)
+                return;
+
+            HasInitialized = true;
+
             HierarchyManager.Initialize();
 
             HookUpJSONReferenceHandler();

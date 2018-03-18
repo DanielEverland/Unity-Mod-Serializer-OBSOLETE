@@ -36,6 +36,67 @@ namespace UMS.Core
             }));
         }
 #endif
+        private static void EnsureManagersAreInitialized(Assembly targetAssembly)
+        {
+            if (targetAssembly != AssemblyManager.EditorAssembly && targetAssembly != AssemblyManager.RuntimeAssembly)
+                return;
+            
+            Type container = null;
+
+            foreach (Type type in targetAssembly.GetTypes())
+            {
+                if (type.Name == typeof(CoreManager).Name)
+                {
+                    container = type;
+                    break;
+                }
+            }
+
+            if (container == null)
+                throw new NullReferenceException();
+
+            MethodInfo method = container.GetMethod("Initialize");
+
+            if (method == null)
+                throw new NullReferenceException();
+
+            method.Invoke(null, null);
+        }
+        public static MethodInfo ConvertMethodInfo(Assembly targetAssembly, MethodInfo method)
+        {
+            EnsureManagersAreInitialized(targetAssembly);
+
+            Type owner = method.DeclaringType;
+            Type ownerInTarget = targetAssembly.GetTypes().First(x => x.Name == owner.Name);            
+
+            return ownerInTarget.GetMethod(method.Name);
+        }
+        public static void CallFunctionInAssembly(Assembly assembly, Type owner, string methodName, params object[] parameters)
+        {
+            EnsureManagersAreInitialized(assembly);
+
+            string ownerName = owner.Name;
+            Type container = null;
+
+            foreach (Type type in assembly.GetTypes())
+            {
+                if(type.Name == ownerName)
+                {
+                    container = type;
+                    break;
+                }
+            }
+
+            if (container == null)
+                throw new NullReferenceException();
+
+            MethodInfo method = container.GetMethod(methodName);
+
+            if (method == null)
+                throw new NullReferenceException();
+
+            method.Invoke(null, parameters);
+        }
         public static byte[] EncodeToPNG(Texture2D texture)
         {
             // Create a temporary RenderTexture of the same size as the texture

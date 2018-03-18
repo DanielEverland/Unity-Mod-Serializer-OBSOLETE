@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -7,6 +8,12 @@ namespace UMS.Core
 {
     public static class AssemblyManager
     {
+        public const string ASSEMBLY_EDITOR_NAME = "UMS_Editor";
+        public const string ASSEMBLY_RUNTIME_NAME = "UMS_Runtime";
+
+        public static Assembly EditorAssembly { get; private set; }
+        public static Assembly RuntimeAssembly { get; private set; }
+
         public static event Action<Type> OnLoadType;
         public static event Action OnFinishedReflection;
 
@@ -73,8 +80,12 @@ namespace UMS.Core
             "System.Xml",
             "System.Configuration",
             "System",
-            "I18N.West",
             "I18N",
+            "I18N.CJK",
+            "I18N.MidEast",
+            "I18N.Other",
+            "I18N.Rare",
+            "I18N.West",
             "Unity.Locator",
             "UnityEditor",
             "UnityEngine.WindModule",
@@ -165,14 +176,55 @@ namespace UMS.Core
         {
             _loadedAssemblies = new List<Assembly>();
 
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            LoadAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+#if EDITOR
+            LoadAssemblies(GetAssembliesInProject());
+#endif
+        }
+        private static void LoadAssemblies(IEnumerable<Assembly> collection)
+        {
+            foreach (Assembly assembly in collection)
             {
                 if (IsBlocked(assembly))
                     continue;
 
+                if (assembly.GetName().Name == ASSEMBLY_RUNTIME_NAME)
+                    RuntimeAssembly = assembly;
+
+                if (assembly.GetName().Name == ASSEMBLY_EDITOR_NAME)
+                    EditorAssembly = assembly;
+                
                 _loadedAssemblies.Add(assembly);
             }
         }
+#if EDITOR
+        private static IEnumerable<Assembly> GetAssembliesInProject()
+        {
+            LinkedList<Assembly> toReturn = new LinkedList<Assembly>();
+            Queue<string> toCheck = new Queue<string>();
+            toCheck.Enqueue(Application.dataPath);
+
+            while (toCheck.Count > 0)
+            {
+                string currentFolder = toCheck.Dequeue();
+
+                foreach (string file in Directory.GetFiles(currentFolder))
+                {
+                    if(Path.GetExtension(file) == ".dll")
+                    {
+                        toReturn.AddLast(Assembly.LoadFile(file));
+                    }
+                }
+
+                foreach (string subFolder in Directory.GetDirectories(currentFolder))
+                {
+                    toCheck.Enqueue(subFolder);
+                }
+            }
+
+            return toReturn;
+        }
+#endif
         private static bool IsBlocked(Assembly assembly)
         {
             return _blockedAssemblies.Contains(assembly.GetName().Name);
