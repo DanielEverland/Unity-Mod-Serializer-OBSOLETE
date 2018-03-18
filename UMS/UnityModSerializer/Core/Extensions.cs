@@ -1,11 +1,36 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using UMS.Deserialization;
 
 namespace UMS.Core
 {
     public static class Extensions
     {
+        public static T ToObject<T>(this byte[] array)
+        {
+            MemoryStream memStream = new MemoryStream();
+            BinaryFormatter binForm = new BinaryFormatter();
+
+            memStream.Write(array, 0, array.Length);
+            memStream.Seek(0, SeekOrigin.Begin);
+            
+            return (T)binForm.Deserialize(memStream);
+        }
+        public static byte[] ToByteArray(this object obj)
+        {
+            if (obj == null)
+                return null;
+
+            BinaryFormatter bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bf.Serialize(ms, obj);
+                return ms.ToArray();
+            }
+
+        }
         /// <summary>
         /// Sets the value of a key. If a key already exists, it is overridden.
         /// </summary>

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using UnityEngine;
+using UMS.Core;
 
 namespace UMS.Types
 {
@@ -8,23 +9,32 @@ namespace UMS.Types
     {
         public override string Extension => "scriptableObject";
 
+        private string objectPath
+        {
+            get
+            {
+                return "ScriptableObjects/" + Name + ".txt";
+            }
+        }
+
         public SerializableScriptableObject() { }
         public SerializableScriptableObject(ScriptableObject scriptableObject) : base(scriptableObject)
         {
             _type = scriptableObject.GetType();
-            _jsonString = JsonUtility.ToJson(scriptableObject, true);
+#if EDITOR
+            StaticObjects.Add(objectPath, JsonUtility.ToJson(scriptableObject, true).ToByteArray());
+#endif
         }
 
         [JsonProperty]
         private Type _type;
-        [JsonProperty]
-        private string _jsonString;
 
         public override ScriptableObject Deserialize()
         {
             ScriptableObject scriptableObject = ScriptableObject.CreateInstance(_type);
+            string json = StaticObjects.GetObject(objectPath).ToObject<string>();
 
-            JsonUtility.FromJsonOverwrite(_jsonString, scriptableObject);
+            JsonUtility.FromJsonOverwrite(json, scriptableObject);
 
             return scriptableObject;
         }
