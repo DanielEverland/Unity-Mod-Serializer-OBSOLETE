@@ -16,6 +16,7 @@ namespace UMS.Core
     {
         public const int MENU_ITEM_PRIORITY = 100;
 
+        public const string MOD_FOLDER_MARK_NAME = ".mods";
         public const string MENU_ITEM_ROOT = "Modding";
         public const string MENU_SERIALIZATION = "Serialization";
 

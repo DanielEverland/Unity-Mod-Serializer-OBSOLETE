@@ -76,6 +76,15 @@ namespace UMS.Core
             }
 
             Directory.CreateDirectory(_pathToRootModsFolder);
+
+            MarkFolder();
+        }
+        private static void MarkFolder()
+        {
+            string fullPath = _pathToRootModsFolder + "/" + Utility.MOD_FOLDER_MARK_NAME;
+
+            File.Create(fullPath);
+            File.SetAttributes(fullPath, File.GetAttributes(fullPath) | FileAttributes.Hidden);
         }
     }
 }
