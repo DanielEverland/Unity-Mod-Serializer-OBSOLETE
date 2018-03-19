@@ -14,34 +14,56 @@ namespace UMS.Deserialization
 {
     public static class Deserializer
     {
-        public static event Action OnHasInitialized;
+        public static event Action OnHasDeserialized;
         public static IDictionary<string, UnityEngine.Object> Objects { get { return _keyLookup; } }
         public static IDictionary<string, byte[]> SerializedData { get { return _serializedData; } }
-        public static bool HasDeserialized { get { return _hasInitialized; } }
+        public static bool HasDeserialized { get; private set; }
+        public static bool HasInitialized { get; private set; }
 
         private static Dictionary<string, byte[]> _serializedData;
         private static Dictionary<int, ObjectEntry> _objectReferences;
         private static Dictionary<string, UnityEngine.Object> _keyLookup;
-
+        
         private static Dictionary<int, List<ActionInstance>> _serializedObjectQueue;
         private static Dictionary<int, List<ActionInstance>> _deserializedObjectQueue;
 
         private static List<JsonConverter> _converters;
-        private static bool _hasInitialized;
+        private static HashSet<int> _locks;
+        private static System.Random _random;
 
         public static void Initialize()
         {
+            if (HasInitialized)
+                return;
+
+            _random = new System.Random();
             _keyLookup = new Dictionary<string, UnityEngine.Object>();
             _serializedData = new Dictionary<string, byte[]>();
             _objectReferences = new Dictionary<int, ObjectEntry>();
             _serializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
             _deserializedObjectQueue = new Dictionary<int, List<ActionInstance>>();
+            _locks = new HashSet<int>();
             _converters = new List<JsonConverter>();
 
             BehaviourManager.OnBehaviourLoadedWithContext += BehaviourLoaded;
 
             CoreManager.Initialize();
-            FinishedInitializing();
+
+            HasInitialized = true;
+        }
+        public static int CreateLock()
+        {
+            int id = _random.Next();
+
+            _locks.Add(id);
+
+            return id;
+        }
+        public static void RemoveLock(int id)
+        {
+            _locks.Remove(id);
+
+            CheckIfFinished();
         }
         public static bool ContainsStaticObject(string localPath)
         {
@@ -220,7 +242,7 @@ namespace UMS.Deserialization
             {
                 if (instance.ExpectedType.IsAssignableFrom(obj.GetType()))
                 {
-                    instance.Action(obj);
+                    instance.Execute(obj);
                 }
                 else
                 {
@@ -281,23 +303,40 @@ namespace UMS.Deserialization
                 action(_objectReferences[id].DeserializedObject);
             }
         }
-        private static void FinishedInitializing()
+        private static void CheckIfFinished()
         {
-            _hasInitialized = true;
+            if (_locks.Count == 0 && HasInitialized)
+                FinishedDeserializing();
+        }
+        private static void FinishedDeserializing()
+        {
+            HasDeserialized = true;
 
-            OnHasInitialized?.Invoke();
+            OnHasDeserialized?.Invoke();
         }
 
         private class ActionInstance
         {
             public ActionInstance(Action<object> action, Type expectedType)
             {
-                Action = action;
+                _action = action;
+                _lockID = CreateLock();
+
                 ExpectedType = expectedType;
             }
 
-            public Action<object> Action { get; set; }
             public Type ExpectedType { get; set; }
+
+            private readonly Action<object> _action;
+            private readonly int _lockID;
+
+            public void Execute(object obj)
+            {
+                RemoveLock(_lockID);
+
+                if(_action != null)
+                    _action.Invoke(obj);
+            }
         }
         private class ObjectEntry
         {
@@ -326,6 +365,10 @@ namespace UMS.Deserialization
                 {
                     Converter.DeserializeObject(SerializedObject, AssignDeserializedObject);
                 }
+                else
+                {
+                    Debug.LogWarning("CANNOT DESERIALIZE " + ID);
+                }
             }
             public void AssignDeserializedObject(object obj)
             {
@@ -335,6 +378,8 @@ namespace UMS.Deserialization
 
                 if (Key != null)
                     _keyLookup.Set(Key, (UnityEngine.Object)DeserializedObject);
+
+                CheckIfFinished();
             }
             public void Deserialize()
             {
