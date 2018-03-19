@@ -60,8 +60,9 @@ namespace UMS.Deserialization
                     using (MemoryStream stream = new MemoryStream())
                     {
                         entry.Extract(stream);
-
-                        _serializedData.Add(entry.FileName, stream.ToArray());
+                        
+                        if(!_serializedData.ContainsKey(entry.FileName))
+                            _serializedData.Add(entry.FileName, stream.ToArray());
                     }
                 }
             }
