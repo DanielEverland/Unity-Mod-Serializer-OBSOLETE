@@ -21,6 +21,8 @@ namespace UMS.Editor
             if (modFiles.Count() == 0)
                 Debug.LogWarning("No mod files on desktop");
 
+            Deserializer.Initialize();
+
             foreach (string path in modFiles)
             {
                 Deserializer.DeserializePackage(path);
