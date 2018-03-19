@@ -34,5 +34,9 @@ namespace UMS.Types
 
             return new Reference(obj);
         }
+        public override string ToString()
+        {
+            return string.Format("Reference ID: " + _id);
+        }
     }
 }
