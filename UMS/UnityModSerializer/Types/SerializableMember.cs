@@ -379,10 +379,7 @@ namespace UMS.Types
                 if (_deserializedObjects.Count == 0)
                     throw new NullReferenceException();
 
-                Type targetType = _deserializedObjects[0].GetType();
-
-                if (_deserializedObjects.Any(x => x.GetType() != targetType))
-                    throw new InvalidCastException();
+                Type targetType = Utility.GetCommonBaseClass(_deserializedObjects);
 
                 Array array = Array.CreateInstance(targetType, _deserializedObjects.Count);
 

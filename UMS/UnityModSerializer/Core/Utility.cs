@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,7 +18,39 @@ namespace UMS.Core
         public const string MANIFEST_NAME = "manifest";
 
         private static Regex _endNumberParanthesis = new Regex(@"\(\d+\)$");
-        
+
+        public static Type GetCommonBaseClass(IEnumerable enumerable)
+        {
+            List<Type> types = new List<Type>();
+
+            foreach (object obj in enumerable)
+            {
+                types.Add(obj.GetType());
+            }
+
+            return GetCommonBaseClassUsingParams(types.ToArray());
+        }
+        public static Type GetCommonBaseClassUsingParams(params Type[] types)
+        {
+            if (types.Length == 0)
+                return typeof(object);
+
+            Type ret = types[0];
+
+            for (int i = 1; i < types.Length; ++i)
+            {
+                if (types[i].IsAssignableFrom(ret))
+                    ret = types[i];
+                else
+                {
+                    // This will always terminate when ret == typeof(object)
+                    while (!ret.IsAssignableFrom(types[i]))
+                        ret = ret.BaseType;
+                }
+            }
+
+            return ret;
+        }
         public static byte[] EncodeToPNG(Texture2D texture)
         {
             // Create a temporary RenderTexture of the same size as the texture
