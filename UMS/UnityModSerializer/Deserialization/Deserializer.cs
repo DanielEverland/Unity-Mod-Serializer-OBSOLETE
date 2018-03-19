@@ -106,7 +106,7 @@ namespace UMS.Deserialization
         public static void AddObject(string key, UnityEngine.Object obj)
         {
             if (_keyLookup.ContainsKey(key))
-                throw new ArgumentException("Key already exists");
+                return;
 
             _keyLookup.Add(key, obj);
         }
